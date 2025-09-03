@@ -93,6 +93,8 @@ graph TD
 - Creates resized thumbnail version
 - Generates blurred version for potential use
 
+![Sheet Parts Example](/images/sheet-parts-example.png "Different sheet parts that can be captured")
+
 **Error Handling:**
 - Retries failed screenshots
 - Logs navigation issues
@@ -111,6 +113,14 @@ graph TD
 - Blur intensity controlled by `--blur-factor` parameter
 - Maintains image structure while obscuring content
 - Useful for sensitive or development sheets
+
+### Blur Effect Examples
+
+| Blur Factor | Result |
+|-------------|---------|
+| 0 (No blur) | ![No blur](/images/blur-factor-0.png "No blur applied") |
+| 5 (Default) | ![Light blur](/images/blur-factor-5.png "Light blur applied") |
+| 10 (Medium) | ![Medium blur](/images/blur-factor-10.png "Medium blur applied") |
 
 ### 6. Upload & Assignment
 

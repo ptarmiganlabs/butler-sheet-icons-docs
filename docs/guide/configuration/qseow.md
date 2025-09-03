@@ -80,6 +80,10 @@ For logging into the web interface:
 --logonpwd your-password    # Your web login password
 ```
 
+When Butler Sheet Icons connects to QSEoW using form-based authentication, you'll see a login page like this:
+
+![QSEoW Login Page](/images/qseow-login.png "QSEoW form-based login page")
+
 ## Virtual Proxy Configuration
 
 ### Form-Based Authentication
@@ -107,6 +111,12 @@ If you don't have a form-based virtual proxy:
 3. **Advanced Settings**:
    - Websocket cross origin whitelist: `*` (for development)
    - Additional response headers: (none needed)
+
+Here's how the virtual proxy configuration should look:
+
+![Virtual Proxy Configuration Part 1](/images/virtual-proxy-1.png "Virtual proxy identification settings")
+
+![Virtual Proxy Configuration Part 2](/images/virtual-proxy-2.png "Virtual proxy authentication settings")
 
 ## Server Connection Details
 

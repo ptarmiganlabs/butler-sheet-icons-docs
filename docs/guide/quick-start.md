@@ -57,6 +57,12 @@ butler-sheet-icons.exe qscloud create-sheet-icons ^
 
 4. **Sit back and enjoy** not having to manually screenshot and process those sheet thumbnails! 🎉😎
 
+### Example: QS Cloud Execution
+
+Here's what it looks like when running Butler Sheet Icons for QS Cloud on Windows:
+
+![QS Cloud Execution](/images/qscloud-execution.png "Butler Sheet Icons running for QS Cloud")
+
 ## Quick Start for QSEoW
 
 1. **[Download](https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest)** the binary for your platform
@@ -100,6 +106,12 @@ butler-sheet-icons.exe qscloud create-sheet-icons ^
 ::: tip Note about Windows Authentication
 The `--prefix form` parameter tells Butler Sheet Icons to use a virtual proxy that uses form-based authentication. This is required when running on Windows, as the default Windows authentication doesn't work with the embedded browser.
 :::
+
+### Example: QSEoW Execution
+
+Here's Butler Sheet Icons running on macOS, connecting to a QSEoW server:
+
+![QSEoW Execution](/images/macos-execution.png "Butler Sheet Icons running for QSEoW")
 
 ## What Happens Next?
 

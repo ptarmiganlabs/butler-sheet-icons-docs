@@ -6,7 +6,7 @@ hero:
   text: "Qlik Sense Sheet Thumbnails"
   tagline: "Automatically create thumbnail images based on the actual layout of sheets in Qlik Sense applications"
   image:
-    src: /images/butler-sheet-icons-hero.png
+    src: /images/butler-sheet-icons-logo.png
     alt: Butler Sheet Icons
   actions:
     - theme: brand
@@ -61,6 +61,22 @@ butler-sheet-icons qscloud create-sheet-icons \
   --logonpwd your-password \
   --appid app-id
 ```
+
+## See it in Action
+
+Here's Butler Sheet Icons running on macOS, updating sheet icons in a Qlik Sense Cloud app:
+
+![Butler Sheet Icons Demo](/images/demo-animated.gif "Butler Sheet Icons in action")
+
+## Before and After
+
+Butler Sheet Icons transforms your app overview from plain sheet listings to visual thumbnails:
+
+### Before
+![App Overview Before](/images/app-overview-before.png "App overview without thumbnails")
+
+### After  
+![App Overview After](/images/app-overview-after.png "App overview with generated thumbnails")
 
 ## Supported Platforms
 

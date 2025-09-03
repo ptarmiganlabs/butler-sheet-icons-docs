@@ -65,6 +65,10 @@ butler-sheet-icons qscloud create-sheet-icons \
   --logonpwd your-password
 ```
 
+When Butler Sheet Icons connects to your QS Cloud tenant, you'll see a login page like this:
+
+![QS Cloud Login Page](/images/qscloud-login.png "Qlik Sense Cloud login page")
+
 ### SSO Environments
 
 If your organization uses Single Sign-On (SSO), you may need to use the `--skip-login` option:
