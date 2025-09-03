@@ -115,15 +115,54 @@ The VitePress theme is configured in `docs/.vitepress/config.js`:
 ### Styling
 
 Custom styles can be added via:
+
 - CSS custom properties
 - Component overrides
 - Theme extensions
 
 ## 🚀 Deployment
 
-### GitHub Pages
+### GitHub Pages with Custom Domain (bsi.ptarmiganlabs.com)
 
-The site can be deployed to GitHub Pages using GitHub Actions:
+The site is configured to deploy to GitHub Pages with the custom domain `bsi.ptarmiganlabs.com`.
+
+#### Automated Deployment Scripts
+
+```bash
+# Build and deploy in one command
+npm run deploy
+
+# Or run steps separately
+npm run deploy:build    # Build the site
+npm run deploy:publish  # Deploy to gh-pages branch
+```
+
+#### Manual Setup Required
+
+**1. DNS Configuration**
+
+- Create a CNAME record in your DNS provider:
+  - **Name**: `bsi` (or `bsi.ptarmiganlabs`)
+  - **Value**: `ptarmiganlabs.github.io`
+  - **TTL**: 300 (or your preferred value)
+
+**2. GitHub Repository Settings**
+
+- Go to repository Settings → Pages
+- Set **Source** to "Deploy from a branch"
+- Select **Branch**: `gh-pages` and **Folder**: `/ (root)`
+- Set **Custom domain** to: `bsi.ptarmiganlabs.com`
+- Enable **Enforce HTTPS**
+
+**3. Verify Setup**
+
+- DNS propagation may take up to 24 hours
+- GitHub will verify domain ownership automatically
+- Check that https://bsi.ptarmiganlabs.com loads correctly
+
+#### Alternative: GitHub Actions Deployment
+
+You can also use GitHub Actions for automated deployment:
 
 ```yaml
 name: Deploy Documentation
@@ -151,6 +190,7 @@ jobs:
 ### Netlify
 
 Deploy to Netlify with these settings:
+
 - **Build command**: `npm run docs:build`
 - **Publish directory**: `docs/.vitepress/dist`
 - **Node version**: 18
@@ -158,6 +198,7 @@ Deploy to Netlify with these settings:
 ### Vercel
 
 Deploy to Vercel with:
+
 - **Framework Preset**: VitePress
 - **Root Directory**: Leave empty
 - **Build Command**: `npm run docs:build`
