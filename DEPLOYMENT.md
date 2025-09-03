@@ -55,16 +55,19 @@ After the manual setup is complete:
 ## Troubleshooting
 
 ### DNS Issues
+
 - DNS propagation can take up to 24 hours
 - Use tools like `dig` or online DNS checkers to verify the CNAME record
 - Test with `dig bsi.ptarmiganlabs.com` - should return `ptarmiganlabs.github.io`
 
 ### GitHub Pages Issues
+
 - Check the **Actions** tab for deployment status
 - Ensure the `gh-pages` branch exists and contains the built files
 - Verify the custom domain is correctly configured in repository settings
 
 ### Build Issues
+
 - Run `npm run docs:build` locally to test the build
 - Check that `docs/.vitepress/dist/` contains the CNAME file after building
 - Ensure all dependencies are installed with `npm install`
