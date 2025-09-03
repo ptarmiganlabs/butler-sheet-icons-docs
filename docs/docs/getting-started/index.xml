@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Getting Started on Butler Sheet Icons</title><link>https://butler-sheet-icons.ptarmiganlabs.com/docs/getting-started/</link><description>Recent content in Getting Started on Butler Sheet Icons</description><generator>Hugo</generator><language>en</language><atom:link href="https://butler-sheet-icons.ptarmiganlabs.com/docs/getting-started/index.xml" rel="self" type="application/rss+xml"/><item><title>Installation</title><link>https://butler-sheet-icons.ptarmiganlabs.com/docs/getting-started/installation/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://butler-sheet-icons.ptarmiganlabs.com/docs/getting-started/installation/</guid><description>&lt;h1 id="installation">Installation&lt;/h1>
-&lt;h2 id="most-common-scenario-stand-alone-tool">Most Common Scenario: Stand-alone Tool&lt;/h2>
-&lt;p>Butler Sheet Icons does not need to be installed.&lt;/p>
-&lt;p>It is a standalone, cross-platform executable that is just downloaded and executed.&lt;/p>
-&lt;p>The latest version is always available from the &lt;a href="https://github.com/ptarmiganlabs/butler-sheet-icons/releases">download page&lt;/a>.&lt;/p>
-&lt;blockquote>
-&lt;p>&lt;strong>Tip:&lt;/strong> Make sure to check for new versions regularly - new features are added and security updates applied.&lt;/p>&lt;/blockquote>
-&lt;h2 id="alternative-docker-container">Alternative: Docker Container&lt;/h2>
-&lt;p>The Docker image of BSI is intended to be used on Linux, macOS, or in a Kubernetes cluster.&lt;/p></description></item></channel></rss>
