@@ -168,6 +168,14 @@ butler-sheet-icons browser list-installed
    --exclude-sheet-status published public
    ```
 
+### QS Cloud Access Denied Example
+
+When trying to update public or published sheets in a published QS Cloud app, you'll see an error like this:
+
+![QS Cloud Access Denied](/images/qscloud-access-denied.png "Access denied error when updating protected sheets in QS Cloud")
+
+**Solution**: Use the `--exclude-sheet-status public published` option for published apps.
+
 ## Browser Issues
 
 ### Browser Installation Problems
