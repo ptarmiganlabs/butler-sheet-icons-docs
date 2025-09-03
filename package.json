@@ -1,0 +1,23 @@
+{
+  "name": "butler-sheet-icons-docs",
+  "version": "1.0.0",
+  "description": "Documentation site for Butler Sheet Icons",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "qlik-sense",
+    "butler",
+    "sheet-icons",
+    "thumbnails",
+    "documentation"
+  ],
+  "author": "Ptarmigan Labs",
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
