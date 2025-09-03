@@ -1,0 +1,36 @@
+{
+  "name": "butler-sheet-icons-docs",
+  "version": "1.0.0",
+  "description": "Documentation site for Butler Sheet Icons",
+  "main": "index.js",
+  "scripts": {
+    "build": "hugo --gc --minify --theme ananke --destination docs",
+    "dev": "hugo server --buildDrafts --bind=0.0.0.0 --port=1313 --theme ananke",
+    "start": "hugo server --bind=0.0.0.0 --port=1313 --theme ananke",
+    "clean": "rm -rf docs public",
+    "test": "echo \"No tests specified\" && exit 0",
+    "install-hugo": "wget -O /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v0.146.0/hugo_extended_0.146.0_Linux-64bit.tar.gz && tar -xzf /tmp/hugo.tar.gz -C /tmp && chmod +x /tmp/hugo && export PATH=\"/tmp:$PATH\"",
+    "submodules": "git submodule update --init --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ptarmiganlabs/butler-sheet-icons-docs.git"
+  },
+  "keywords": [
+    "qlik-sense",
+    "butler",
+    "documentation",
+    "hugo"
+  ],
+  "author": "Ptarmigan Labs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ptarmiganlabs/butler-sheet-icons-docs/issues"
+  },
+  "homepage": "https://github.com/ptarmiganlabs/butler-sheet-icons-docs#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "postcss-cli": "^10.1.0"
+  }
+}

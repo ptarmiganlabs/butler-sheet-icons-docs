@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://butler-sheet-icons.ptarmiganlabs.com/sitemap.xml
