@@ -5,12 +5,14 @@ Are you the impatient kind and just want to try it out? Here's what you need to 
 ## Prerequisites
 
 For **Qlik Sense Cloud**:
+
 1. Your Qlik Sense Cloud tenant URL
 2. An [API key](https://qlik.dev/authenticate/api-key/generate-your-first-api-key) for Qlik Sense Cloud
 3. Your user ID and password for logging into the web UI
 4. The ID of the app you want to update
 
 For **Qlik Sense Enterprise on Windows (QSEoW)**:
+
 1. Access to the QMC to export certificates
 2. Your QSEoW server details
 3. API and login credentials
@@ -44,15 +46,6 @@ For **Qlik Sense Enterprise on Windows (QSEoW)**:
   --appid your-app-id
 ```
 
-```cmd [Windows CMD]
-butler-sheet-icons.exe qscloud create-sheet-icons ^
-  --tenanturl your-tenant.region.qlikcloud.com ^
-  --apikey your-api-key ^
-  --logonuserid your-user-id ^
-  --logonpwd your-password ^
-  --appid your-app-id
-```
-
 :::
 
 4. **Sit back and enjoy** not having to manually screenshot and process those sheet thumbnails! 🎉😎
@@ -67,7 +60,7 @@ Here's what it looks like when running Butler Sheet Icons for QS Cloud on Window
 
 1. **[Download](https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest)** the binary for your platform
 
-2. **Export certificates** from the QMC ([instructions](https://help.qlik.com/en-US/sense-admin/February2022/Subsystems/DeployAdministerQSE/Content/Sense_DeployAdminister/QSEoW/Administer_QSEoW/Managing_QSEoW/export-certificates.htm))
+2. **Export certificates** from the QMC ([instructions](https://help.qlik.com/en-US/sense-admin/May2025/Subsystems/DeployAdministerQSE/Content/Sense_DeployAdminister/QSEoW/Administer_QSEoW/Managing_QSEoW/export-certificates.htm))
 
 3. **Place certificates** in a `cert` directory relative to where you'll run the tool
 

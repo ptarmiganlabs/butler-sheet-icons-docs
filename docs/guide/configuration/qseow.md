@@ -20,13 +20,8 @@ QSEoW uses certificate-based authentication for API access. You must export cert
 
 1. **Open QMC**: Navigate to your QSEoW server's QMC
 2. **Go to Certificates**: Navigate to "Certificates" section
-3. **Export Machine Certificate**: 
-   - Click "Export certificates" in the action bar
-   - Choose "Machine certificate"
-   - Export as Windows format
-   - Download the exported ZIP file
-
-4. **Extract Files**: Extract the ZIP to get:
+3. **Export Certificate**: Follow instructions on [Qlik help site](https://help.qlik.com/en-US/sense-admin/November2024/Subsystems/DeployAdministerQSE/Content/Sense_DeployAdminister/QSEoW/Administer_QSEoW/Managing_QSEoW/export-certificates.htm)
+4. **Extract Files**: You need these files:
    - `client.pem` - Public certificate
    - `client_key.pem` - Private key
 
@@ -34,7 +29,7 @@ QSEoW uses certificate-based authentication for API access. You must export cert
 
 Place certificates in the default location:
 
-```
+```text
 your-working-directory/
 ├── butler-sheet-icons.exe
 └── cert/
@@ -50,7 +45,7 @@ butler-sheet-icons qseow create-sheet-thumbnails \
   --certkeyfile /path/to/client_key.pem
 ```
 
-::: tip Certificate Security
+::: danger Certificate Security
 Keep certificates secure and never commit them to source control. Use appropriate file permissions to restrict access.
 :::
 
@@ -58,29 +53,25 @@ Keep certificates secure and never commit them to source control. Use appropriat
 
 ### API Authentication
 
-QSEoW API access requires:
+Use by BSI when accessing the QSEoW APIs.
+These can actually be anything as certificates will be used for the actual authentication, but it is recommended to use one of the standard Sense internal accounts, for example `Internal\sa_api`.
 
 ```bash
---apiuserdir Internal        # User directory (usually 'Internal')
---apiuserid sa_api          # Service account with API permissions
+--apiuserdir Internal        # User directory to use when connecting to Sense APIs (usually 'Internal')
+--apiuserid sa_api           # User ID to use when connecting to Sense APIs
 ```
 
-Common user directories:
-- `Internal` - Default QSEoW directory
-- `DOMAIN` - Active Directory domain
-- Custom directory names
+### Web UI Authentication
 
-### Web UI Authentication  
-
-For logging into the web interface:
+Used by BSI when logging in via QSEoW's web interface:
 
 ```bash
---logonuserdir Internal     # User directory for web login
+--logonuserdir MYCOMPANYDIR     # User directory for web login. Often the same as the Active Directory (AD) domain.
 --logonuserid your-username # Your web login username
 --logonpwd your-password    # Your web login password
 ```
 
-When Butler Sheet Icons connects to QSEoW using form-based authentication, you'll see a login page like this:
+When Butler Sheet Icons connects to QSEoW using form-based authentication, you'll see a login page like this (if `--headless false`):
 
 ![QSEoW Login Page](/images/qseow-login.png "QSEoW form-based login page")
 
@@ -88,22 +79,27 @@ When Butler Sheet Icons connects to QSEoW using form-based authentication, you'l
 
 ### Form-Based Authentication
 
-Butler Sheet Icons requires form-based authentication (not Windows authentication):
+When running Butler Sheet Icons on Windows form-based authentication must be used, otherwise the browser will default to Windows authentication.  
+Adding the following option will tell BSI to use a virtual proxy called "form", which must exist in Sense and be configured as such.
 
 ```bash
 --prefix form              # Use virtual proxy with form authentication
 ```
+
+When using Butler Sheet Icons on operating systems other than Windows (that do not default to Windows authentication), you can leave out the `--prefix form` option.
 
 ### Setting Up Form Virtual Proxy
 
 If you don't have a form-based virtual proxy:
 
 1. **Create Virtual Proxy** in QMC:
+
    - Prefix: `form`
    - Description: `Form-based authentication for tools`
    - Session cookie header name: `X-Qlik-Session-form`
 
 2. **Authentication Configuration**:
+
    - Authentication method: `Ticket`
    - Windows authentication pattern: `Form`
    - Anonymous access mode: `No anonymous user`
@@ -151,12 +147,13 @@ For development/testing environments:
 **Critical**: You must specify your QSEoW version for compatibility:
 
 ```bash
---sense-version 2024-May          # Current version
+--sense-version 2024-May          # Use the version used in your Qlik Sense environment
 ```
 
 Available versions:
+
 - `2024-Nov` - November 2024 release
-- `2024-May` - May 2024 release  
+- `2024-May` - May 2024 release
 - `2023-Nov` - November 2023 release
 - `2023-Aug` - August 2023 release
 - `2023-May` - May 2023 release
@@ -187,10 +184,7 @@ By default, BSI uses a library called "Butler sheet thumbnails":
 1. **Open QMC**: Navigate to Content Libraries
 2. **Create New**: Click "Create new"
 3. **Configure**:
-   - Name: `Butler sheet thumbnails`
-   - Type: `Content library`
-   - Path: Choose appropriate file system path
-4. **Permissions**: Ensure API user has write access
+   - Name: `My Custom Library`
 
 ### Custom Content Library
 
@@ -219,12 +213,13 @@ Update all apps with a specific tag:
 To set up tag-based updates:
 
 1. **Create Tag** in QMC:
-   - Name: `updateSheetThumbnails` 
+
+   - Name: `updateSheetThumbnails`
    - Description: `Apps that should get updated sheet icons`
 
 2. **Tag Apps**: Apply the tag to target apps
 
-3. **Run BSI**: Use the `--qliksensetag` option
+3. **Run BSI**: Use the `--qliksensetag updateSheetThumbnails` option
 
 ## Complete Configuration Example
 
@@ -254,11 +249,25 @@ export BSI_QSEOW_CST_SENSE_VERSION="2024-May"
 
 ### Command Execution
 
-```bash
-# Minimal command with environment variables
-butler-sheet-icons qseow create-sheet-thumbnails
+Minimal command with environment variables
 
-# Full command example
+::: code-group
+
+```bash [Bash]
+butler-sheet-icons qseow create-sheet-thumbnails
+```
+
+```powershell [PowerShell]
+butler-sheet-icons qseow create-sheet-thumbnails
+```
+
+:::
+
+Full command example
+
+::: code-group
+
+```bash [Bash]
 butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -274,6 +283,25 @@ butler-sheet-icons qseow create-sheet-thumbnails \
   --includesheetpart 2 \
   --headless true
 ```
+
+```powershell [PowerShell]
+butler-sheet-icons qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --apiuserdir Internal `
+  --apiuserid sa_api `
+  --logonuserdir Internal `
+  --logonuserid your-username `
+  --logonpwd your-password `
+  --prefix form `
+  --contentlibrary "Butler sheet thumbnails" `
+  --sense-version 2024-May `
+  --pagewait 5 `
+  --includesheetpart 2 `
+  --headless true
+```
+
+:::
 
 ## Advanced Configuration
 
@@ -343,21 +371,25 @@ butler-sheet-icons qseow create-sheet-thumbnails \
 ### Common Issues
 
 **Certificate Errors**:
+
 - Verify certificates are correctly exported and placed
 - Check file permissions on certificate files
 - Ensure certificates haven't expired
 
 **Authentication Failures**:
+
 - Verify user credentials and directories
 - Check virtual proxy configuration
 - Ensure service account has necessary permissions
 
 **Version Compatibility**:
+
 - Always specify correct `--sense-version`
 - Check QSEoW version in QMC → About
 - Update BSI if using newer QSEoW version
 
 **Content Library Issues**:
+
 - Ensure library exists before running BSI
 - Verify write permissions for API user
 - Check library path accessibility

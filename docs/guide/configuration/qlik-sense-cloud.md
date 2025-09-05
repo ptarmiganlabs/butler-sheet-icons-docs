@@ -18,21 +18,23 @@ Butler Sheet Icons uses API keys to access QS Cloud APIs for app information and
 ### Creating an API Key
 
 1. **Navigate to API Keys**:
+
    - Log into your Qlik Sense Cloud tenant
-   - Go to your profile menu → Developer Portal
+   - Go to your profile menu → Settings. You should now be looking at your personal profile page
    - Select "API Keys" from the sidebar
 
 2. **Generate New Key**:
+
    - Click "Generate new API key"
    - Provide a descriptive name (e.g., "Butler Sheet Icons")
-   - Set appropriate expiration date
+   - Set appropriate expiration timeframe
    - Copy the generated key immediately (you won't see it again!)
 
 3. **Verify Permissions**:
    - Ensure your user account has access to the apps you want to update
    - For published apps, you can only update private sheet icons
 
-::: tip API Key Security
+::: danger API Key Security
 Store your API key securely using environment variables or secure secret management systems. Never commit API keys to source code.
 :::
 
@@ -41,11 +43,13 @@ Store your API key securely using environment variables or secure secret managem
 You can provide the API key in several ways:
 
 **Command Line**:
+
 ```bash
 butler-sheet-icons qscloud create-sheet-icons --apikey your-api-key-here
 ```
 
 **Environment Variable** (recommended):
+
 ```bash
 export BSI_QSCLOUD_CST_APIKEY="your-api-key-here"
 butler-sheet-icons qscloud create-sheet-icons
@@ -87,29 +91,23 @@ The `--skip-login` option is experimental and may not work with all SSO configur
 
 ### Tenant URL Format
 
-Your tenant URL can be specified in multiple formats:
+When using Butler Sheet Icons, use the tenant URL as you see it in your browser when accessing Qlik Sense Cloud.
+
+For example:
 
 ```bash
 # Full URL with protocol
 --tenanturl https://your-tenant.region.qlikcloud.com
 
-# Just the hostname
---tenanturl your-tenant.region.qlikcloud.com
-
-# Common examples
+# For example
 --tenanturl mytenant.eu.qlikcloud.com
---tenanturl company.us.qlikcloud.com
---tenanturl demo.ap.qlikcloud.com
 ```
 
-### Region-Specific Considerations
-
-Different Qlik Cloud regions may have slight variations:
-- **US**: `tenant.us.qlikcloud.com`
-- **EU**: `tenant.eu.qlikcloud.com`
-- **AP**: `tenant.ap.qlikcloud.com`
-
 ## App Selection Methods
+
+::: tip Using Environment Variables to provide default values
+The examples below assume environment variables have been set for all required parameters.
+:::
 
 ### Single App Update
 
@@ -129,36 +127,12 @@ butler-sheet-icons qscloud create-sheet-icons \
   --collectionid your-collection-id
 ```
 
-To find collection IDs, use:
+To find collection IDs in a specific tenant, use:
 
 ```bash
 butler-sheet-icons qscloud list-collections \
   --tenanturl your-tenant \
   --apikey your-api-key
-```
-
-## Sheet Permissions
-
-Understanding QS Cloud sheet permissions is crucial for successful updates:
-
-### Published Apps
-- ✅ **Private sheets**: Can be updated
-- ❌ **Published sheets**: Cannot be updated
-- ❌ **Public sheets**: Cannot be updated
-
-### Unpublished Apps
-- ✅ **Private sheets**: Can be updated
-- ✅ **Published sheets**: Can be updated
-- ✅ **Public sheets**: Can be updated
-
-### Recommended Exclusions
-
-For published apps, exclude sheets you cannot update:
-
-```bash
-butler-sheet-icons qscloud create-sheet-icons \
-  --exclude-sheet-status published public \
-  --appid your-published-app-id
 ```
 
 ## Complete Configuration Example
@@ -185,7 +159,7 @@ export BSI_QSCLOUD_CST_COLLECTION_ID="collection-uuid"
 # With environment variables set, minimal command needed
 butler-sheet-icons qscloud create-sheet-icons
 
-# Or with specific options
+# Or with specific options that will override their environment variable counterparts
 butler-sheet-icons qscloud create-sheet-icons \
   --pagewait 7 \
   --includesheetpart 2 \
@@ -240,19 +214,27 @@ butler-sheet-icons qscloud create-sheet-icons \
 ### Common Issues
 
 **Login Failures**:
+
 - Verify credentials are correct
 - Check if MFA is required (not currently supported)
 - Try `--skip-login` for SSO environments
 
 **API Key Issues**:
+
 - Ensure key hasn't expired
 - Verify key has necessary permissions
 - Check tenant URL is correct
 
 **Permission Errors**:
+
 - Use appropriate `--exclude-sheet-status` options
 - Verify your user has access to target apps
 - Check app publication status
+
+**The general troubleshooting approach**:
+
+- Use `--headless false` to see the embedded browser that is used for login and app access.
+- Seeing what is shown in the browser usually helps in understanding what is causing the issue.
 
 ### Debug Mode
 
