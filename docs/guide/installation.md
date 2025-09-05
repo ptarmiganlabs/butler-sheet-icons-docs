@@ -10,23 +10,26 @@ The easiest and most common way to use Butler Sheet Icons is with the pre-built 
 
 Visit the [GitHub releases page](https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest) and download the appropriate binary for your platform:
 
-- **Windows**: `butler-sheet-icons-win.exe` (signed with commercial certificate)
-- **macOS**: `butler-sheet-icons-macos` (notarized by Apple)
+- **Windows**: `butler-sheet-icons-win.exe`
+- **macOS**: `butler-sheet-icons-macos`
 - **Linux**: `butler-sheet-icons-linux`
 
 ### Platform-Specific Notes
 
 #### Windows
+
 - The binary is digitally signed with a commercial certificate from Certum
 - Windows may show a security warning on first run - this is normal
 - No additional dependencies required
 
 #### macOS
+
 - The binary is notarized by Apple's standard process
 - macOS may show a warning on first run - allow it in System Preferences
 - Works on both Intel and Apple Silicon Macs
 
 #### Linux
+
 - Compatible with most Linux distributions
 - May require setting executable permissions: `chmod +x butler-sheet-icons-linux`
 - No additional dependencies required
@@ -79,7 +82,6 @@ docker run -it --name butler-sheet-icons \
 Create a `docker-compose.yml` file:
 
 ```yaml
-version: '3.8'
 services:
   butler-sheet-icons:
     image: ptarmiganlabs/butler-sheet-icons:latest
@@ -105,12 +107,14 @@ For developers, contributors, or when you need to modify the tool. Requires Node
 ### Installation Steps
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/ptarmiganlabs/butler-sheet-icons.git
    cd butler-sheet-icons
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
@@ -160,10 +164,12 @@ your-working-directory/
 For Qlik Sense Enterprise on Windows, you'll need certificates:
 
 1. **Export from QMC**:
+
    - Follow [Qlik's certificate export guide](https://help.qlik.com/en-US/sense-admin/February2022/Subsystems/DeployAdministerQSE/Content/Sense_DeployAdminister/QSEoW/Administer_QSEoW/Managing_QSEoW/export-certificates.htm)
    - Export `client.pem` and `client_key.pem`
 
 2. **Place in cert directory**:
+
    ```
    cert/
    ├── client.pem
@@ -175,67 +181,6 @@ For Qlik Sense Enterprise on Windows, you'll need certificates:
    --certfile /path/to/client.pem \
    --certkeyfile /path/to/client_key.pem
    ```
-
-## 🏗️ Installation for CI/CD
-
-### GitHub Actions
-
-```yaml
-name: Update Sheet Icons
-on:
-  workflow_dispatch:
-
-jobs:
-  update-icons:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Butler Sheet Icons
-        run: |
-          wget https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest/download/butler-sheet-icons-linux
-          chmod +x butler-sheet-icons-linux
-      
-      - name: Update Thumbnails
-        env:
-          BSI_API_KEY: ${{ secrets.QLIK_API_KEY }}
-          BSI_TENANT_URL: ${{ secrets.QLIK_TENANT_URL }}
-        run: |
-          ./butler-sheet-icons-linux qscloud create-sheet-icons \
-            --tenanturl $BSI_TENANT_URL \
-            --apikey $BSI_API_KEY \
-            --appid ${{ github.event.inputs.app_id }}
-```
-
-### Jenkins
-
-```groovy
-pipeline {
-    agent any
-    
-    stages {
-        stage('Download Tool') {
-            steps {
-                sh '''
-                    wget https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest/download/butler-sheet-icons-linux
-                    chmod +x butler-sheet-icons-linux
-                '''
-            }
-        }
-        
-        stage('Update Icons') {
-            steps {
-                withCredentials([string(credentialsId: 'qlik-api-key', variable: 'API_KEY')]) {
-                    sh '''
-                        ./butler-sheet-icons-linux qscloud create-sheet-icons \
-                            --tenanturl ${QLIK_TENANT} \
-                            --apikey ${API_KEY} \
-                            --appid ${APP_ID}
-                    '''
-                }
-            }
-        }
-    }
-}
-```
 
 ## 🔍 Verification
 
@@ -270,6 +215,7 @@ butler-sheet-icons browser install --browser chrome
 ### Common Issues
 
 #### Binary Not Found
+
 ```bash
 # Make sure it's executable (Linux/macOS)
 chmod +x butler-sheet-icons-linux
@@ -285,12 +231,14 @@ chmod +x butler-sheet-icons-linux
 **macOS**: System Preferences → Security & Privacy → Allow anyway
 
 #### Docker Permission Issues
+
 ```bash
 # Fix volume mount permissions
 sudo chown -R $(whoami) ./img ./cert
 ```
 
 #### Node.js Version Issues
+
 ```bash
 # Check Node.js version
 node --version
@@ -310,4 +258,4 @@ Now that Butler Sheet Icons is installed:
 
 ---
 
-*Having installation issues? Check our [Troubleshooting Guide](/guide/troubleshooting) or open an issue on [GitHub](https://github.com/ptarmiganlabs/butler-sheet-icons/issues).*
+_Having installation issues? Check our [Troubleshooting Guide](/guide/troubleshooting) or open an issue on [GitHub](https://github.com/ptarmiganlabs/butler-sheet-icons/issues)._

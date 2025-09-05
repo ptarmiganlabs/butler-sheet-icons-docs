@@ -1,0 +1,80 @@
+name: Documentation Improvement
+description: Suggest improvements to existing documentation
+title: '[Enhancement]: '
+labels: ['enhancement', 'documentation']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting ways to improve the Butler Sheet Icons documentation! Your feedback helps make it better for everyone.
+
+  - type: dropdown
+    id: improvement-type
+    attributes:
+      label: Type of Improvement
+      description: What kind of improvement are you suggesting?
+      options:
+        - Add missing information
+        - Clarify existing content
+        - Add examples
+        - Improve organization/navigation
+        - Add visual aids (diagrams, screenshots)
+        - Update outdated content
+        - Accessibility improvements
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: page-url
+    attributes:
+      label: Page URL or Section
+      description: Which page or section could be improved? (e.g., /guide/quick-start or "Browser Management")
+      placeholder: /guide/quick-start
+
+  - type: textarea
+    id: improvement-description
+    attributes:
+      label: Improvement Description
+      description: Describe what could be improved and why
+      placeholder: The installation guide could benefit from...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-solution
+    attributes:
+      label: Suggested Solution
+      description: How would you improve this? What would you add or change?
+      placeholder: I suggest adding a section that explains...
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: What specific use case or scenario would this improvement help with?
+      placeholder: This would help users who are...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this improvement?
+      options:
+        - Low - Nice to have
+        - Medium - Would be helpful
+        - High - Important for user success
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verification
+      description: Please confirm
+      options:
+        - label: I have searched existing issues for similar suggestions
+          required: true
+        - label: This suggestion is about documentation (not the Butler Sheet Icons tool itself)
+          required: true

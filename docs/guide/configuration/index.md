@@ -17,6 +17,7 @@ For on-premises installations. Requires certificate-based authentication.
 ## Common Configuration
 
 Both environments support:
+
 - Environment variables for secure credential storage
 - Browser configuration and management
 - Image output customization
