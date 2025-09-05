@@ -18,7 +18,7 @@ Update sheet icons for a specific QSEoW app:
   --logonuserid your-username \
   --logonpwd your-password \
   --prefix form \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   --contentlibrary "Butler sheet thumbnails"
 ```
 
@@ -32,7 +32,7 @@ Update sheet icons for a specific QSEoW app:
   --logonuserid your-username `
   --logonpwd your-password `
   --prefix form `
-  --sense-version 2024-May `
+  --sense-version 2024-Nov `
   --contentlibrary "Butler sheet thumbnails"
 ```
 
@@ -61,7 +61,7 @@ Update all apps with a specific tag, applying advanced filtering:
   --logonuserid your-username \
   --logonpwd your-password \
   --prefix form \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   --qliksensetag "updateSheetThumbnails" \
   --exclude-sheet-tag "excludeFromThumbnails" \
   --exclude-sheet-number 1 2 \
@@ -82,6 +82,7 @@ Update all apps with a specific tag, applying advanced filtering:
 For security and reusability, use environment variables:
 
 ### PowerShell Setup
+
 ```powershell
 # Set environment variables for QSEoW
 $env:BSI_QSEOW_CST_HOST = 'qlik-server.company.com'
@@ -91,7 +92,7 @@ $env:BSI_QSEOW_CST_LOGON_USER_DIR = 'Internal'
 $env:BSI_QSEOW_CST_LOGON_USER_ID = 'your-username'
 $env:BSI_QSEOW_CST_LOGON_PWD = 'your-password'
 $env:BSI_QSEOW_CST_PREFIX = 'form'
-$env:BSI_QSEOW_CST_SENSE_VERSION = '2024-May'
+$env:BSI_QSEOW_CST_SENSE_VERSION = '2024-Nov'
 $env:BSI_QSEOW_CST_CONTENT_LIBRARY = 'Butler sheet thumbnails'
 
 # Run with minimal command line parameters
@@ -99,6 +100,7 @@ $env:BSI_QSEOW_CST_CONTENT_LIBRARY = 'Butler sheet thumbnails'
 ```
 
 ### Bash Setup
+
 ```bash
 # Set environment variables for QSEoW
 export BSI_QSEOW_CST_HOST='qlik-server.company.com'
@@ -108,7 +110,7 @@ export BSI_QSEOW_CST_LOGON_USER_DIR='Internal'
 export BSI_QSEOW_CST_LOGON_USER_ID='your-username'
 export BSI_QSEOW_CST_LOGON_PWD='your-password'
 export BSI_QSEOW_CST_PREFIX='form'
-export BSI_QSEOW_CST_SENSE_VERSION='2024-May'
+export BSI_QSEOW_CST_SENSE_VERSION='2024-Nov'
 export BSI_QSEOW_CST_CONTENT_LIBRARY='Butler sheet thumbnails'
 
 # Run with minimal command line parameters
@@ -120,6 +122,7 @@ export BSI_QSEOW_CST_CONTENT_LIBRARY='Butler sheet thumbnails'
 Complex filtering scenarios for enterprise environments:
 
 ### Exclude Development Sheets
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
@@ -130,7 +133,7 @@ Complex filtering scenarios for enterprise environments:
   --logonuserid your-username \
   --logonpwd your-password \
   --prefix form \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   --exclude-sheet-status private \
   --exclude-sheet-tag "development" "test" \
   --exclude-sheet-title "Debug" "Test Sheet" "Sandbox" \
@@ -138,6 +141,7 @@ Complex filtering scenarios for enterprise environments:
 ```
 
 ### Blur Sensitive Content
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
@@ -162,38 +166,42 @@ Complex filtering scenarios for enterprise environments:
 Control which part of sheets to include in thumbnails:
 
 ### Sheet Content Only
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --includesheetpart 1 \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   # ... other parameters
 ```
 
 ### Content + Title
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --includesheetpart 2 \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   # ... other parameters
 ```
 
 ### Full Page
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --includesheetpart 4 \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   # ... other parameters
 ```
 
 ## Certificate Management
 
 ### Default Certificate Location
+
 ```bash
 # Expected directory structure:
 your-project/
@@ -207,37 +215,40 @@ your-project/
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ### Custom Certificate Paths
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --certfile /path/to/custom/client.pem \
   --certkeyfile /path/to/custom/client_key.pem \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ## Content Library Management
 
 ### Using Default Library
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --contentlibrary "Butler sheet thumbnails" \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ### Custom Content Library
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --contentlibrary "My Custom Thumbnails" \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ## Removing Sheet Icons
@@ -268,15 +279,17 @@ Remove from all apps with a tag:
 
 ## Version-Specific Examples
 
-### QSEoW 2024-May
+### QSEoW 2024-Nov
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   # ... other parameters
 ```
 
 ### QSEoW 2023-Nov
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
@@ -285,6 +298,7 @@ Remove from all apps with a tag:
 ```
 
 ### Legacy Versions
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
@@ -295,78 +309,88 @@ Remove from all apps with a tag:
 ## Development and Testing
 
 ### Debug Mode with Visible Browser
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --headless false \
   --loglevel debug \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ### Test with Single Sheet
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --exclude-sheet-number 2 3 4 5 6 7 8 9 10 \
-  --sense-version 2024-May \
+  --sense-version 2024-Nov \
   --pagewait 10
 ```
 
 ## Network Configuration
 
 ### Custom Ports
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --port 8443 \
   --qrsport 4242 \
   --engineport 4747 \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ### Non-secure Connection (Development)
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --secure false \
   --port 80 \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ### Self-signed Certificates
+
 ```bash
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --rejectUnauthorized false \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ## Common Error Scenarios
 
 ### Certificate Issues
+
 ```
 Error: Unable to load certificate files
 ```
 
-**Solution**: 
+**Solution**:
+
 1. Verify certificate files exist in `./cert/` directory
 2. Check file permissions
 3. Ensure certificates were exported correctly from QMC
 
 ### Authentication Failures
+
 ```
 Error: Authentication failed
 ```
 
 **Solutions**:
+
 1. Verify user credentials are correct
 2. Check user has appropriate permissions
 3. Ensure virtual proxy is configured for form authentication
 4. Try `--prefix form` parameter
 
 ### Version Mismatch
+
 ```
 Error: Could not navigate to sheet
 ```
@@ -374,6 +398,7 @@ Error: Could not navigate to sheet
 **Solution**: Verify `--sense-version` matches your QSEoW installation
 
 ### Content Library Missing
+
 ```
 Error: Content library not found
 ```

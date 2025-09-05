@@ -20,6 +20,7 @@ butler-sheet-icons <platform> <command> [options]
 | `qscloud` | `remove-sheet-icons` | Remove thumbnails from QS Cloud apps |
 | `qscloud` | `list-collections` | List available collections |
 | `qseow` | `create-sheet-thumbnails` | Create thumbnails for QSEoW apps |
+| `qseow` | `create-sheet-icons` | Alias of create-sheet-thumbnails |
 | `qseow` | `remove-sheet-icons` | Remove thumbnails from QSEoW apps |
 | `browser` | `install` | Install browser for BSI |
 | `browser` | `list-installed` | Show installed browsers |
@@ -200,7 +201,7 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | `--logonuserdir` | Login user directory | `Internal` |
 | `--logonuserid` | Login user ID | `username` |
 | `--logonpwd` | Login password | `password` |
-| `--sense-version` | QSEoW version | `2024-May` |
+| `--sense-version` | QSEoW version | `2024-Nov` |
 
 #### App Selection (choose one)
 
@@ -218,7 +219,7 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | `--qrsport` | QRS port | `4242` | `--qrsport 4243` |
 | `--engineport` | Engine port | `4747` | `--engineport 4748` |
 | `--prefix` | Virtual proxy prefix | `""` | `--prefix form` |
-| `--rejectUnauthorized` | SSL verification | `false` | `--rejectUnauthorized true` |
+| `--rejectUnauthorized` | Ignore cert mismatch | `false` | `--rejectUnauthorized true` |
 
 #### Certificate Options
 
@@ -232,6 +233,9 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--contentlibrary` | Target content library | `Butler sheet thumbnails` |
+| `--includesheetpart` | Screenshot area (1-4) | `1` |
+| `--pagewait` | Seconds to wait per sheet | `5` |
+| `--imagedir` | Screenshot directory | `./img` |
 
 #### Sheet Filtering
 
@@ -250,7 +254,7 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | `--blur-sheet-title` | Blur by title | `--blur-sheet-title "Financial Data"` |
 | `--blur-sheet-status` | Blur by status | `--blur-sheet-status published` |
 | `--blur-sheet-tag` | Blur by tag | `--blur-sheet-tag "sensitive"` |
-| `--blur-factor` | Blur intensity | `--blur-factor 10` |
+| `--blur-factor` | Blur intensity (0-100) | `--blur-factor 10` |
 
 #### Complete Example
 
@@ -266,6 +270,8 @@ butler-sheet-icons qseow create-sheet-thumbnails \
   --prefix form \
   --contentlibrary "Butler sheet thumbnails" \
   --sense-version 2024-May \
+  --browser chrome \
+  --browser-version latest \
   --secure true \
   --includesheetpart 2 \
   --exclude-sheet-tag "excludeFromUpdate" \

@@ -147,7 +147,7 @@ For development/testing environments:
 **Critical**: You must specify your QSEoW version for compatibility:
 
 ```bash
---sense-version 2024-May          # Use the version used in your Qlik Sense environment
+--sense-version 2024-Nov          # Use the version used in your Qlik Sense environment
 ```
 
 Available versions:
@@ -163,6 +163,10 @@ Available versions:
 
 ::: warning Version Compatibility
 Using the wrong version parameter may cause login or navigation failures. Always specify the correct version for your QSEoW installation.
+:::
+
+::: tip Command alias
+You can use either `create-sheet-thumbnails` or `create-sheet-icons` with QSEoW — they are equivalent.
 :::
 
 ## Content Library Setup
@@ -244,7 +248,7 @@ export BSI_QSEOW_CST_QLIKSENSE_TAG="updateSheetThumbnails"
 
 # Configuration
 export BSI_QSEOW_CST_CONTENT_LIBRARY="Butler sheet thumbnails"
-export BSI_QSEOW_CST_SENSE_VERSION="2024-May"
+export BSI_QSEOW_CST_SENSE_VERSION="2024-Nov"
 ```
 
 ### Command Execution
@@ -278,7 +282,7 @@ butler-sheet-icons qseow create-sheet-thumbnails \
   --logonpwd your-password \
   --prefix form \
   --contentlibrary "Butler sheet thumbnails" \
-  --sense-version 2024-May \
+   --sense-version 2024-Nov \
   --pagewait 5 \
   --includesheetpart 2 \
   --headless true
@@ -295,7 +299,7 @@ butler-sheet-icons qseow create-sheet-thumbnails `
   --logonpwd your-password `
   --prefix form `
   --contentlibrary "Butler sheet thumbnails" `
-  --sense-version 2024-May `
+   --sense-version 2024-Nov `
   --pagewait 5 `
   --includesheetpart 2 `
   --headless true

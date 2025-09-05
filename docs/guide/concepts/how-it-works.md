@@ -5,8 +5,9 @@ Butler Sheet Icons automates the process of creating sheet thumbnails by mimicki
 ## The Challenge
 
 Creating meaningful sheet thumbnails manually involves:
+
 1. Opening each sheet in a browser
-2. Taking screenshots 
+2. Taking screenshots
 3. Cropping and resizing images
 4. Uploading images to Qlik Sense
 5. Assigning images to sheets
@@ -44,17 +45,20 @@ graph TD
 ### 1. Initialization & Authentication
 
 **Browser Setup:**
+
 - Downloads and installs headless browser if needed
 - Configures browser with appropriate settings
 - Sets up network interception for debugging
 
 **Authentication:**
-- **QS Cloud**: Uses API key + web login credentials
-- **QSEoW**: Uses certificates for API + web credentials for UI
+
+- **QS Cloud**: Uses API key for API access + web login credentials for UI interaction
+- **QSEoW**: Uses certificates for API access + web credentials for UI interaction
 
 ### 2. App Discovery
 
 **API-Driven Discovery:**
+
 - Queries Qlik Sense APIs to find target applications
 - Supports multiple selection methods:
   - Single app by ID
@@ -62,6 +66,7 @@ graph TD
   - Multiple apps by collection (QS Cloud)
 
 **Filtering Applied:**
+
 - Validates app accessibility
 - Checks user permissions
 - Applies any app-level exclusions
@@ -69,6 +74,7 @@ graph TD
 ### 3. Sheet Analysis
 
 **For Each Target App:**
+
 - Uses Qlik Sense Engine API to enumerate sheets
 - Retrieves sheet metadata (title, status, tags, position)
 - Applies sheet-level filtering rules:
@@ -79,15 +85,17 @@ graph TD
 ### 4. Screenshot Capture
 
 **Browser Navigation:**
+
 - Navigates to each sheet using web interface
 - Waits for specified time (`--pagewait`) for sheet rendering
 - Handles complex sheets with longer load times
 
 **Screenshot Process:**
+
 - Captures screenshot of specified sheet area:
   - Area 1: Main sheet content only
   - Area 2: Sheet content + title
-  - Area 3: Sheet content + title + selection bar  
+  - Area 3: Sheet content + title + selection bar
   - Area 4: Full page including menu bar
 - Saves original screenshot to disk
 - Creates resized thumbnail version
@@ -96,6 +104,7 @@ graph TD
 ![Sheet Parts Example](/images/sheet-parts-example.png "Different sheet parts that can be captured")
 
 **Error Handling:**
+
 - Retries failed screenshots
 - Logs navigation issues
 - Continues with remaining sheets if one fails
@@ -103,12 +112,14 @@ graph TD
 ### 5. Image Processing
 
 **Standard Processing:**
+
 - Resizes images to appropriate thumbnail dimensions
 - Optimizes for web display
 - Maintains aspect ratios
 - Applies consistent quality settings
 
 **Blur Processing:**
+
 - Creates blurred versions of all images
 - Blur intensity controlled by `--blur-factor` parameter
 - Maintains image structure while obscuring content
@@ -116,20 +127,22 @@ graph TD
 
 ### Blur Effect Examples
 
-| Blur Factor | Result |
-|-------------|---------|
-| 0 (No blur) | ![No blur](/images/blur-factor-0.png "No blur applied") |
-| 5 (Default) | ![Light blur](/images/blur-factor-5.png "Light blur applied") |
+| Blur Factor | Result                                                           |
+| ----------- | ---------------------------------------------------------------- |
+| 0 (No blur) | ![No blur](/images/blur-factor-0.png "No blur applied")          |
+| 5 (Default) | ![Light blur](/images/blur-factor-5.png "Light blur applied")    |
 | 10 (Medium) | ![Medium blur](/images/blur-factor-10.png "Medium blur applied") |
 
 ### 6. Upload & Assignment
 
 **Content Library Upload:**
+
 - **QSEoW**: Uploads to specified content library via QRS API
 - **QS Cloud**: Uploads directly via Cloud APIs
 - Handles existing images (overwrites or creates new)
 
 **Sheet Assignment:**
+
 - Uses Qlik Sense APIs to assign uploaded images to sheets
 - Applies blurred images to sheets matching blur criteria
 - Maintains audit trail of changes
@@ -140,37 +153,43 @@ graph TD
 ### Core Components
 
 **Headless Browser (Puppeteer):**
-- Chrome or Firefox automation
-- JavaScript execution environment
-- Network interception capabilities
+
+- Chrome or Firefox in headless (by default) mode
+- Fully imitates a real user accessing the Qlik Sense web interface
 - Screenshot and PDF generation
 
 **Qlik Sense APIs:**
+
 - **Engine API**: App and sheet metadata
 - **Repository API (QSEoW)**: Content management
 - **Cloud APIs**: Tenant and app management
-- **WebSocket Protocol**: Real-time communication
+- **WebSockets**: Real-time communication with Qlik Sense engine
 
 **Image Processing:**
+
 - Screenshot capture and manipulation
 - Resize and optimization routines
 - Blur effect algorithms
 - Format conversion (PNG/JPEG)
+- Screen shots stored locally for later use
 
 ### Architecture Benefits
 
 **API-First Approach:**
-- Faster than pure web scraping
-- More reliable than screen automation
+
+- Purpose built for this exact use-case
+- More reliable than screen automation or web scraping
 - Provides rich metadata access
 - Enables bulk operations
 
 **Hybrid Web/API Model:**
+
 - Screenshots require web interface (visual accuracy)
 - Metadata and uploads use APIs (speed and reliability)
 - Best of both approaches
 
 **Browser Isolation:**
+
 - Each run uses clean browser state
 - No interference from existing sessions
 - Consistent authentication flow
@@ -178,44 +197,17 @@ graph TD
 
 ## Performance Characteristics
 
-### Speed Factors
-
-**Fast Operations:**
-- API calls (app/sheet discovery)
-- Image uploads
-- Sheet assignments
-
-**Slower Operations:**
-- Browser navigation between sheets
-- Page rendering and wait times
-- Screenshot capture and processing
-
-### Optimization Strategies
-
-**Parallel Processing:**
-- Multiple apps can be processed sequentially
-- Image processing happens while navigating to next sheet
-- Upload batching for efficiency
-
-**Caching:**
-- Browser instances reused within session
-- API responses cached where appropriate
-- Image processing pipeline optimized
-
-**Wait Time Tuning:**
-- `--pagewait` parameter balances speed vs accuracy
-- Complex sheets may need longer wait times
-- Simple sheets can use shorter waits
-
 ### Typical Performance
 
 **Single Sheet:**
+
 - Navigation: 2-5 seconds
-- Screenshot: 1-2 seconds  
+- Screenshot: 1-2 seconds
 - Processing: <1 second
 - **Total: 3-8 seconds per sheet**
 
 **Full App (10 sheets):**
+
 - Initial setup: 10-15 seconds
 - Per sheet: 3-8 seconds
 - Upload batch: 5-10 seconds
@@ -226,68 +218,64 @@ graph TD
 ### Graceful Degradation
 
 **Sheet-Level Failures:**
+
 - Continue processing remaining sheets
 - Log specific failure reasons
 - Provide summary of successful vs failed operations
 
 **App-Level Failures:**
+
 - Continue with remaining apps
 - Isolate failures to specific apps
 - Maintain overall process integrity
 
-### Common Failure Scenarios
+### Possible Failure Scenarios
 
 **Authentication Issues:**
+
 - API key expiration
 - Certificate problems
 - Password changes
 - Network connectivity
 
 **Sheet Access Problems:**
+
 - Permission restrictions
 - Hidden or deleted sheets
 - App publication state changes
 
 **Technical Failures:**
+
 - Browser crashes
 - Network timeouts
 - Disk space issues
 - Memory constraints
-
-### Recovery Mechanisms
-
-**Automatic Retries:**
-- Failed screenshots retried with longer wait times
-- Network requests retried with exponential backoff
-- Browser crashes trigger restart
-
-**Manual Recovery:**
-- Detailed logging for troubleshooting
-- Option to resume from specific app/sheet
-- Dry-run mode for testing
 
 ## Security & Privacy
 
 ### Data Handling
 
 **Minimal Data Exposure:**
+
 - Screenshots only capture visual layout
 - No data values extracted or stored permanently
 - Browser sessions are isolated and cleaned
 
 **Credential Security:**
+
 - Support for environment variables
 - No credential logging or persistence
-- Secure API token handling
 
 ### Privacy Controls
 
 **Blur Functionality:**
-- Automatically blur sensitive sheets
+
+- Blur sensitive sheets
 - Configurable blur intensity
 - Multiple criteria for blur selection
 
 **Exclusion Controls:**
+
 - Skip sheets entirely if needed
 - Multiple exclusion criteria
 - Granular control over what gets processed
@@ -297,16 +285,25 @@ graph TD
 ### Logging Levels
 
 **Production (`info`):**
+
 - Key milestones and summary information
 - Error messages and warnings
 - Performance metrics
 
+**Verbose (`verbose`):**
+
+- All production logs
+- Detailed timing information
+- Full request/response logging
+
 **Debug (`debug`):**
+
 - Detailed operation steps
 - API request/response details
 - Browser navigation events
 
 **Development (`silly`):**
+
 - WebSocket message traffic
 - Detailed timing information
 - Full request/response logging
@@ -314,11 +311,13 @@ graph TD
 ### Visual Debugging
 
 **Headless Mode Toggle:**
+
 - `--headless false` shows browser window
 - See exactly what Butler Sheet Icons sees
 - Debug navigation and rendering issues
 
 **Screenshot Retention:**
+
 - All screenshots saved locally
 - Before/after comparison possible
 - Manual review of thumbnail quality

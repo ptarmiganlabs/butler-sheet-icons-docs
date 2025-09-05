@@ -78,7 +78,7 @@ Here's what it looks like when running Butler Sheet Icons for QS Cloud on Window
   --logonuserid your-user-id \
   --logonpwd your-password \
   --prefix form \
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 ```powershell [Windows PowerShell]
@@ -91,7 +91,7 @@ Here's what it looks like when running Butler Sheet Icons for QS Cloud on Window
   --logonuserid your-user-id `
   --logonpwd your-password `
   --prefix form `
-  --sense-version 2024-May
+  --sense-version 2024-Nov
 ```
 
 :::

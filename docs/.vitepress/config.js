@@ -1,6 +1,7 @@
 import { defineConfig } from "vitepress";
+import { withMermaid } from "vitepress-plugin-mermaid";
 
-export default defineConfig({
+export default withMermaid({
   title: "Butler Sheet Icons",
   description: "Automatically create Qlik Sense sheet thumbnail images",
   base: "/",
@@ -19,6 +20,8 @@ export default defineConfig({
       },
     ],
   ],
+
+  // plugins: [mermaidPlugin()],
 
   themeConfig: {
     logo: "/images/butler-sheet-icons-logo.png",
@@ -159,9 +162,19 @@ export default defineConfig({
     },
   },
 
-  markdown: {
-    config: (md) => {
-      // Configure markdown-it here if needed
-    },
+  mermaid: {
+    // refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options
   },
+  // optionally set additional config for plugin itself with MermaidPluginConfig
+  // mermaidPlugin: {
+  //   class: "mermaid my-class", // set additional css classes for parent container
+  // },
+
+  // markdown: {
+  //   // Enable Mermaid diagrams like ```mermaid code fences
+  //   mermaid: true,
+  //   config: (md) => {
+  //     // Configure markdown-it here if needed
+  //   },
+  // },
 });
