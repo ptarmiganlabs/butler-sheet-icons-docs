@@ -150,16 +150,7 @@ For development/testing environments:
 --sense-version 2024-Nov          # Use the version used in your Qlik Sense environment
 ```
 
-Available versions:
-
-- `2024-Nov` - November 2024 release
-- `2024-May` - May 2024 release
-- `2023-Nov` - November 2023 release
-- `2023-Aug` - August 2023 release
-- `2023-May` - May 2023 release
-- `2023-Feb` - February 2023 release
-- `2022-Nov` - November 2022 release
-- `pre-2022-Nov` - Older versions
+For a list of supported QSEoW versions and the exact values to use with `--sense-version`, see [Supported Versions → QSEoW](/reference/supported-versions#qlik-sense-enterprise-on-windows-qseow).
 
 ::: warning Version Compatibility
 Using the wrong version parameter may cause login or navigation failures. Always specify the correct version for your QSEoW installation.
@@ -324,6 +315,10 @@ butler-sheet-icons qseow create-sheet-thumbnails `
 --blur-sheet-tag "containsSensitiveData"
 --blur-factor 8
 ```
+
+::: tip Status-based exclusion in QSEoW
+BSI can update icons for Public, Published, and Private sheets in both published and unpublished apps. Use `--exclude-sheet-status` only when you intentionally want to skip certain statuses (for example, leave private development sheets unchanged).
+:::
 
 ### Image Options
 

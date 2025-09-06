@@ -196,6 +196,24 @@ butler-sheet-icons qscloud create-sheet-icons \
 --blur-factor 8
 ```
 
+::: tip Status-based exclusion in QS Cloud
+In published apps, only private sheets can be updated by BSI. To avoid permission errors when processing published apps, exclude public and published sheets:
+
+::: code-group
+
+```bash [Bash]
+butler-sheet-icons qscloud create-sheet-icons \
+  --exclude-sheet-status public published
+```
+
+```powershell [PowerShell]
+butler-sheet-icons qscloud create-sheet-icons `
+  --exclude-sheet-status public published
+```
+
+:::
+:::
+
 ### Browser Configuration
 
 ```bash

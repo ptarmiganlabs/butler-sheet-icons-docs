@@ -52,7 +52,9 @@ And here's the same operation on Windows:
 
 Update all apps with a specific tag, applying advanced filtering:
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --apiuserdir Internal \
@@ -77,13 +79,40 @@ Update all apps with a specific tag, applying advanced filtering:
   --headless true
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --apiuserdir Internal `
+  --apiuserid sa_api `
+  --logonuserdir Internal `
+  --logonuserid your-username `
+  --logonpwd your-password `
+  --prefix form `
+  --sense-version 2024-Nov `
+  --qliksensetag "updateSheetThumbnails" `
+  --exclude-sheet-tag "excludeFromThumbnails" `
+  --exclude-sheet-number 1 2 `
+  --exclude-sheet-title "Intro" "Definitions" "Help" `
+  --exclude-sheet-status private `
+  --blur-sheet-number 3 5 `
+  --blur-sheet-title "Financial Dashboard" `
+  --blur-factor 10 `
+  --contentlibrary "Butler sheet thumbnails" `
+  --pagewait 5 `
+  --imagedir .\img `
+  --includesheetpart 2 `
+  --headless true
+```
+
+:::
+
 ## Environment Variables Example
 
 For security and reusability, use environment variables:
 
-### PowerShell Setup
+::: code-group
 
-```powershell
+```powershell [Windows PowerShell]
 # Set environment variables for QSEoW
 $env:BSI_QSEOW_CST_HOST = 'qlik-server.company.com'
 $env:BSI_QSEOW_CST_API_USER_DIR = 'Internal'
@@ -99,9 +128,7 @@ $env:BSI_QSEOW_CST_CONTENT_LIBRARY = 'Butler sheet thumbnails'
 .\butler-sheet-icons.exe qseow create-sheet-thumbnails --appid a3e0f5d2-000a-464f-998d-33d333b175d7
 ```
 
-### Bash Setup
-
-```bash
+```bash [macOS/Linux]
 # Set environment variables for QSEoW
 export BSI_QSEOW_CST_HOST='qlik-server.company.com'
 export BSI_QSEOW_CST_API_USER_DIR='Internal'
@@ -117,13 +144,17 @@ export BSI_QSEOW_CST_CONTENT_LIBRARY='Butler sheet thumbnails'
 ./butler-sheet-icons qseow create-sheet-thumbnails --appid a3e0f5d2-000a-464f-998d-33d333b175d7
 ```
 
+:::
+
 ## Advanced Sheet Filtering
 
 Complex filtering scenarios for enterprise environments:
 
 ### Exclude Development Sheets
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -140,9 +171,30 @@ Complex filtering scenarios for enterprise environments:
   --contentlibrary "Butler sheet thumbnails"
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --apiuserdir Internal `
+  --apiuserid sa_api `
+  --logonuserdir Internal `
+  --logonuserid your-username `
+  --logonpwd your-password `
+  --prefix form `
+  --sense-version 2024-Nov `
+  --exclude-sheet-status private `
+  --exclude-sheet-tag "development" "test" `
+  --exclude-sheet-title "Debug" "Test Sheet" "Sandbox" `
+  --contentlibrary "Butler sheet thumbnails"
+```
+
+:::
+
 ### Blur Sensitive Content
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --qliksensetag "production-apps" \
@@ -161,48 +213,102 @@ Complex filtering scenarios for enterprise environments:
   --pagewait 7
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --qliksensetag "production-apps" `
+  --apiuserdir Internal `
+  --apiuserid sa_api `
+  --logonuserdir Internal `
+  --logonuserid your-username `
+  --logonpwd your-password `
+  --prefix form `
+  --sense-version 2024-May `
+  --blur-sheet-tag "sensitive" "confidential" `
+  --blur-sheet-title "Financial Summary" "Executive Dashboard" `
+  --blur-factor 15 `
+  --exclude-sheet-status private `
+  --contentlibrary "Butler sheet thumbnails" `
+  --pagewait 7
+```
+
+:::
+
 ## Different Sheet Parts
 
 Control which part of sheets to include in thumbnails:
 
 ### Sheet Content Only
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --includesheetpart 1 \
-  --sense-version 2024-Nov \
-  # ... other parameters
+  --sense-version 2024-Nov
 ```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --includesheetpart 1 `
+  --sense-version 2024-Nov
+```
+
+:::
 
 ### Content + Title
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --includesheetpart 2 \
-  --sense-version 2024-Nov \
-  # ... other parameters
+  --sense-version 2024-Nov
 ```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --includesheetpart 2 `
+  --sense-version 2024-Nov
+```
+
+:::
 
 ### Full Page
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --includesheetpart 4 \
-  --sense-version 2024-Nov \
-  # ... other parameters
+  --sense-version 2024-Nov
 ```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --includesheetpart 4 `
+  --sense-version 2024-Nov
+```
+
+:::
 
 ## Certificate Management
 
 ### Default Certificate Location
 
-```bash
+```text
 # Expected directory structure:
 your-project/
 ├── butler-sheet-icons.exe
@@ -210,17 +316,33 @@ your-project/
 │   ├── client.pem
 │   └── client_key.pem
 └── img/                     # Created automatically
+```
 
-# Command (certificates found automatically):
+Command (certificates found automatically):
+
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ### Custom Certificate Paths
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -229,11 +351,24 @@ your-project/
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --certfile .\cert\client.pem `
+  --certkeyfile .\cert\client_key.pem `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ## Content Library Management
 
 ### Using Default Library
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -241,9 +376,21 @@ your-project/
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --contentlibrary "Butler sheet thumbnails" `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ### Custom Content Library
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -251,11 +398,23 @@ your-project/
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --contentlibrary "My Custom Thumbnails" `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ## Removing Sheet Icons
 
 Remove all sheet icons from a specific app:
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow remove-sheet-icons \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -265,9 +424,23 @@ Remove all sheet icons from a specific app:
   --certkeyfile ./cert/client_key.pem
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow remove-sheet-icons `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --apiuserdir Internal `
+  --apiuserid sa_api `
+  --certfile .\cert\client.pem `
+  --certkeyfile .\cert\client_key.pem
+```
+
+:::
+
 Remove from all apps with a tag:
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow remove-sheet-icons \
   --host qlik-server.company.com \
   --qliksensetag "remove-thumbnails" \
@@ -277,40 +450,81 @@ Remove from all apps with a tag:
   --certkeyfile ./cert/client_key.pem
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow remove-sheet-icons `
+  --host qlik-server.company.com `
+  --qliksensetag "remove-thumbnails" `
+  --apiuserdir Internal `
+  --apiuserid sa_api `
+  --certfile .\cert\client.pem `
+  --certkeyfile .\cert\client_key.pem
+```
+
+:::
+
 ## Version-Specific Examples
 
 ### QSEoW 2024-Nov
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
-  --sense-version 2024-Nov \
-  # ... other parameters
+  --sense-version 2024-Nov
 ```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --sense-version 2024-Nov
+```
+
+:::
 
 ### QSEoW 2023-Nov
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
-  --sense-version 2023-Nov \
-  # ... other parameters
+  --sense-version 2023-Nov
 ```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --sense-version 2023-Nov
+```
+
+:::
 
 ### Legacy Versions
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
-  --sense-version pre-2022-Nov \
-  # ... other parameters
+  --sense-version pre-2022-Nov
 ```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --sense-version pre-2022-Nov
+```
+
+:::
 
 ## Development and Testing
 
 ### Debug Mode with Visible Browser
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -319,9 +533,22 @@ Remove from all apps with a tag:
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --headless false `
+  --loglevel debug `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ### Test with Single Sheet
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
@@ -330,11 +557,24 @@ Remove from all apps with a tag:
   --pagewait 10
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 `
+  --exclude-sheet-number 2 3 4 5 6 7 8 9 10 `
+  --sense-version 2024-Nov `
+  --pagewait 10
+```
+
+:::
+
 ## Network Configuration
 
 ### Custom Ports
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --port 8443 \
@@ -343,9 +583,22 @@ Remove from all apps with a tag:
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --port 8443 `
+  --qrsport 4242 `
+  --engineport 4747 `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ### Non-secure Connection (Development)
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --secure false \
@@ -353,20 +606,41 @@ Remove from all apps with a tag:
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --secure false `
+  --port 80 `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ### Self-signed Certificates
 
-```bash
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qseow create-sheet-thumbnails \
   --host qlik-server.company.com \
   --rejectUnauthorized false \
   --sense-version 2024-Nov
 ```
 
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host qlik-server.company.com `
+  --rejectUnauthorized false `
+  --sense-version 2024-Nov
+```
+
+:::
+
 ## Common Error Scenarios
 
 ### Certificate Issues
 
-```
+```text
 Error: Unable to load certificate files
 ```
 
@@ -378,7 +652,7 @@ Error: Unable to load certificate files
 
 ### Authentication Failures
 
-```
+```text
 Error: Authentication failed
 ```
 
@@ -391,7 +665,7 @@ Error: Authentication failed
 
 ### Version Mismatch
 
-```
+```text
 Error: Could not navigate to sheet
 ```
 
@@ -399,7 +673,7 @@ Error: Could not navigate to sheet
 
 ### Content Library Missing
 
-```
+```text
 Error: Content library not found
 ```
 

@@ -1,5 +1,7 @@
 import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
+// Generated at build time by scripts/fetch-bsi-version.mjs
+import { version as bsiVersion } from "./version.js";
 
 export default withMermaid({
   title: "Butler Sheet Icons",
@@ -32,8 +34,12 @@ export default withMermaid({
       { text: "Reference", link: "/reference/commands" },
       { text: "Examples", link: "/examples/" },
       {
-        text: "v3.8.0",
+        text: bsiVersion,
         items: [
+          {
+            text: "Downloads",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/releases",
+          },
           {
             text: "Changelog",
             link: "https://github.com/ptarmiganlabs/butler-sheet-icons/blob/main/CHANGELOG.md",
@@ -79,6 +85,7 @@ export default withMermaid({
               link: "/guide/concepts/sheet-exclusion",
             },
             { text: "Sheet Blurring", link: "/guide/concepts/sheet-blurring" },
+            { text: "Sheet Parts", link: "/guide/concepts/sheet-parts" },
             {
               text: "Browser Management",
               link: "/guide/concepts/browser-management",

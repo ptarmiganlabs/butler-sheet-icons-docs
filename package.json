@@ -4,9 +4,10 @@
   "description": "Documentation site for Butler Sheet Icons",
   "type": "module",
   "scripts": {
-    "docs:dev": "vitepress dev ./docs",
-    "docs:build": "vitepress build ./docs",
-    "docs:preview": "vitepress preview ./docs",
+    "pre:version": "node ./scripts/fetch-bsi-version.mjs",
+    "docs:dev": "npm run pre:version && vitepress dev ./docs",
+    "docs:build": "npm run pre:version && vitepress build ./docs",
+    "docs:preview": "npm run pre:version && vitepress preview ./docs",
     "deploy": "npm run docs:build && gh-pages -d docs/.vitepress/dist",
     "deploy:ci": "npm run docs:build"
   },

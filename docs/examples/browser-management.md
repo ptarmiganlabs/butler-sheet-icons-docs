@@ -1,190 +1,143 @@
 # Browser Management Examples
 
-These examples demonstrate how to use Butler Sheet Icons' browser management features for different scenarios and platforms.
+These examples show how to list, install, select, and remove browsers used by Butler Sheet Icons. All commands are provided for macOS/Linux (Bash) and Windows (PowerShell).
 
 ## Prerequisites
 
-Before running these examples, ensure you have Butler Sheet Icons installed. Download the latest version from the [releases page](https://github.com/ptarmiganlabs/butler-sheet-icons/releases).
+- Install Butler Sheet Icons from the releases page
+- Ensure you can run the executable
+  - macOS/Linux: `./butler-sheet-icons`
+  - Windows: `./butler-sheet-icons.exe` (or `butler-sheet-icons.exe`)
 
-## Basic Browser Operations
+## Basic operations
 
-### List Currently Installed Browsers
+### List currently installed browsers
 
-Check which browsers are currently available in the BSI cache:
+::: code-group
 
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser list-installed
-```
-
-**macOS/Linux:**
-```bash
+```bash [macOS/Linux]
 ./butler-sheet-icons browser list-installed
 ```
 
-**Example Output:**
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser list-installed
 ```
+
+:::
+
+Example output:
+
+```text
 2024-02-16T14:10:55.141Z info: App version: 3.2.3
 2024-02-16T14:10:55.141Z info: Installed browsers:
-2024-02-16T14:10:55.156Z info:     chrome, build id=121.0.6167.85, platform=win64, path=C:\Users\goran\.cache\puppeteer\chrome\win64-121.0.6167.85
-2024-02-16T14:10:55.156Z info:     firefox, build id=124.0a1, platform=win64, path=C:\Users\goran\.cache\puppeteer\firefox\win64-124.0a1
+2024-02-16T14:10:55.156Z info:     chrome, build id=121.0.6167.85, platform=mac, path=/Users/you/.cache/puppeteer/chrome/mac-121.0.6167.85
+2024-02-16T14:10:55.156Z info:     firefox, build id=124.0a1, platform=mac, path=/Users/you/.cache/puppeteer/firefox/mac-124.0a1
 ```
 
-### Install Default Browser (Latest Chrome)
+### Install default browser (latest Chrome)
 
-Install the latest stable version of Chrome:
+::: code-group
 
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser install
-```
-
-**macOS/Linux:**
-```bash
+```bash [macOS/Linux]
 ./butler-sheet-icons browser install
 ```
 
-**Example Output:**
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser install
 ```
+
+:::
+
+Example output:
+
+```text
 2024-02-16T14:13:35.312Z info: App version: 3.2.3
 2024-02-16T14:13:35.484Z info: Resolved browser build id: "121.0.6167.85" for browser "chrome" version "stable"
 2024-02-16T14:13:35.562Z info: Installing browser...
 2024-02-16T14:13:44.062Z info: Browser "chrome" version "121.0.6167.85" installed
 ```
 
-### Install Firefox
+### Install Firefox (latest)
 
-Install the latest version of Firefox:
+::: code-group
 
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser install --browser firefox
-```
-
-**macOS/Linux:**
-```bash
+```bash [macOS/Linux]
 ./butler-sheet-icons browser install --browser firefox
 ```
 
-**Example Output:**
-```
-2024-02-16T14:17:47.673Z info: App version: 3.2.3
-2024-02-16T14:17:47.976Z info: Resolved browser build id: "124.0a1" for browser "firefox" version "latest"
-2024-02-16T14:17:48.343Z info: Installing browser...
-2024-02-16T14:19:06.845Z info: Browser "firefox" version "124.0a1" installed
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser install --browser firefox
 ```
 
-## Advanced Browser Management
+:::
 
-### Install Specific Chrome Version
+### List available Chrome builds (channels)
 
-First, check available versions:
+::: code-group
 
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser list-available --browser chrome --channel stable
-```
-
-**macOS/Linux:**
-```bash
+```bash [macOS/Linux]
 ./butler-sheet-icons browser list-available --browser chrome --channel stable
 ```
 
-**Example Output:**
-```
-2024-02-16T14:15:46.237Z info: App version: 3.2.3
-2024-02-16T14:15:46.677Z info: Chrome versions from "stable" channel:
-2024-02-16T14:15:49.320Z info:     121.0.6167.85, "chrome/platforms/mac/channels/stable/versions/121.0.6167.85"
-2024-02-16T14:15:49.684Z info:     121.0.6167.75, "chrome/platforms/mac/channels/stable/versions/121.0.6167.75"
-2024-02-16T14:15:52.633Z info:     120.0.6099.109, "chrome/platforms/mac/channels/stable/versions/120.0.6099.109"
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser list-available --browser chrome --channel stable
 ```
 
-Then install a specific version:
+:::
 
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser install --browser chrome --browser-version 121.0.6167.85
-```
+### Install a specific Chrome version
 
-**macOS/Linux:**
-```bash
+First list available versions (see above), then install:
+
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
 ```
 
-### Check Available Chrome Channels
-
-View different Chrome release channels:
-
-**Stable Channel:**
-```bash
-./butler-sheet-icons browser list-available --browser chrome --channel stable
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser install --browser chrome --browser-version 121.0.6167.85
 ```
 
-**Beta Channel:**
-```bash
-./butler-sheet-icons browser list-available --browser chrome --channel beta
-```
+:::
 
-**Dev Channel:**
-```bash
-./butler-sheet-icons browser list-available --browser chrome --channel dev
-```
+### Uninstall a specific browser version
 
-### Uninstall Specific Browser Version
+::: code-group
 
-Remove a specific browser version from the cache:
-
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser uninstall --browser chrome --browser-version 121.0.6167.85
-```
-
-**macOS/Linux:**
-```bash
+```bash [macOS/Linux]
 ./butler-sheet-icons browser uninstall --browser chrome --browser-version 121.0.6167.85
 ```
 
-**Example Output:**
-```
-2024-02-16T14:26:39.018Z info: App version: 3.2.3
-2024-02-16T14:26:39.018Z info: Starting browser uninstallation
-2024-02-16T14:26:39.018Z info: Uninstalling browser: chrome, build id=121.0.6167.85, platform=win64, path=C:\Users\goran\.cache\puppeteer\chrome\win64-121.0.6167.85
-2024-02-16T14:26:39.096Z info: Browser "chrome", version "121.0.6167.85" uninstalled.
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser uninstall --browser chrome --browser-version 121.0.6167.85
 ```
 
-### Remove All Browsers
+:::
 
-Clean the entire browser cache:
+### Remove all cached browsers
 
-**Windows:**
-```powershell
-.\butler-sheet-icons.exe browser uninstall-all
-```
+::: code-group
 
-**macOS/Linux:**
-```bash
+```bash [macOS/Linux]
 ./butler-sheet-icons browser uninstall-all
 ```
 
-**Example Output:**
-```
-2024-02-16T14:29:24.989Z info: App version: 3.2.3
-2024-02-16T14:29:24.990Z info: Starting uninstallation of all browsers
-2024-02-16T14:29:24.991Z info: Uninstalling 2 browsers:
-2024-02-16T14:29:24.992Z info:     Starting uninstallation of "chrome", build id "121.0.6167.85"
-2024-02-16T14:29:25.880Z info:     Starting uninstallation of "firefox", build id "124.0a1"
-2024-02-16T14:29:26.214Z info: Browser "chrome" (121.0.6167.85) uninstalled.
-2024-02-16T14:29:26.214Z info: Browser "firefox" (124.0a1) uninstalled.
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe browser uninstall-all
 ```
 
-## Using Browsers with Sheet Icon Creation
+:::
 
-### Use Default Browser
+## Using browsers when creating sheet icons
 
-The simplest approach - BSI will use or download Chrome automatically:
+### Use default browser
 
-**QS Cloud:**
-```bash
+BSI will download and use the default browser (Chrome) if needed:
+
+::: code-group
+
+```bash [macOS/Linux]
 butler-sheet-icons qscloud create-sheet-icons \
   --tenanturl mytenant.eu.qlikcloud.com \
   --apikey $BSI_API_KEY \
@@ -193,12 +146,22 @@ butler-sheet-icons qscloud create-sheet-icons \
   --appid 12345678-1234-1234-1234-123456789012
 ```
 
-### Specify Browser Type
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe qscloud create-sheet-icons `
+  --tenanturl mytenant.eu.qlikcloud.com `
+  --apikey $env:BSI_API_KEY `
+  --logonuserid user@company.com `
+  --logonpwd mypassword `
+  --appid 12345678-1234-1234-1234-123456789012
+```
 
-Use a specific browser for sheet icon creation:
+:::
 
-**Using Chrome:**
-```bash
+### Specify browser type (Chrome/Firefox)
+
+::: code-group
+
+```bash [macOS/Linux]
 butler-sheet-icons qscloud create-sheet-icons \
   --tenanturl mytenant.eu.qlikcloud.com \
   --apikey $BSI_API_KEY \
@@ -208,26 +171,31 @@ butler-sheet-icons qscloud create-sheet-icons \
   --browser chrome
 ```
 
-**Using Firefox:**
-```bash
-butler-sheet-icons qscloud create-sheet-icons \
-  --tenanturl mytenant.eu.qlikcloud.com \
-  --apikey $BSI_API_KEY \
-  --logonuserid user@company.com \
-  --logonpwd mypassword \
-  --appid 12345678-1234-1234-1234-123456789012 \
-  --browser firefox
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe qscloud create-sheet-icons `
+  --tenanturl mytenant.eu.qlikcloud.com `
+  --apikey $env:BSI_API_KEY `
+  --logonuserid user@company.com `
+  --logonpwd mypassword `
+  --appid 12345678-1234-1234-1234-123456789012 `
+  --browser chrome
 ```
 
-### Use Specific Browser Version
+:::
 
-For production environments requiring consistency:
+Using Firefox works the same, set `--browser firefox`.
 
-```bash
-# First install the specific version
-butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
+### Use a specific browser version
 
-# Then use it for sheet icon creation
+Install and then use a pinned version for consistency:
+
+::: code-group
+
+```bash [macOS/Linux]
+# Install specific version
+./butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
+
+# Use it
 butler-sheet-icons qscloud create-sheet-icons \
   --tenanturl mytenant.eu.qlikcloud.com \
   --apikey $BSI_API_KEY \
@@ -238,60 +206,39 @@ butler-sheet-icons qscloud create-sheet-icons \
   --browser-version 121.0.6167.85
 ```
 
-## Environment-Specific Examples
+```powershell [Windows PowerShell]
+# Install specific version
+./butler-sheet-icons.exe browser install --browser chrome --browser-version 121.0.6167.85
 
-### Development Environment
-
-For debugging and development, use visible browser mode:
-
-```bash
-butler-sheet-icons qscloud create-sheet-icons \
-  --tenanturl mytenant.eu.qlikcloud.com \
-  --apikey $BSI_API_KEY \
-  --logonuserid user@company.com \
-  --logonpwd mypassword \
-  --appid 12345678-1234-1234-1234-123456789012 \
-  --headless false \
-  --loglevel debug \
-  --browser chrome
+# Use it
+./butler-sheet-icons.exe qscloud create-sheet-icons `
+  --tenanturl mytenant.eu.qlikcloud.com `
+  --apikey $env:BSI_API_KEY `
+  --logonuserid user@company.com `
+  --logonpwd mypassword `
+  --appid 12345678-1234-1234-1234-123456789012 `
+  --browser chrome `
+  --browser-version 121.0.6167.85
 ```
 
-### CI/CD Pipeline
+:::
 
-For automated environments, ensure consistent browser versions:
+## Docker usage
 
-```bash
-#!/bin/bash
-# Install specific browser version
-./butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
+Browsers in Docker are downloaded inside the container.
 
-# Create sheet icons with specific browser
-./butler-sheet-icons qscloud create-sheet-icons \
-  --tenanturl $QS_TENANT_URL \
-  --apikey $QS_API_KEY \
-  --logonuserid $QS_USER \
-  --logonpwd $QS_PASSWORD \
-  --collectionid $QS_COLLECTION_ID \
-  --headless true \
-  --browser chrome \
-  --browser-version 121.0.6167.85 \
-  --loglevel info
-```
+::: code-group
 
-### Docker Environment
-
-When using BSI in Docker, browsers are downloaded into the container:
-
-```bash
+```bash [macOS/Linux]
 # List browsers in container
 docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser list-installed
 
-# Install specific browser in container
+# Install Firefox in container
 docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser install --browser firefox
 
-# Use specific browser for sheet icons
+# Use Firefox for sheet icons
 docker run -it --rm \
-  -v /local/img:/nodeapp/img \
+  -v $(pwd)/images:/nodeapp/img \
   ptarmiganlabs/butler-sheet-icons:latest \
   qscloud create-sheet-icons \
   --tenanturl mytenant.eu.qlikcloud.com \
@@ -303,44 +250,94 @@ docker run -it --rm \
   --headless true
 ```
 
-## Troubleshooting Browser Issues
+```powershell [Windows PowerShell]
+# List browsers in container
+docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser list-installed
 
-### Check Browser Installation Status
+# Install Firefox in container
+docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser install --browser firefox
 
-Complete diagnostic of browser setup:
+# Use Firefox for sheet icons
+docker run -it --rm `
+  -v ${PWD}/images:/nodeapp/img `
+  ptarmiganlabs/butler-sheet-icons:latest `
+  qscloud create-sheet-icons `
+  --tenanturl mytenant.eu.qlikcloud.com `
+  --apikey $env:BSI_API_KEY `
+  --logonuserid user@company.com `
+  --logonpwd mypassword `
+  --appid 12345678-1234-1234-1234-123456789012 `
+  --browser firefox `
+  --headless true
+```
 
-```bash
-# Check what's installed
+:::
+
+## Diagnostics and troubleshooting
+
+### Full diagnostic of browser setup
+
+::: code-group
+
+```bash [macOS/Linux]
+# Installed browsers
 ./butler-sheet-icons browser list-installed
 
-# Check what's available for download
+# Available Chrome builds
 ./butler-sheet-icons browser list-available --browser chrome
 
-# Check Firefox availability
+# Available Firefox builds
 ./butler-sheet-icons browser list-available --browser firefox
 ```
 
-### Clean Browser Cache and Reinstall
+```powershell [Windows PowerShell]
+# Installed browsers
+./butler-sheet-icons.exe browser list-installed
 
-If experiencing browser issues:
+# Available Chrome builds
+./butler-sheet-icons.exe browser list-available --browser chrome
 
-```bash
-# Remove all browsers
+# Available Firefox builds
+./butler-sheet-icons.exe browser list-available --browser firefox
+```
+
+:::
+
+### Clean cache and reinstall
+
+::: code-group
+
+```bash [macOS/Linux]
+# Remove all
 ./butler-sheet-icons browser uninstall-all
 
-# Reinstall fresh browsers
+# Reinstall common browsers
 ./butler-sheet-icons browser install --browser chrome
 ./butler-sheet-icons browser install --browser firefox
 
-# Verify installation
+# Verify
 ./butler-sheet-icons browser list-installed
 ```
 
-### Test Browser Functionality
+```powershell [Windows PowerShell]
+# Remove all
+./butler-sheet-icons.exe browser uninstall-all
 
-Use visible mode to test browser operation:
+# Reinstall common browsers
+./butler-sheet-icons.exe browser install --browser chrome
+./butler-sheet-icons.exe browser install --browser firefox
 
-```bash
+# Verify
+./butler-sheet-icons.exe browser list-installed
+```
+
+:::
+
+### Visible mode test (debugging)
+
+::: code-group
+
+```bash [macOS/Linux]
 ./butler-sheet-icons qscloud create-sheet-icons \
   --tenanturl mytenant.eu.qlikcloud.com \
   --apikey $BSI_API_KEY \
@@ -352,41 +349,61 @@ Use visible mode to test browser operation:
   --loglevel verbose
 ```
 
-## Platform-Specific Notes
+```powershell [Windows PowerShell]
+./butler-sheet-icons.exe qscloud create-sheet-icons `
+  --tenanturl mytenant.eu.qlikcloud.com `
+  --apikey $env:BSI_API_KEY `
+  --logonuserid user@company.com `
+  --logonpwd mypassword `
+  --appid 12345678-1234-1234-1234-123456789012 `
+  --headless false `
+  --pagewait 10 `
+  --loglevel verbose
+```
+
+:::
+
+## Platform-specific notes
 
 ### Windows
+
 - Browsers are stored in `C:\Users\<username>\.cache\puppeteer\`
 - Use PowerShell for the best experience
-- Windows Defender might scan downloaded browsers (causing slight delays)
+- Windows Defender might scan downloaded browsers (slight delays)
 
 ### macOS
+
 - Browsers are stored in `~/.cache/puppeteer/`
 - BSI binaries are notarized by Apple
-- First run might show a security warning (this is normal)
+- First run might show a security warning (normal)
 
 ### Linux
+
 - Browsers are stored in `~/.cache/puppeteer/`
 - Ensure sufficient disk space for browser downloads
 - Some distributions might require additional dependencies
 
-## Best Practices
+## Best practices
 
-### For Production
-1. **Use specific browser versions** to ensure consistency
-2. **Pre-install browsers** rather than downloading during execution
-3. **Use headless mode** for better performance
-4. **Monitor disk space** as browsers can be large (100-200MB each)
+### Production
 
-### For Development
-1. **Use visible mode** when debugging login issues
-2. **Keep multiple browser versions** for testing compatibility
-3. **Use verbose logging** to understand what's happening
-4. **Test with both Chrome and Firefox** to ensure compatibility
+1. Use specific browser versions to ensure consistency
+2. Pre-install browsers rather than downloading during execution
+3. Use headless mode for better performance
+4. Monitor disk space (browsers are 100–200 MB each)
 
-### For CI/CD
-1. **Cache browser downloads** between pipeline runs
-2. **Use specific versions** to avoid unexpected changes
-3. **Include browser installation** in your deployment scripts
-4. **Test browser functionality** as part of your pipeline
+### Development
 
-For more information about browser management concepts, see the [Browser Management Guide](/guide/concepts/browser-management).
+1. Use visible mode when debugging login issues
+2. Keep multiple browser versions for compatibility testing
+3. Use verbose logging to understand behavior
+4. Test with both Chrome and Firefox
+
+### CI/CD
+
+1. Cache browser downloads between pipeline runs
+2. Use specific versions to avoid unexpected changes
+3. Include browser installation in your deployment scripts
+4. Test browser functionality in your pipeline
+
+For conceptual information, see the Browser Management Guide.
