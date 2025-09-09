@@ -1,132 +1,288 @@
-import { defineConfig } from 'vitepress'
+import { joinURL, withoutTrailingSlash } from "ufo";
 
-export default defineConfig({
-  title: 'Butler Sheet Icons',
-  description: 'Automatically create Qlik Sense sheet thumbnail images',
+import { defineConfig } from "vitepress";
+import { withMermaid } from "vitepress-plugin-mermaid";
+
+// Generated at build time by scripts/fetch-bsi-version.mjs
+import { version as bsiVersion } from "./version.js";
+
+export default withMermaid({
+  title: "Butler Sheet Icons",
+  description: "Automatically create Qlik Sense sheet thumbnail images",
+  base: "/",
+  lang: "en-US",
+  cleanUrls: true,
+  sitemap: {
+    hostname: "https://butler-sheet-icons.ptarmiganlabs.com",
+  },
+
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
-    ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'Butler Sheet Icons Documentation' }],
-    ['meta', { property: 'og:description', content: 'Automatically create Qlik Sense sheet thumbnail images' }],
+    ["link", { rel: "icon", href: "/favicon.ico" }],
+    ["meta", { property: "og:type", content: "website" }],
+    [
+      "meta",
+      { property: "og:title", content: "Butler Sheet Icons Documentation" },
+    ],
+    [
+      "meta",
+      {
+        property: "og:description",
+        content: "Automatically create Qlik Sense sheet thumbnail images",
+      },
+    ],
+
+    [
+      "script",
+      {
+        defer: "",
+        "data-domain": "butler-sheet-icons.ptarmiganlabs.com",
+        src: "https://plausible.io/js/script.file-downloads.outbound-links.js",
+      },
+    ],
+    [
+      "script",
+      {},
+      `window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }`,
+    ],
   ],
 
   themeConfig: {
-    logo: '/images/butler-sheet-icons-logo.png',
-    
+    logo: "/images/butler-sheet-icons-logo.png",
+
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/introduction' },
-      { text: 'Reference', link: '/reference/commands' },
-      { text: 'Examples', link: '/examples/' },
-      { 
-        text: 'v3.8.0', 
+      { text: "Home", link: "/" },
+      { text: "Guide", link: "/guide/introduction" },
+      { text: "Reference", link: "/reference/commands" },
+      { text: "Examples", link: "/examples/" },
+      {
+        text: bsiVersion,
         items: [
-          { text: 'Changelog', link: 'https://github.com/ptarmiganlabs/butler-sheet-icons/blob/main/CHANGELOG.md' },
-          { text: 'GitHub', link: 'https://github.com/ptarmiganlabs/butler-sheet-icons' }
-        ]
-      }
+          {
+            text: "Downloads",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/releases",
+          },
+          {
+            text: "Issues",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/issues",
+          },
+          {
+            text: "Discussions",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/discussions",
+          },
+          {
+            text: "Changelog",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/blob/main/CHANGELOG.md",
+          },
+          {
+            text: "Ptarmigan Labs main site",
+            link: "https://ptarmiganlabs.com",
+          },
+        ],
+      },
     ],
 
     sidebar: {
-      '/guide/': [
+      "/guide/": [
         {
-          text: 'Getting Started',
+          text: "Getting Started",
           items: [
-            { text: 'Introduction', link: '/guide/introduction' },
-            { text: 'Quick Start', link: '/guide/quick-start' },
-            { text: 'Installation', link: '/guide/installation' }
-          ]
+            { text: "Introduction", link: "/guide/introduction" },
+            { text: "Quick Start", link: "/guide/quick-start" },
+            { text: "Installation", link: "/guide/installation" },
+          ],
         },
         {
-          text: 'Configuration',
+          text: "Configuration",
           items: [
-            { text: 'Overview', link: '/guide/configuration/' },
-            { text: 'Qlik Sense Cloud', link: '/guide/configuration/qlik-sense-cloud' },
-            { text: 'Qlik Sense Enterprise (QSEoW)', link: '/guide/configuration/qseow' }
-          ]
+            { text: "Overview", link: "/guide/configuration/" },
+            {
+              text: "Qlik Sense Cloud",
+              link: "/guide/configuration/qlik-sense-cloud",
+            },
+            {
+              text: "Qlik Sense Enterprise (QSEoW)",
+              link: "/guide/configuration/qseow",
+            },
+          ],
         },
         {
-          text: 'Core Concepts',
+          text: "Core Concepts",
           items: [
-            { text: 'How It Works', link: '/guide/concepts/how-it-works' },
-            { text: 'Sheet Exclusion', link: '/guide/concepts/sheet-exclusion' },
-            { text: 'Sheet Blurring', link: '/guide/concepts/sheet-blurring' },
-            { text: 'Browser Management', link: '/guide/concepts/browser-management' },
-            { text: 'Environment Variables', link: '/guide/concepts/environment-variables' }
-          ]
+            { text: "How It Works", link: "/guide/concepts/how-it-works" },
+            {
+              text: "Sheet Exclusion",
+              link: "/guide/concepts/sheet-exclusion",
+            },
+            { text: "Sheet Blurring", link: "/guide/concepts/sheet-blurring" },
+            { text: "Sheet Parts", link: "/guide/concepts/sheet-parts" },
+            {
+              text: "Browser Management",
+              link: "/guide/concepts/browser-management",
+            },
+            {
+              text: "Environment Variables",
+              link: "/guide/concepts/environment-variables",
+            },
+          ],
         },
         {
-          text: 'Advanced Topics',
+          text: "Advanced Topics",
           items: [
-            { text: 'CI/CD Integration', link: '/guide/advanced/ci-cd' },
-            { text: 'Docker Usage', link: '/guide/advanced/docker' },
-            { text: 'Proxy Configuration', link: '/guide/advanced/proxy' },
-            { text: 'Troubleshooting', link: '/guide/troubleshooting' }
-          ]
-        }
+            { text: "CI/CD Integration", link: "/guide/advanced/ci-cd" },
+            { text: "Docker Usage", link: "/guide/advanced/docker" },
+            { text: "Proxy Configuration", link: "/guide/advanced/proxy" },
+            { text: "Troubleshooting", link: "/guide/troubleshooting" },
+          ],
+        },
       ],
-      '/reference/': [
+      "/reference/": [
         {
-          text: 'Command Reference',
+          text: "Command Reference",
           items: [
-            { text: 'Overview', link: '/reference/commands' },
-            { text: 'QSEoW Commands', link: '/reference/qseow' },
-            { text: 'QS Cloud Commands', link: '/reference/qscloud' },
-            { text: 'Browser Commands', link: '/reference/browser' }
-          ]
+            { text: "Overview", link: "/reference/commands" },
+            { text: "QSEoW Commands", link: "/reference/qseow" },
+            { text: "QS Cloud Commands", link: "/reference/qscloud" },
+            { text: "Browser Commands", link: "/reference/browser" },
+          ],
         },
         {
-          text: 'API Reference',
+          text: "API Reference",
           items: [
-            { text: 'Supported Versions', link: '/reference/supported-versions' },
-            { text: 'Security', link: '/reference/security' }
-          ]
-        }
+            {
+              text: "Supported Versions",
+              link: "/reference/supported-versions",
+            },
+            { text: "Security", link: "/reference/security" },
+          ],
+        },
       ],
-      '/examples/': [
+      "/examples/": [
         {
-          text: 'Usage Examples',
+          text: "Usage Examples",
           items: [
-            { text: 'Overview', link: '/examples/' },
-            { text: 'QS Cloud Examples', link: '/examples/qscloud' },
-            { text: 'QSEoW Examples', link: '/examples/qseow' },
-            { text: 'Docker Examples', link: '/examples/docker' },
-            { text: 'Browser Management', link: '/examples/browser-management' }
-          ]
-        }
-      ]
+            { text: "Overview", link: "/examples/" },
+            { text: "QS Cloud Examples", link: "/examples/qscloud" },
+            { text: "QSEoW Examples", link: "/examples/qseow" },
+            { text: "Docker Examples", link: "/examples/docker" },
+            {
+              text: "Browser Management",
+              link: "/examples/browser-management",
+            },
+          ],
+        },
+      ],
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/ptarmiganlabs/butler-sheet-icons' }
+      {
+        icon: "github",
+        link: "https://github.com/ptarmiganlabs/butler-sheet-icons",
+      },
     ],
 
     footer: {
-      message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024 Ptarmigan Labs'
+      message: "Released under the MIT License.",
+      copyright: "Copyright © 2025 Ptarmigan Labs",
     },
 
     search: {
-      provider: 'local'
-    },
-
-    editLink: {
-      pattern: 'https://github.com/ptarmiganlabs/butler-sheet-icons-docs/edit/main/docs/:path',
-      text: 'Edit this page on GitHub'
+      provider: "local",
     },
 
     lastUpdated: {
-      text: 'Updated at',
+      text: "Updated at",
       formatOptions: {
-        dateStyle: 'full',
-        timeStyle: 'medium'
-      }
-    }
+        dateStyle: "full",
+        timeStyle: "medium",
+      },
+    },
   },
 
-  markdown: {
-    config: (md) => {
-      // Configure markdown-it here if needed
-    }
-  }
-})
+  mermaid: {
+    // refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options
+  },
+  // optionally set additional config for plugin itself with MermaidPluginConfig
+  // mermaidPlugin: {
+  //   class: "mermaid my-class", // set additional css classes for parent container
+  // },
+
+  // markdown: {
+  //   // Enable Mermaid diagrams like ```mermaid code fences
+  //   mermaid: true,
+  //   config: (md) => {
+  //     // Configure markdown-it here if needed
+  //   },
+  // },
+
+  transformPageData: (pageData, { siteConfig }) => {
+    // Initialize the `head` frontmatter if it doesn't exist.
+    pageData.frontmatter.head ??= [];
+
+    // Create canonical URL
+    pageData.frontmatter.head.push([
+      "link",
+      {
+        rel: "canonical",
+        href: joinURL(
+          "https://butler-sheet-icons.ptarmiganlabs.com",
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+        ),
+      },
+    ]);
+
+    pageData.frontmatter.head.push([
+      "meta",
+      {
+        property: "og:url",
+        content: joinURL(
+          "https://butler-sheet-icons.ptarmiganlabs.com",
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+        ),
+      },
+    ]);
+
+    // Add basic meta tags to the frontmatter.
+    pageData.frontmatter.head.push(
+      [
+        "meta",
+        {
+          property: "og:title",
+          content:
+            pageData.frontmatter.title ||
+            pageData.title ||
+            siteConfig.site.title,
+        },
+      ],
+      [
+        "meta",
+        {
+          name: "twitter:title",
+          content:
+            pageData.frontmatter.title ||
+            pageData.title ||
+            siteConfig.site.title,
+        },
+      ],
+      [
+        "meta",
+        {
+          property: "og:description",
+          content:
+            pageData.frontmatter.description ||
+            pageData.description ||
+            siteConfig.site.description,
+        },
+      ],
+      [
+        "meta",
+        {
+          name: "twitter:description",
+          content:
+            pageData.frontmatter.description ||
+            pageData.description ||
+            siteConfig.site.description,
+        },
+      ]
+    );
+  },
+});

@@ -8,11 +8,6 @@ This section contains practical examples for using Butler Sheet Icons in various
 - [QSEoW Examples](/examples/qseow)
 - [Docker Examples](/examples/docker)
 
-## By Use Case
+## General
 
 - [Browser Management](/examples/browser-management)
-- Single app updates
-- Bulk operations
-- CI/CD integration
-
-*More examples coming soon...*

@@ -2,11 +2,12 @@
 layout: home
 
 hero:
-  name: "Butler Sheet Icons"
+  # name: "Butler Sheet Icons"
+  name: ""
   text: "Qlik Sense Sheet Thumbnails"
   tagline: "Automatically create thumbnail images based on the actual layout of sheets in Qlik Sense applications"
   image:
-    src: /images/butler-sheet-icons-hero.png
+    src: /images/butler-sheet-icons-logo.png
     alt: Butler Sheet Icons
   actions:
     - theme: brand
@@ -62,12 +63,35 @@ butler-sheet-icons qscloud create-sheet-icons \
   --appid app-id
 ```
 
+## See it in Action
+
+Here's Butler Sheet Icons running on macOS, updating sheet icons in a Qlik Sense Cloud app:
+
+![Butler Sheet Icons Demo](/images/demo-animated.gif "Butler Sheet Icons in action")
+
+## Before and After
+
+Butler Sheet Icons transforms your app overview from plain sheet listings to visual thumbnails:
+
+### Before
+
+![App Overview Before](/images/app-overview-before.png "App overview without thumbnails")
+
+### After
+
+![App Overview After](/images/app-overview-after.png "App overview with generated thumbnails")
+
 ## Supported Platforms
+
+Execution environments:
 
 - ✅ Windows (binaries signed with commercial certificate)
 - ✅ macOS (notarized by Apple)
 - ✅ Linux
 - ✅ Docker containers
+
+Qlik Sense product support:
+
 - ✅ Qlik Sense Cloud
 - ✅ Qlik Sense Enterprise on Windows
 
@@ -79,6 +103,6 @@ Ready to automate your sheet thumbnails? Check out our [Quick Start Guide](/guid
 
 <div class="vp-doc">
 
-*Butler Sheet Icons is an open-source project sponsored by [Ptarmigan Labs](https://ptarmiganlabs.com). For support and services relating to the Butler family of tools or Qlik Sense projects in general, please contact info@ptarmiganlabs.com.*
+_Butler Sheet Icons is an open-source project sponsored by [Ptarmigan Labs](https://ptarmiganlabs.com). For support and services relating to the Butler family of tools or Qlik Sense projects in general, please contact info@ptarmiganlabs.com._
 
 </div>

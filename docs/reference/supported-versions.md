@@ -8,17 +8,17 @@ Butler Sheet Icons supports multiple QSEoW versions using the `--sense-version` 
 
 ### Currently Supported Versions
 
-| QSEoW Version | BSI Version | Last Tested | Command Parameter | Status |
-|---------------|-------------|-------------|-------------------|---------|
-| 2024-Nov IR | 3.8.0 | 2025-Jan-6 | `--sense-version 2024-Nov` | ✅ Supported |
-| 2024-May IR | 3.8.0 | 2024-Dec-6 | `--sense-version 2024-May` | ✅ Supported |
-| 2023-Nov patch 3 | 3.6.4 | 2024-Nov-6 | `--sense-version 2023-Nov` | ✅ Supported |
-| 2023-Aug patch 3 | 3.6.0 | 2024-Jan-4 | `--sense-version 2023-Aug` | ✅ Supported |
-| 2023-May patch 6 | 3.5.0 | 2023-Oct-6 | `--sense-version 2023-May` | ✅ Supported |
-| 2023-Feb IR | 3.4.0 | 2023-Jul-24 | `--sense-version 2023-Feb` | ✅ Supported |
-| 2022-Nov patch 2 | 3.2.0 | 2023-Jan-3 | `--sense-version 2022-Nov` | ✅ Supported |
-| 2022-Aug patch 5 | 3.1.0 | 2023-Jan-2 | `--sense-version pre-2022-Nov` | ⚠️ Legacy Support |
-| 2022-May IR | 3.0.0 | 2022-Sep-30 | `--sense-version pre-2022-Nov` | ⚠️ Legacy Support |
+| QSEoW Version    | BSI Version | Last Tested | Command Parameter              | Status            |
+| ---------------- | ----------- | ----------- | ------------------------------ | ----------------- |
+| 2024-Nov IR      | 3.8.0       | 2025-Jan-6  | `--sense-version 2024-Nov`     | ✅ Supported      |
+| 2024-May IR      | 3.8.0       | 2024-Dec-6  | `--sense-version 2024-May`     | ✅ Supported      |
+| 2023-Nov patch 3 | 3.6.4       | 2024-Nov-6  | `--sense-version 2023-Nov`     | ✅ Supported      |
+| 2023-Aug patch 3 | 3.6.0       | 2024-Jan-4  | `--sense-version 2023-Aug`     | ✅ Supported      |
+| 2023-May patch 6 | 3.5.0       | 2023-Oct-6  | `--sense-version 2023-May`     | ✅ Supported      |
+| 2023-Feb IR      | 3.4.0       | 2023-Jul-24 | `--sense-version 2023-Feb`     | ✅ Supported      |
+| 2022-Nov patch 2 | 3.2.0       | 2023-Jan-3  | `--sense-version 2022-Nov`     | ✅ Supported      |
+| 2022-Aug patch 5 | 3.1.0       | 2023-Jan-2  | `--sense-version pre-2022-Nov` | ⚠️ Legacy Support |
+| 2022-May IR      | 3.0.0       | 2022-Sep-30 | `--sense-version pre-2022-Nov` | ⚠️ Legacy Support |
 
 ### Version Selection
 
@@ -30,7 +30,7 @@ butler-sheet-icons qseow create-sheet-thumbnails \
   --sense-version 2024-May \
   # ... other options
 
-# For November 2023 release  
+# For November 2023 release
 butler-sheet-icons qseow create-sheet-thumbnails \
   --sense-version 2023-Nov \
   # ... other options
@@ -39,40 +39,38 @@ butler-sheet-icons qseow create-sheet-thumbnails \
 ### Finding Your QSEoW Version
 
 1. **QMC Method**:
+
    - Log into the Qlik Management Console (QMC)
-   - Navigate to "About" section
-   - Look for "Product version" information
+   - Version is displayed in lower right corner
 
 2. **Hub Method**:
+
    - Log into Qlik Sense Hub
    - Click your profile menu → About
-   - Version information is displayed
-
-3. **API Method**:
-   ```bash
-   curl -X GET "https://your-server/qrs/about" \
-        --cert client.pem \
-        --key client_key.pem
-   ```
+   - Version information is displayed in the popup window
 
 ### Version-Specific Notes
 
 **2024-Nov and Later:**
+
 - Enhanced security features
 - Updated web interface elements
 - Improved performance for large apps
 
 **2024-May:**
+
 - New sheet navigation patterns
 - Updated selection bar styling
 - Enhanced mobile responsiveness
 
 **2023 Releases:**
+
 - Modernized web interface
 - New authentication flows
 - Updated navigation elements
 
 **2022 and Earlier:**
+
 - Legacy web interface
 - Different authentication patterns
 - Use `pre-2022-Nov` for versions before November 2022
@@ -83,47 +81,34 @@ Qlik Sense Cloud is continuously updated by Qlik. Butler Sheet Icons adapts to t
 
 ### Compatibility Status
 
-| Test Date | BSI Version | Region | Status | Notes |
-|-----------|-------------|---------|---------|-------|
-| 2025-Jan-6 | 3.8.0 | US, EU, AP | ✅ Working | All features functional |
-| 2024-Dec-6 | 3.7.0 | US, EU, AP | ✅ Working | Latest cloud features supported |
-| 2024-Nov-6 | 3.6.4 | US, EU, AP | ✅ Working | No issues detected |
-| 2024-Aug-23 | 3.6.3 | US, EU, AP | ✅ Working | Full compatibility |
-| 2024-Jun-3 | 3.6.2 | US, EU, AP | ✅ Working | New API endpoints supported |
-| 2024-Apr-24 | 3.5.0 | US, EU, AP | ✅ Working | Login page updates handled |
-| 2024-Apr-22 | 3.4.1 | US, EU, AP | ❌ Login Issues | Login page changes broke authentication |
-| 2024-Mar-8 | 3.4.1 | US, EU, AP | ✅ Working | After hotfix for login issues |
+| Test Date   | BSI Version | Status          | Notes                                   |
+| ----------- | ----------- | --------------- | --------------------------------------- |
+| 2025-Sep-8  | 3.8.0       | ✅ Working      | All features functional                 |
+| 2025-Jan-6  | 3.8.0       | ✅ Working      | All features functional                 |
+| 2024-Dec-6  | 3.7.0       | ✅ Working      | Latest cloud features supported         |
+| 2024-Nov-6  | 3.6.4       | ✅ Working      | No issues detected                      |
+| 2024-Aug-23 | 3.6.3       | ✅ Working      | Full compatibility                      |
+| 2024-Jun-3  | 3.6.2       | ✅ Working      | New API endpoints supported             |
+| 2024-Apr-24 | 3.5.0       | ✅ Working      | Login page updates handled              |
+| 2024-Apr-22 | 3.4.1       | ❌ Login Issues | Login page changes broke authentication |
+| 2024-Mar-8  | 3.4.1       | ✅ Working      | After hotfix for login issues           |
 
 ### Cloud-Specific Considerations
 
-**Regional Differences:**
-- All major regions (US, EU, AP) are supported
-- Minor UI differences between regions are handled automatically
-- API endpoints vary by region but are auto-detected
-
 **Continuous Updates:**
+
 - Qlik regularly updates the cloud interface
 - Butler Sheet Icons is updated to handle major changes
-- Some temporary compatibility issues may occur during Qlik's deployment windows
-
-**No Version Parameter Needed:**
-- Unlike QSEoW, no version parameter is required for QS Cloud
-- Butler Sheet Icons automatically adapts to the current cloud version
+- If issues arise, check for latest BSI version or [open a GitHub issue](https://github.com/ptarmiganlabs/butler-sheet-icons/issues/new/choose).
 
 ## Browser Compatibility
 
-Butler Sheet Icons uses headless browsers for screenshot capture. Different browser versions may produce slightly different results.
-
-### Supported Browsers
-
-| Browser | Versions | Recommendation | Notes |
-|---------|----------|----------------|-------|
-| **Chrome** | 120+ | ✅ Recommended | Best compatibility and performance |
-| **Chrome** | 115-119 | ✅ Supported | Good compatibility |
-| **Chrome** | <115 | ⚠️ Limited | May have compatibility issues |
-| **Firefox** | Latest | ✅ Supported | Alternative option, latest only |
+Butler Sheet Icons uses headless browsers for screenshot capture.  
+The latest available version will be used by default, it usually works well.
 
 ### Browser Selection
+
+A specific browser and version can be specified if needed.
 
 ```bash
 # Use latest Chrome (recommended)
@@ -159,70 +144,46 @@ butler-sheet-icons browser install --browser chrome
 
 ### Operating Systems
 
-| Platform | Architecture | Status | Notes |
-|----------|-------------|---------|-------|
-| **Windows** | x64 | ✅ Fully Supported | Signed binaries, Windows 10+ |
-| **Windows** | ARM64 | ⚠️ Limited | Via Node.js source only |
-| **macOS** | Intel x64 | ✅ Fully Supported | Notarized binaries |
-| **macOS** | Apple Silicon (M1/M2) | ✅ Fully Supported | Native ARM64 support |
-| **Linux** | x64 | ✅ Fully Supported | Most distributions |
-| **Linux** | ARM64 | ⚠️ Limited | Via Node.js source only |
+| Platform    | Architecture                | Status             | Notes                        |
+| ----------- | --------------------------- | ------------------ | ---------------------------- |
+| **Windows** | x64                         | ✅ Fully Supported | Signed binaries, Windows 10+ |
+| **Windows** | ARM64                       | ⚠️ Limited         | Via Node.js source only      |
+| **macOS**   | Intel x64                   | ✅ Fully Supported | Notarized binaries           |
+| **macOS**   | Apple Silicon (M1/M2/M3/M4) | ⚠️ Coming          | Via Node.js source only      |
+| **Linux**   | x64                         | ✅ Fully Supported | Most distributions           |
+| **Linux**   | ARM64                       | ⚠️ Limited         | Via Node.js source only      |
 
 ### Container Support
 
-| Platform | Status | Notes |
-|----------|---------|-------|
-| **Docker** | ✅ Fully Supported | Linux containers, multi-arch |
-| **Kubernetes** | ✅ Supported | Via Docker images |
-| **Podman** | ✅ Supported | Compatible with Docker images |
+| Platform       | Status             | Notes                         |
+| -------------- | ------------------ | ----------------------------- |
+| **Docker**     | ✅ Fully Supported | Linux containers, multi-arch  |
+| **Kubernetes** | ✅ Supported       | Via Docker images             |
+| **Podman**     | ✅ Supported       | Compatible with Docker images |
 
 ## Node.js Compatibility
 
 For users running Butler Sheet Icons from source:
 
-| Node.js Version | Status | Notes |
-|-----------------|---------|-------|
-| **20.x LTS** | ✅ Recommended | Current LTS, fully tested |
-| **18.x LTS** | ✅ Supported | Previous LTS, well tested |
-| **16.x LTS** | ⚠️ Legacy | End of life, use at own risk |
-| **<16.x** | ❌ Unsupported | Not compatible |
-
-## API Compatibility
-
-### Qlik Sense Engine API
-
-Butler Sheet Icons uses the Qlik Sense Engine API for app and sheet metadata:
-
-| Engine Version | Schema Version | Status |
-|----------------|----------------|---------|
-| **12.612.0+** | 12.612.0 | ✅ Current default |
-| **12.x** | 12.612.0 | ✅ Supported |
-| **<12.x** | Custom | ⚠️ May require schema adjustment |
-
-### QSEoW Repository Service (QRS)
-
-| QRS Version | Status | Notes |
-|-------------|---------|-------|
-| **Current** | ✅ Supported | All recent QSEoW versions |
-| **Legacy** | ⚠️ Limited | Some features may not work |
-
-### Qlik Sense Cloud APIs
-
-| API Version | Status | Notes |
-|-------------|---------|-------|
-| **Current** | ✅ Supported | Auto-detected and adapted |
-| **Legacy** | ✅ Supported | Backward compatibility maintained |
+| Node.js Version | Status         | Notes                     |
+| --------------- | -------------- | ------------------------- |
+| **20.x LTS**    | ✅ Recommended | Current LTS, fully tested |
+| **18.x LTS**    | ✅ Supported   | Previous LTS, well tested |
+| **16.x LTS**    | ❌ Unsupported | Not compatible            |
+| **<16.x**       | ❌ Unsupported | Not compatible            |
 
 ## Upgrade Path
 
 ### From BSI 2.x to 3.x
 
 **Breaking Changes:**
+
 - `--sense-version` parameter now mandatory for QSEoW
 - Some command options renamed
 - Browser management improved
 
 **Migration Steps:**
+
 1. Update to latest BSI 3.x
 2. Add `--sense-version` parameter to QSEoW commands
 3. Review command options for any changes
@@ -231,12 +192,14 @@ Butler Sheet Icons uses the Qlik Sense Engine API for app and sheet metadata:
 ### From BSI 1.x to 3.x
 
 **Major Changes:**
+
 - Complete rewrite with improved reliability
 - New browser management system
 - Enhanced error handling
 - Better logging and debugging
 
 **Migration Steps:**
+
 1. Review all command-line options (many changed)
 2. Update scripts and automation
 3. Test thoroughly before production use
@@ -267,12 +230,14 @@ node --version
 When reporting version compatibility issues:
 
 1. **Include Version Information**:
+
    - Butler Sheet Icons version
    - Qlik Sense version (exact build number if possible)
    - Operating system and version
    - Browser version being used
 
 2. **Provide Context**:
+
    - What worked vs. what didn't
    - Error messages
    - Screenshots if UI-related
@@ -284,12 +249,14 @@ When reporting version compatibility issues:
 ## Future Compatibility
 
 Butler Sheet Icons is actively maintained to support:
+
 - Latest Qlik Sense Cloud updates
 - New QSEoW releases
 - Current browser versions
 - Modern operating systems
 
 **Support Policy:**
+
 - Latest 3 major QSEoW releases fully supported
 - Current Qlik Sense Cloud always supported
 - Security updates for all supported versions

@@ -122,9 +122,9 @@ Custom styles can be added via:
 
 ## 🚀 Deployment
 
-### GitHub Pages with Custom Domain (bsi.ptarmiganlabs.com)
+### GitHub Pages with Custom Domain (butler-sheet-icons.ptarmiganlabs.com)
 
-The site is configured to deploy to GitHub Pages with the custom domain `bsi.ptarmiganlabs.com`.
+The site is configured to deploy to GitHub Pages with the custom domain `butler-sheet-icons.ptarmiganlabs.com`.
 
 #### Automated Deployment Scripts
 
@@ -142,7 +142,7 @@ npm run deploy:publish  # Deploy to gh-pages branch
 **1. DNS Configuration**
 
 - Create a CNAME record in your DNS provider:
-  - **Name**: `bsi` (or `bsi.ptarmiganlabs`)
+  - **Name**: `butler-sheet-icons` (or `butler-sheet-icons.ptarmiganlabs`)
   - **Value**: `ptarmiganlabs.github.io`
   - **TTL**: 300 (or your preferred value)
 
@@ -151,14 +151,14 @@ npm run deploy:publish  # Deploy to gh-pages branch
 - Go to repository Settings → Pages
 - Set **Source** to "Deploy from a branch"
 - Select **Branch**: `gh-pages` and **Folder**: `/ (root)`
-- Set **Custom domain** to: `bsi.ptarmiganlabs.com`
+- Set **Custom domain** to: `butler-sheet-icons.ptarmiganlabs.com`
 - Enable **Enforce HTTPS**
 
 **3. Verify Setup**
 
 - DNS propagation may take up to 24 hours
 - GitHub will verify domain ownership automatically
-- Check that https://bsi.ptarmiganlabs.com loads correctly
+- Check that https://butler-sheet-icons.ptarmiganlabs.com loads correctly
 
 #### Alternative: GitHub Actions Deployment
 

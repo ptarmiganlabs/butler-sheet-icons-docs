@@ -4,12 +4,12 @@
   "description": "Documentation site for Butler Sheet Icons",
   "type": "module",
   "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
-    "deploy:build": "npm run docs:build",
-    "deploy:publish": "gh-pages -d docs/.vitepress/dist",
-    "deploy": "npm run deploy:build && npm run deploy:publish"
+    "pre:version": "node ./scripts/fetch-bsi-version.mjs",
+    "docs:dev": "npm run pre:version && vitepress dev ./docs",
+    "docs:build": "npm run pre:version && vitepress build ./docs",
+    "docs:preview": "npm run pre:version && vitepress preview ./docs",
+    "deploy": "npm run docs:build && gh-pages -d docs/.vitepress/dist",
+    "deploy:ci": "npm run docs:build"
   },
   "keywords": [
     "qlik-sense",
@@ -22,6 +22,9 @@
   "license": "MIT",
   "devDependencies": {
     "gh-pages": "^6.3.0",
-    "vitepress": "^1.6.4"
+    "mermaid": "^11.11.0",
+    "ufo": "^1.6.1",
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17"
   }
 }
