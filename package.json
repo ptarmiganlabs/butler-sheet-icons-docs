@@ -23,6 +23,7 @@
   "devDependencies": {
     "gh-pages": "^6.3.0",
     "mermaid": "^11.11.0",
+    "ufo": "^1.6.1",
     "vitepress": "^1.6.4",
     "vitepress-plugin-mermaid": "^2.0.17"
   }

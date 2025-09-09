@@ -81,16 +81,17 @@ Qlik Sense Cloud is continuously updated by Qlik. Butler Sheet Icons adapts to t
 
 ### Compatibility Status
 
-| Test Date   | BSI Version | Region     | Status          | Notes                                   |
-| ----------- | ----------- | ---------- | --------------- | --------------------------------------- |
-| 2025-Jan-6  | 3.8.0       | US, EU, AP | ✅ Working      | All features functional                 |
-| 2024-Dec-6  | 3.7.0       | US, EU, AP | ✅ Working      | Latest cloud features supported         |
-| 2024-Nov-6  | 3.6.4       | US, EU, AP | ✅ Working      | No issues detected                      |
-| 2024-Aug-23 | 3.6.3       | US, EU, AP | ✅ Working      | Full compatibility                      |
-| 2024-Jun-3  | 3.6.2       | US, EU, AP | ✅ Working      | New API endpoints supported             |
-| 2024-Apr-24 | 3.5.0       | US, EU, AP | ✅ Working      | Login page updates handled              |
-| 2024-Apr-22 | 3.4.1       | US, EU, AP | ❌ Login Issues | Login page changes broke authentication |
-| 2024-Mar-8  | 3.4.1       | US, EU, AP | ✅ Working      | After hotfix for login issues           |
+| Test Date   | BSI Version | Status          | Notes                                   |
+| ----------- | ----------- | --------------- | --------------------------------------- |
+| 2025-Sep-8  | 3.8.0       | ✅ Working      | All features functional                 |
+| 2025-Jan-6  | 3.8.0       | ✅ Working      | All features functional                 |
+| 2024-Dec-6  | 3.7.0       | ✅ Working      | Latest cloud features supported         |
+| 2024-Nov-6  | 3.6.4       | ✅ Working      | No issues detected                      |
+| 2024-Aug-23 | 3.6.3       | ✅ Working      | Full compatibility                      |
+| 2024-Jun-3  | 3.6.2       | ✅ Working      | New API endpoints supported             |
+| 2024-Apr-24 | 3.5.0       | ✅ Working      | Login page updates handled              |
+| 2024-Apr-22 | 3.4.1       | ❌ Login Issues | Login page changes broke authentication |
+| 2024-Mar-8  | 3.4.1       | ✅ Working      | After hotfix for login issues           |
 
 ### Cloud-Specific Considerations
 
@@ -102,18 +103,12 @@ Qlik Sense Cloud is continuously updated by Qlik. Butler Sheet Icons adapts to t
 
 ## Browser Compatibility
 
-Butler Sheet Icons uses headless browsers for screenshot capture. Different browser versions may produce slightly different results.
-
-### Supported Browsers
-
-| Browser     | Versions | Recommendation | Notes                              |
-| ----------- | -------- | -------------- | ---------------------------------- |
-| **Chrome**  | 120+     | ✅ Recommended | Best compatibility and performance |
-| **Chrome**  | 115-119  | ✅ Supported   | Good compatibility                 |
-| **Chrome**  | <115     | ⚠️ Limited     | May have compatibility issues      |
-| **Firefox** | Latest   | ✅ Supported   | Alternative option, latest only    |
+Butler Sheet Icons uses headless browsers for screenshot capture.  
+The latest available version will be used by default, it usually works well.
 
 ### Browser Selection
+
+A specific browser and version can be specified if needed.
 
 ```bash
 # Use latest Chrome (recommended)
@@ -170,12 +165,12 @@ butler-sheet-icons browser install --browser chrome
 
 For users running Butler Sheet Icons from source:
 
-| Node.js Version | Status         | Notes                        |
-| --------------- | -------------- | ---------------------------- |
-| **20.x LTS**    | ✅ Recommended | Current LTS, fully tested    |
-| **18.x LTS**    | ✅ Supported   | Previous LTS, well tested    |
-| **16.x LTS**    | ⚠️ Legacy      | End of life, use at own risk |
-| **<16.x**       | ❌ Unsupported | Not compatible               |
+| Node.js Version | Status         | Notes                     |
+| --------------- | -------------- | ------------------------- |
+| **20.x LTS**    | ✅ Recommended | Current LTS, fully tested |
+| **18.x LTS**    | ✅ Supported   | Previous LTS, well tested |
+| **16.x LTS**    | ❌ Unsupported | Not compatible            |
+| **<16.x**       | ❌ Unsupported | Not compatible            |
 
 ## Upgrade Path
 

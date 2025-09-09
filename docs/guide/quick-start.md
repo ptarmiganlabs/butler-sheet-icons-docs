@@ -1,6 +1,6 @@
 # Quick Start
 
-Are you the impatient kind and just want to try it out? Here's what you need to get started quickly with Butler Sheet Icons.
+Here's what you need to get started quickly with Butler Sheet Icons.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ For **Qlik Sense Enterprise on Windows (QSEoW)**:
 
 1. **[Download](https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest)** the binary for your platform (Windows, macOS, or Linux)
 
-2. **Create an API key** following the [Qlik documentation](https://qlik.dev/authenticate/api-key/generate-your-first-api-key)
+2. **Create an API key** as described in the [Qlik documentation](https://qlik.dev/authenticate/api-key/generate-your-first-api-key)
 
 3. **Run Butler Sheet Icons** with basic options:
 
@@ -97,7 +97,7 @@ Here's what it looks like when running Butler Sheet Icons for QS Cloud on Window
 :::
 
 ::: tip Note about Windows Authentication
-The `--prefix form` parameter tells Butler Sheet Icons to use a virtual proxy that uses form-based authentication. This is required when running on Windows, as the default Windows authentication doesn't work with the embedded browser.
+The `--prefix form` parameter tells Butler Sheet Icons to use a virtual proxy called "form", which is configured to use form-based authentication. This is required when running on Windows, as the default Windows authentication doesn't work with the embedded browser. The virtual proxy ("form" in this case) can be called anything as long as there is a matching virtual proxy - using form based authentication - configured in the Qlik Management Console (QMC).
 :::
 
 ### Example: QSEoW Execution

@@ -35,7 +35,7 @@ Butler Sheet Icons uses API keys to access QS Cloud APIs for app information and
    - For published apps, you can only update private sheet icons
 
 ::: danger API Key Security
-Store your API key securely using environment variables or secure secret management systems. Never commit API keys to source code.
+Store your API key securely using environment variables or secure secret management tools. Never commit API keys to source code.
 :::
 
 ### Using the API Key

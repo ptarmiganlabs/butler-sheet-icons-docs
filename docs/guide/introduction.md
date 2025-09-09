@@ -21,8 +21,8 @@ Butler Sheet Icons automates the last approach - creating thumbnail images that 
 
 ### 🚀 Cross-Platform Support
 
-- Windows (with commercial code signing)
-- macOS (notarized by Apple)
+- Windows
+- macOS
 - Linux
 - Docker containers
 

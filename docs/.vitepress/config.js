@@ -1,5 +1,8 @@
+import { joinURL, withoutTrailingSlash } from "ufo";
+
 import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
+
 // Generated at build time by scripts/fetch-bsi-version.mjs
 import { version as bsiVersion } from "./version.js";
 
@@ -7,6 +10,12 @@ export default withMermaid({
   title: "Butler Sheet Icons",
   description: "Automatically create Qlik Sense sheet thumbnail images",
   base: "/",
+  lang: "en-US",
+  cleanUrls: true,
+  sitemap: {
+    hostname: "https://butler-sheet-icons.ptarmiganlabs.com",
+  },
+
   head: [
     ["link", { rel: "icon", href: "/favicon.ico" }],
     ["meta", { property: "og:type", content: "website" }],
@@ -21,9 +30,21 @@ export default withMermaid({
         content: "Automatically create Qlik Sense sheet thumbnail images",
       },
     ],
-  ],
 
-  // plugins: [mermaidPlugin()],
+    [
+      "script",
+      {
+        defer: "",
+        "data-domain": "butler-sheet-icons.ptarmiganlabs.com",
+        src: "https://plausible.io/js/script.file-downloads.outbound-links.js",
+      },
+    ],
+    [
+      "script",
+      {},
+      `window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }`,
+    ],
+  ],
 
   themeConfig: {
     logo: "/images/butler-sheet-icons-logo.png",
@@ -41,12 +62,20 @@ export default withMermaid({
             link: "https://github.com/ptarmiganlabs/butler-sheet-icons/releases",
           },
           {
+            text: "Issues",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/issues",
+          },
+          {
+            text: "Discussions",
+            link: "https://github.com/ptarmiganlabs/butler-sheet-icons/discussions",
+          },
+          {
             text: "Changelog",
             link: "https://github.com/ptarmiganlabs/butler-sheet-icons/blob/main/CHANGELOG.md",
           },
           {
-            text: "GitHub",
-            link: "https://github.com/ptarmiganlabs/butler-sheet-icons",
+            text: "Ptarmigan Labs main site",
+            link: "https://ptarmiganlabs.com",
           },
         ],
       },
@@ -184,4 +213,76 @@ export default withMermaid({
   //     // Configure markdown-it here if needed
   //   },
   // },
+
+  transformPageData: (pageData, { siteConfig }) => {
+    // Initialize the `head` frontmatter if it doesn't exist.
+    pageData.frontmatter.head ??= [];
+
+    // Create canonical URL
+    pageData.frontmatter.head.push([
+      "link",
+      {
+        rel: "canonical",
+        href: joinURL(
+          "https://butler-sheet-icons.ptarmiganlabs.com",
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+        ),
+      },
+    ]);
+
+    pageData.frontmatter.head.push([
+      "meta",
+      {
+        property: "og:url",
+        content: joinURL(
+          "https://butler-sheet-icons.ptarmiganlabs.com",
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+        ),
+      },
+    ]);
+
+    // Add basic meta tags to the frontmatter.
+    pageData.frontmatter.head.push(
+      [
+        "meta",
+        {
+          property: "og:title",
+          content:
+            pageData.frontmatter.title ||
+            pageData.title ||
+            siteConfig.site.title,
+        },
+      ],
+      [
+        "meta",
+        {
+          name: "twitter:title",
+          content:
+            pageData.frontmatter.title ||
+            pageData.title ||
+            siteConfig.site.title,
+        },
+      ],
+      [
+        "meta",
+        {
+          property: "og:description",
+          content:
+            pageData.frontmatter.description ||
+            pageData.description ||
+            siteConfig.site.description,
+        },
+      ],
+      [
+        "meta",
+        {
+          name: "twitter:description",
+          content:
+            pageData.frontmatter.description ||
+            pageData.description ||
+            siteConfig.site.description,
+        },
+      ]
+    );
+  },
 });

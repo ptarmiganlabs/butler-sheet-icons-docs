@@ -10,9 +10,9 @@ The easiest and most common way to use Butler Sheet Icons is with the pre-built 
 
 Visit the [GitHub releases page](https://github.com/ptarmiganlabs/butler-sheet-icons/releases/latest) and download the appropriate binary for your platform:
 
-- **Windows**: `butler-sheet-icons-win.exe`
-- **macOS**: `butler-sheet-icons-macos`
-- **Linux**: `butler-sheet-icons-linux`
+- **Windows**: `butler-sheet-icons-<version>-win.zip`
+- **macOS**: `butler-sheet-icons-<version>-arm64-macos.zip` (Apple Silicon, M1/M2/M3/M4), `butler-sheet-icons-<version>-macos.zip` (Intel)
+- **Linux**: `butler-sheet-icons-<version>-linux.zip`
 
 ### Platform-Specific Notes
 
@@ -120,6 +120,7 @@ For developers, contributors, or when you need to modify the tool. Requires Node
    ```
 
 3. **Run from source**:
+
    ```bash
    node src/butler-sheet-icons.js --help
    ```
@@ -148,7 +149,7 @@ Regardless of installation method, Butler Sheet Icons expects certain file struc
 
 ### Default Directory Structure
 
-```
+```bash
 your-working-directory/
 ├── butler-sheet-icons      # Binary (or node src/)
 ├── cert/                   # QSEoW certificates (optional)
@@ -170,13 +171,14 @@ For Qlik Sense Enterprise on Windows, you'll need certificates:
 
 2. **Place in cert directory**:
 
-   ```
+   ```bash
    cert/
    ├── client.pem
    └── client_key.pem
    ```
 
-3. **Specify custom paths** (if needed):
+3. **Specify custom paths** using command line options if needed:
+
    ```bash
    --certfile /path/to/client.pem \
    --certkeyfile /path/to/client_key.pem

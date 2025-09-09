@@ -105,7 +105,7 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 
 ### GitHub Pages Configuration
 
-- **Custom Domain**: `bsi.ptarmiganlabs.com`
+- **Custom Domain**: `butler-sheet-icons.ptarmiganlabs.com`
 - **Branch**: `gh-pages` (automatically updated by deploy script)
 - **CNAME**: Configured for custom domain
 - **SSL**: Enforced HTTPS
@@ -115,7 +115,7 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 1. Content changes are made to `main` branch
 2. Run `npm run deploy` to build and publish
 3. GitHub Pages serves from `gh-pages` branch
-4. DNS points `bsi.ptarmiganlabs.com` to GitHub Pages
+4. DNS points `butler-sheet-icons.ptarmiganlabs.com` to GitHub Pages
 
 ## Code Quality & Testing
 

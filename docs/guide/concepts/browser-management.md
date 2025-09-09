@@ -24,7 +24,8 @@ Browsers are downloaded and stored in a cache directory:
 - **Windows**: `C:\Users\<username>\.cache\puppeteer\`
 - **macOS/Linux**: `~/.cache/puppeteer/`
 
-Each browser version is stored in its own subdirectory for easy management.
+Each browser version is stored in its own subdirectory for easy management.  
+There are Butler Sheet Icons browser management commands for installing, updating, and removing browsers.
 
 ## Initial Browser Setup
 

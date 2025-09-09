@@ -38,12 +38,12 @@ Tip: Titles with spaces must be wrapped in quotes.
 
 Sheets can have different statuses, and how they are handled differs between QS Cloud and QSEoW:
 
-| Platform | App state   | Sheets that can be updated by BSI |
-| -------- | ----------- | --------------------------------- |
-| QS Cloud | Published   | Private                           |
-| QS Cloud | Unpublished | Public, Published, Private        |
-| QSEoW    | Published   | Public, Published, Private        |
-| QSEoW    | Unpublished | Public, Published, Private        |
+| Platform | App state   | Sheets that can be updated by BSI                                   |
+| -------- | ----------- | ------------------------------------------------------------------- |
+| QS Cloud | Published   | Private. See ["Access Denied" tip](#tips-and-troubleshooting) below |
+| QS Cloud | Unpublished | Public, Published, Private                                          |
+| QSEoW    | Published   | Public, Published, Private                                          |
+| QSEoW    | Unpublished | Public, Published, Private                                          |
 
 Recommendations:
 
@@ -136,7 +136,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 ## Tips and troubleshooting
 
 - Hidden sheets are never updated by BSI (both QS Cloud and QSEoW).
-- If you get “Access denied” in QS Cloud on a published app, add --exclude-sheet-status public published to skip non-updatable sheets.
+- If you get “Access denied” in QS Cloud on a published app, add `--exclude-sheet-status public published` to skip non-updatable sheets.
 - Combine multiple exclude filters; they’re additive.
 - For privacy without fully excluding, consider blurring instead (see below).
 
