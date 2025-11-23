@@ -10,6 +10,7 @@ Butler Sheet Icons supports multiple QSEoW versions using the `--sense-version` 
 
 | QSEoW Version    | BSI Version | Last Tested | Command Parameter              | Status            |
 | ---------------- | ----------- | ----------- | ------------------------------ | ----------------- |
+| 2025-May         | 3.9.0       | 2025-Nov-22 | `--sense-version 2025-May`     | ✅ Supported      |
 | 2024-Nov IR      | 3.8.0       | 2025-Jan-6  | `--sense-version 2024-Nov`     | ✅ Supported      |
 | 2024-May IR      | 3.8.0       | 2024-Dec-6  | `--sense-version 2024-May`     | ✅ Supported      |
 | 2023-Nov patch 3 | 3.6.4       | 2024-Nov-6  | `--sense-version 2023-Nov`     | ✅ Supported      |
@@ -83,6 +84,7 @@ Qlik Sense Cloud is continuously updated by Qlik. Butler Sheet Icons adapts to t
 
 | Test Date   | BSI Version | Status          | Notes                                   |
 | ----------- | ----------- | --------------- | --------------------------------------- |
+| 2025-Nov-22 | 3.9.0       | ✅ Working      | All features functional                 |
 | 2025-Sep-8  | 3.8.0       | ✅ Working      | All features functional                 |
 | 2025-Jan-6  | 3.8.0       | ✅ Working      | All features functional                 |
 | 2024-Dec-6  | 3.7.0       | ✅ Working      | Latest cloud features supported         |

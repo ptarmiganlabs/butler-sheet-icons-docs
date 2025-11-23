@@ -2,6 +2,8 @@
 
 Butler Sheet Icons is available as a Docker image, making it perfect for containerized environments, CI/CD pipelines, and server deployments.
 
+The official image includes an embedded Chromium browser and is designed to work well in air-gapped environments. For a detailed explanation of how browsers are detected and how to override the embedded browser, see [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
+
 ## Docker Image Information
 
 - Image: `ptarmiganlabs/butler-sheet-icons:latest`
@@ -146,7 +148,7 @@ docker run --rm \
   --logonuserid your-username \
   --logonpwd your-password \
   --contentlibrary "Butler sheet thumbnails" \
-  --sense-version 2024-May \
+  --sense-version 2025-May \
   --imagedir ./img
 ```
 
@@ -165,7 +167,7 @@ docker run --rm `
   --logonuserid your-username `
   --logonpwd your-password `
   --contentlibrary "Butler sheet thumbnails" `
-  --sense-version 2024-May `
+  --sense-version 2025-May `
   --imagedir ./img
 ```
 
@@ -340,7 +342,7 @@ services:
       - BSI_QSEOW_CST_LOGON_USER_DIR=Internal
       - BSI_QSEOW_CST_LOGON_USER_ID=${LOGON_USER}
       - BSI_QSEOW_CST_LOGON_PWD=${LOGON_PASSWORD}
-      - BSI_QSEOW_CST_SENSE_VERSION=2024-May
+      - BSI_QSEOW_CST_SENSE_VERSION=2025-May
     command:
       [
         "qseow",
