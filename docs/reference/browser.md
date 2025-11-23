@@ -2,6 +2,8 @@
 
 Butler Sheet Icons (BSI) includes a comprehensive `browser` command that allows you to download, install, and manage browsers used for capturing sheet thumbnails. This command is particularly useful when you need specific browser versions for compatibility or testing purposes.
 
+For details on how BSI decides which browser to use at runtime, and how environment variables like `PUPPETEER_EXECUTABLE_PATH` affect that behaviour, see the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) concept page.
+
 ## Overview
 
 BSI uses its own browser cache system and does not rely on browsers installed elsewhere on your system. This ensures consistency and allows for precise version control. The browser command supports Chrome and Firefox across Windows, macOS, and Linux platforms.
@@ -16,14 +18,14 @@ butler-sheet-icons browser [command] [options]
 
 ### Available Commands
 
-| Command | Description |
-|---------|-------------|
+| Command          | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
 | `list-installed` | Show which browsers are currently installed and available for use by BSI |
-| `list-available` | Show which browsers are available for download and installation |
-| `install` | Install a browser into the BSI cache |
-| `uninstall` | Uninstall a specific browser from the BSI cache |
-| `uninstall-all` | Uninstall all browsers from the BSI cache |
-| `help` | Display help for browser commands |
+| `list-available` | Show which browsers are available for download and installation          |
+| `install`        | Install a browser into the BSI cache                                     |
+| `uninstall`      | Uninstall a specific browser from the BSI cache                          |
+| `uninstall-all`  | Uninstall all browsers from the BSI cache                                |
+| `help`           | Display help for browser commands                                        |
 
 ## Commands Reference
 
@@ -32,6 +34,7 @@ butler-sheet-icons browser [command] [options]
 Lists browsers currently installed in the BSI cache. Note that this only shows browsers installed by BSI, not system-wide browser installations.
 
 **Usage:**
+
 ```bash
 butler-sheet-icons browser list-installed [options]
 ```
@@ -43,6 +46,7 @@ butler-sheet-icons browser list-installed [options]
 | `-h, --help` | Display help for command | |
 
 **Example Output (Windows):**
+
 ```powershell
 PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
 2024-02-16T14:10:55.141Z info: App version: 3.2.3
@@ -55,6 +59,7 @@ PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
 Shows which browser versions are available for download. BSI automatically detects your operating system and only displays compatible versions.
 
 **Usage:**
+
 ```bash
 butler-sheet-icons browser list-available [options]
 ```
@@ -68,6 +73,7 @@ butler-sheet-icons browser list-available [options]
 | `-h, --help` | Display help for command | |
 
 **Example Output (macOS):**
+
 ```bash
 ➜  butler-sheet-icons ./butler-sheet-icons browser list-available --browser chrome --channel stable
 2024-02-16T14:15:46.237Z info: App version: 3.2.3
@@ -87,6 +93,7 @@ Note the build IDs (e.g., 121.0.6167.85) in the output. These are the exact iden
 Downloads and installs a browser into the BSI cache. By default, installs the latest stable version of Chrome.
 
 **Usage:**
+
 ```bash
 butler-sheet-icons browser install [options]
 ```
@@ -102,6 +109,7 @@ butler-sheet-icons browser install [options]
 **Examples:**
 
 Install latest Chrome (Windows):
+
 ```powershell
 PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser install
 2024-02-16T14:13:35.312Z info: App version: 3.2.3
@@ -111,6 +119,7 @@ PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser install
 ```
 
 Install latest Firefox (macOS):
+
 ```bash
 ➜  butler-sheet-icons ./butler-sheet-icons browser install --browser firefox --browser-version latest
 2024-02-16T14:17:47.673Z info: App version: 3.2.3
@@ -122,11 +131,13 @@ Install latest Firefox (macOS):
 #### Browser Version Notes
 
 **Chrome Versions:**
+
 - Chrome supports specific build IDs (e.g., `121.0.6167.85`)
 - Some older Chrome versions may no longer be available for download
 - Use `list-available` to see what versions are currently downloadable
 
 **Firefox Versions:**
+
 - Currently, only the `latest` version of Firefox is supported
 - Specific version support for Firefox is pending
 
@@ -139,6 +150,7 @@ If you try to install an older Chrome version that's no longer available, you'll
 Removes a specific browser version from the BSI cache. This doesn't affect other browsers on your system, only those in the BSI cache.
 
 **Usage:**
+
 ```bash
 butler-sheet-icons browser uninstall [options]
 ```
@@ -152,6 +164,7 @@ butler-sheet-icons browser uninstall [options]
 | `-h, --help` | Display help for command | |
 
 **Example (Windows):**
+
 ```powershell
 # First, see what's installed
 PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
@@ -179,6 +192,7 @@ PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
 Removes all browsers from the BSI cache. This is useful for cleaning up or resetting your browser cache.
 
 **Usage:**
+
 ```bash
 butler-sheet-icons browser uninstall-all [options]
 ```
@@ -190,6 +204,7 @@ butler-sheet-icons browser uninstall-all [options]
 | `-h, --help` | Display help for command | |
 
 **Example (macOS):**
+
 ```bash
 # Check current installations
 ➜  butler-sheet-icons ./butler-sheet-icons browser list-installed
@@ -220,10 +235,11 @@ butler-sheet-icons browser uninstall-all [options]
 ### Development Environment Setup
 
 1. **Install latest stable browsers:**
+
    ```bash
    # Install latest Chrome
    butler-sheet-icons browser install
-   
+
    # Install latest Firefox
    butler-sheet-icons browser install --browser firefox
    ```
@@ -250,11 +266,13 @@ butler-sheet-icons browser list-installed
 If you're experiencing browser-related problems:
 
 1. **Check available versions:**
+
    ```bash
    butler-sheet-icons browser list-available --browser chrome
    ```
 
 2. **Clean browser cache:**
+
    ```bash
    butler-sheet-icons browser uninstall-all
    ```

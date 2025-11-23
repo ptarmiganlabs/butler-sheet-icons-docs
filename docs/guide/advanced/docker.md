@@ -5,6 +5,9 @@ Butler Sheet Icons (BSI) is available as an official Docker image, making it eas
 - Image: `ptarmiganlabs/butler-sheet-icons:latest`
 - Runs headless; suitable for CI/CD and servers
 - Same features as pre-built binaries
+- Includes an embedded Chromium browser and is designed to work well in air-gapped environments
+
+For details on how the container decides which browser to use, and how to override the embedded browser with a cached or system browser, see [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
 
 ## Quick check
 
@@ -167,6 +170,7 @@ Notes
 - Mount `./images` for outputs and (for QSEoW) `./cert` for certificates (`client.pem`, `client_key.pem`).
 - Ensure the QSEoW content library exists (default: "Butler sheet thumbnails").
 - Environment variable names follow the BSI pattern; CLI flags override env vars.
+  - Browser usage inside the container is described in more detail on the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page.
 
 See also
 

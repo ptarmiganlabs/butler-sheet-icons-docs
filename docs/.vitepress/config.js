@@ -123,6 +123,10 @@ export default withMermaid({
               text: "Environment Variables",
               link: "/guide/concepts/environment-variables",
             },
+            {
+              text: "Browser detection & env vars",
+              link: "/guide/concepts/browser-detection-and-environment-variables",
+            },
           ],
         },
         {

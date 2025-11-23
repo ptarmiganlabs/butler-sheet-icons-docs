@@ -1,14 +1,16 @@
 # Browser Management
 
-Butler Sheet Icons uses an embedded web browser to automate the process of logging into Qlik Sense and capturing sheet thumbnails. Understanding how browser management works is essential for successful operation.
+Butler Sheet Icons uses a headless web browser to automate the process of logging into Qlik Sense and capturing sheet thumbnails. Understanding how browser management works is essential for successful operation.
 
 ## How Browser Management Works
 
-Butler Sheet Icons uses its own cache of browsers, completely separate from any browsers you might have installed on your computer. This approach ensures:
+By default Butler Sheet Icons uses its own cache of browsers, completely separate from any browsers you might have installed on your computer. This approach ensures:
 
 - **Consistency**: The same browser version across different environments
 - **Isolation**: No interference with your personal browser settings
 - **Control**: Ability to use specific browser versions for compatibility
+
+In addition to the cached browsers managed by BSI, you can also point BSI at a specific system browser executable via the `PUPPETEER_EXECUTABLE_PATH` environment variable. That is covered in more detail on the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page.
 
 ## Supported Browsers
 
@@ -29,11 +31,11 @@ There are Butler Sheet Icons browser management commands for installing, updatin
 
 ## Initial Browser Setup
 
-When running Butler Sheet Icons for the first time, you have several options:
+When running Butler Sheet Icons for the first time, you have several options. The most common ones are summarised below; the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page goes into more detail about detection order and environment variables.
 
 ### Automatic Download (Default)
 
-If no browser is specified, BSI will automatically download the latest stable version of Chrome:
+If no browser is specified, BSI will automatically download the latest stable version of Chrome (when needed):
 
 ::: code-group
 
@@ -51,7 +53,7 @@ butler-sheet-icons qscloud create-sheet-icons --tenanturl mytenant.eu.qlikcloud.
 
 ### Manual Browser Installation
 
-You can pre-install browsers using the browser management commands:
+You can pre-install browsers into the BSI cache using the browser management commands:
 
 ::: code-group
 
@@ -81,7 +83,7 @@ butler-sheet-icons browser install --browser firefox
 
 ## Browser Selection
 
-When running sheet icon creation commands, you can specify which browser to use:
+When running sheet icon creation commands, you can specify which browser to use from the BSI cache:
 
 ::: code-group
 
@@ -108,6 +110,8 @@ butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version
 ```
 
 :::
+
+If you instead want to force BSI to use a _system_ browser (for example a centrally managed Chrome or Edge installation), set `PUPPETEER_EXECUTABLE_PATH` before running BSI. This is described in detail on the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page.
 
 ## Browser Versions and Compatibility
 
