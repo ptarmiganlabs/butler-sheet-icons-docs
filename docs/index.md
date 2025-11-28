@@ -97,7 +97,7 @@ Qlik Sense product support:
 
 ## Getting Started
 
-Ready to automate your sheet thumbnails? Check out our [Quick Start Guide](/guide/quick-start) or jump straight into the [Installation Instructions](/guide/installation).
+Ready to automate your sheet thumbnails? Check out the [Quick Start Guide](/guide/quick-start) or jump straight into the [Installation Instructions](/guide/installation).
 
 ---
 

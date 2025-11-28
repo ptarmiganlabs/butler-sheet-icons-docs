@@ -7,22 +7,26 @@ This guide covers common issues and solutions when using Butler Sheet Icons. Mos
 Before diving into specific issues, try these general diagnostic steps:
 
 ### 1. Verify Installation
+
 ```bash
 butler-sheet-icons --version
 butler-sheet-icons --help
 ```
 
 ### 2. Test with Verbose Logging
+
 ```bash
 butler-sheet-icons qscloud create-sheet-icons --loglevel debug
 ```
 
 ### 3. Run in Non-Headless Mode
+
 ```bash
 butler-sheet-icons qscloud create-sheet-icons --headless false
 ```
 
 ### 4. Check Browser Installation
+
 ```bash
 butler-sheet-icons browser list-installed
 ```
@@ -32,6 +36,7 @@ butler-sheet-icons browser list-installed
 ### QS Cloud Authentication Problems
 
 **Symptoms:**
+
 - Login failures
 - "Invalid credentials" errors
 - Stuck on login page
@@ -39,12 +44,14 @@ butler-sheet-icons browser list-installed
 **Solutions:**
 
 1. **Verify Credentials**:
+
    ```bash
    # Test credentials manually by logging in through web browser
    # Ensure no special characters need escaping
    ```
 
 2. **Check API Key**:
+
    ```bash
    # Verify API key hasn't expired
    # Test API key with a simple curl request
@@ -53,16 +60,18 @@ butler-sheet-icons browser list-installed
    ```
 
 3. **MFA/SSO Issues**:
+
    ```bash
    # Try --skip-login for SSO environments
    --skip-login
-   
+
    # For MFA, ensure you're using app passwords where available
    ```
 
 ### QSEoW Authentication Problems
 
 **Symptoms:**
+
 - Certificate errors
 - "Access denied" messages
 - Connection timeouts
@@ -70,15 +79,17 @@ butler-sheet-icons browser list-installed
 **Solutions:**
 
 1. **Certificate Issues**:
+
    ```bash
    # Verify certificate files exist and have correct permissions
    ls -la cert/
-   
+
    # Re-export certificates from QMC if needed
    # Ensure certificates haven't expired
    ```
 
 2. **User Directory Issues**:
+
    ```bash
    # Verify user directory names are correct
    --apiuserdir "Internal"    # Note the quotes for spaces
@@ -86,10 +97,11 @@ butler-sheet-icons browser list-installed
    ```
 
 3. **Virtual Proxy Configuration**:
+
    ```bash
    # Ensure you're using form-based authentication
    --prefix form
-   
+
    # Check virtual proxy exists and is configured correctly
    ```
 
@@ -98,6 +110,7 @@ butler-sheet-icons browser list-installed
 ### Wrong QSEoW Version
 
 **Symptoms:**
+
 - Login works but navigation fails
 - Sheets don't load properly
 - JavaScript errors in debug mode
@@ -110,13 +123,14 @@ butler-sheet-icons browser list-installed
 --sense-version 2024-May    # Use exact version
 
 # Available versions:
-# 2024-Nov, 2024-May, 2023-Nov, 2023-Aug, 2023-May, 
+# 2024-Nov, 2024-May, 2023-Nov, 2023-Aug, 2023-May,
 # 2023-Feb, 2022-Nov, pre-2022-Nov
 ```
 
 ### Content Library Issues (QSEoW)
 
 **Symptoms:**
+
 - "Content library not found" errors
 - Upload failures
 - Permission denied errors
@@ -124,6 +138,7 @@ butler-sheet-icons browser list-installed
 **Solutions:**
 
 1. **Create Content Library**:
+
    ```bash
    # Library must exist before running BSI
    # Create in QMC → Content Libraries
@@ -131,6 +146,7 @@ butler-sheet-icons browser list-installed
    ```
 
 2. **Check Permissions**:
+
    ```bash
    # Ensure API user has write access to content library
    # Verify library path is accessible
@@ -144,6 +160,7 @@ butler-sheet-icons browser list-installed
 ### App Access Issues
 
 **Symptoms:**
+
 - "App not found" errors
 - "Access denied" for specific apps
 - Empty app lists
@@ -151,12 +168,14 @@ butler-sheet-icons browser list-installed
 **Solutions:**
 
 1. **Verify App IDs**:
+
    ```bash
    # Double-check app ID format (GUID)
    # Ensure app exists and is accessible
    ```
 
 2. **Check Permissions**:
+
    ```bash
    # QS Cloud: Verify user has access to app
    # QSEoW: Check app security rules
@@ -183,6 +202,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 ### Browser Installation Problems
 
 **Symptoms:**
+
 - "Browser not found" errors
 - Download failures during installation
 - Installation timeouts
@@ -191,58 +211,63 @@ Browser-related problems are among the most common issues when using Butler Shee
 **Solutions:**
 
 1. **Check Internet Connectivity**:
+
    ```bash
    # Test basic connectivity
    ping google.com
-   
+
    # Test HTTPS connectivity
    curl -I https://edgedl.me.gvt1.com
    ```
 
 2. **Manual Browser Installation**:
+
    ```bash
    # List what browsers are available for download
    butler-sheet-icons browser list-available --browser chrome
-   
+
    # Install browser manually
    butler-sheet-icons browser install --browser chrome
-   
+
    # Try a different browser version if one fails
    butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
    ```
 
 3. **Proxy Configuration Issues**:
+
    ```bash
    # For corporate networks, set proxy environment variables
    # Windows (PowerShell):
    $env:http_proxy='http://username:password@proxy.company.com:8080'
    $env:https_proxy='http://username:password@proxy.company.com:8080'
-   
+
    # macOS/Linux:
    export http_proxy='http://username:password@proxy.company.com:8080'
    export https_proxy='http://username:password@proxy.company.com:8080'
    ```
 
 4. **Disk Space Issues**:
+
    ```bash
    # Check available disk space (browsers are 100-200MB each)
    # Windows:
    dir C:\Users\%USERNAME%\.cache\puppeteer
-   
+
    # macOS/Linux:
    du -sh ~/.cache/puppeteer
    df -h ~/.cache
-   
+
    # Clean up old installations if needed
    butler-sheet-icons browser uninstall-all
    ```
 
 5. **Chrome Version Availability**:
+
    ```bash
    # Some older Chrome versions are no longer available
    # Check what's available:
    butler-sheet-icons browser list-available --browser chrome --channel stable
-   
+
    # Try a newer version if installation fails
    butler-sheet-icons browser install --browser chrome --browser-version latest
    ```
@@ -250,6 +275,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 ### Browser Runtime Crashes
 
 **Symptoms:**
+
 - Sudden browser termination during execution
 - "Browser disconnected" errors
 - Memory-related errors
@@ -258,37 +284,40 @@ Browser-related problems are among the most common issues when using Butler Shee
 **Solutions:**
 
 1. **Memory Management**:
+
    ```bash
    # Use headless mode to reduce memory usage (default)
    --headless true
-   
+
    # Increase page wait time to reduce load
    --pagewait 10
-   
+
    # Process fewer apps at once
    # Split large collections into smaller batches
    ```
 
 2. **Browser Selection and Versions**:
+
    ```bash
    # Try different browser
    --browser firefox
-   
+
    # Use specific stable browser version
    butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
    --browser chrome --browser-version 121.0.6167.85
-   
+
    # List installed browsers to verify
    butler-sheet-icons browser list-installed
    ```
 
 3. **System Resource Monitoring**:
+
    ```bash
    # Monitor system resources during execution
    # Windows: Task Manager
-   # macOS: Activity Monitor  
+   # macOS: Activity Monitor
    # Linux: htop or top
-   
+
    # Ensure sufficient RAM (2GB+ recommended)
    # Ensure sufficient CPU availability
    ```
@@ -304,6 +333,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 ### Browser Login and Navigation Issues
 
 **Symptoms:**
+
 - Browser opens but doesn't navigate properly
 - Login page loads but credentials aren't entered
 - Stuck on intermediate pages
@@ -312,6 +342,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 **Solutions:**
 
 1. **Use Non-Headless Mode for Debugging**:
+
    ```bash
    # See what's actually happening in the browser
    butler-sheet-icons qscloud create-sheet-icons \
@@ -325,29 +356,32 @@ Browser-related problems are among the most common issues when using Butler Shee
    ```
 
 2. **Page Wait Time Adjustment**:
+
    ```bash
    # Increase wait time for slow-loading pages
    --pagewait 15
-   
+
    # Some networks or servers may be slower
    # Increase gradually until pages load completely
    ```
 
 3. **Browser Compatibility Testing**:
+
    ```bash
    # Test with both Chrome and Firefox
    # Chrome:
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --headless false ...
-   
+
    # Firefox:
    butler-sheet-icons qscloud create-sheet-icons --browser firefox --headless false ...
    ```
 
 4. **SSO and Login Page Issues**:
+
    ```bash
    # For QS Cloud with SSO, try skipping login page
    --skip-login
-   
+
    # This bypasses the standard login page
    # Use only if your organization has SSO that auto-redirects
    ```
@@ -355,6 +389,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 ### Browser Version Compatibility
 
 **Symptoms:**
+
 - Login works but app navigation fails
 - JavaScript errors in verbose logging
 - Features don't work as expected
@@ -363,20 +398,22 @@ Browser-related problems are among the most common issues when using Butler Shee
 **Solutions:**
 
 1. **Use Recommended Browser Versions**:
+
    ```bash
    # Check what versions have been tested
    butler-sheet-icons browser list-available --browser chrome --channel stable
-   
+
    # Install a well-tested version
    butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
    ```
 
 2. **Test Multiple Browser Versions**:
+
    ```bash
    # Install multiple versions for testing
    butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
    butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
-   
+
    # Test each version
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 121.0.6167.85 ...
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
@@ -392,6 +429,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 ### Browser Cache and Permissions
 
 **Symptoms:**
+
 - "Permission denied" errors
 - Cannot write to browser cache directory
 - Browser installation appears to succeed but browser not found
@@ -399,34 +437,37 @@ Browser-related problems are among the most common issues when using Butler Shee
 **Solutions:**
 
 1. **Check Cache Directory Permissions**:
+
    ```bash
    # Windows: Check folder permissions in File Explorer
    # Right-click on C:\Users\%USERNAME%\.cache → Properties → Security
-   
+
    # macOS/Linux: Check directory permissions
    ls -la ~/.cache/
    ls -la ~/.cache/puppeteer/
-   
+
    # Ensure user has read/write access
    chmod 755 ~/.cache/puppeteer/
    ```
 
 2. **Manual Cache Directory Creation**:
+
    ```bash
    # Create cache directory if it doesn't exist
    # Windows:
    mkdir %USERPROFILE%\.cache\puppeteer
-   
+
    # macOS/Linux:
    mkdir -p ~/.cache/puppeteer
    ```
 
 3. **Alternative Cache Location**:
+
    ```bash
    # Set custom cache directory using environment variable
    # Windows:
    $env:PUPPETEER_CACHE_DIR='C:\custom\cache\location'
-   
+
    # macOS/Linux:
    export PUPPETEER_CACHE_DIR='/custom/cache/location'
    ```
@@ -436,11 +477,13 @@ Browser-related problems are among the most common issues when using Butler Shee
 #### Windows Issues
 
 **Symptoms:**
+
 - Windows Defender blocks browser download
 - Antivirus software quarantines browser files
 - Permission errors on system directories
 
 **Solutions:**
+
 ```bash
 # Temporarily disable real-time protection during installation
 # Or add BSI cache directory to exclusions in Windows Defender
@@ -452,11 +495,13 @@ Browser-related problems are among the most common issues when using Butler Shee
 #### macOS Issues
 
 **Symptoms:**
+
 - "App is damaged" security warnings
 - Gatekeeper blocks browser execution
 - Permission denied in user cache directory
 
 **Solutions:**
+
 ```bash
 # Allow app in System Preferences → Security & Privacy
 # BSI binaries are notarized, but browsers might trigger warnings
@@ -470,11 +515,13 @@ sudo chown -R $USER ~/.cache/
 #### Linux Issues
 
 **Symptoms:**
+
 - Missing system dependencies for browser operation
 - Library compatibility issues
 - Display issues in headless mode
 
 **Solutions:**
+
 ```bash
 # Install required dependencies (Ubuntu/Debian):
 sudo apt-get update
@@ -528,14 +575,16 @@ butler-sheet-icons qscloud create-sheet-icons \
 For complex browser issues, try these advanced troubleshooting steps:
 
 1. **Enable Verbose Browser Logging**:
+
    ```bash
    # Use silly log level to see all browser communication
    --loglevel silly
-   
+
    # This will show all WebSocket traffic and browser events
    ```
 
 2. **Test with Minimal Configuration**:
+
    ```bash
    # Strip down to minimal options to isolate the issue
    butler-sheet-icons qscloud create-sheet-icons \
@@ -549,11 +598,12 @@ For complex browser issues, try these advanced troubleshooting steps:
    ```
 
 3. **Browser Process Monitoring**:
+
    ```bash
    # Monitor browser processes during execution
    # Windows: tasklist | findstr chrome
    # macOS/Linux: ps aux | grep chrome
-   
+
    # Check if browser processes are being terminated unexpectedly
    ```
 
@@ -564,6 +614,7 @@ For more information about browser management, see the [Browser Management Guide
 ### Connection Timeouts
 
 **Symptoms:**
+
 - "Connection timeout" errors
 - Slow response times
 - Intermittent failures
@@ -571,18 +622,20 @@ For more information about browser management, see the [Browser Management Guide
 **Solutions:**
 
 1. **Increase Timeouts**:
+
    ```bash
    # Increase page wait time
    --pagewait 15
-   
+
    # For slow networks, use longer waits
    ```
 
 2. **Network Configuration**:
+
    ```bash
    # Check firewall rules for QSEoW ports
    # 4242 (QRS), 4747 (Engine), 443/80 (Web)
-   
+
    # Test network connectivity
    telnet qlik-server.company.com 443
    ```
@@ -590,6 +643,7 @@ For more information about browser management, see the [Browser Management Guide
 ### Proxy Configuration
 
 **Symptoms:**
+
 - Cannot reach internet for browser downloads
 - Connection refused errors
 - SSL/TLS errors
@@ -610,6 +664,7 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 ### Sheets Not Loading
 
 **Symptoms:**
+
 - Blank screenshots
 - "Sheet not found" errors
 - Screenshots of loading screens
@@ -617,6 +672,7 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 **Solutions:**
 
 1. **Increase Wait Time**:
+
    ```bash
    # Complex sheets need longer load times
    --pagewait 10    # or higher for very complex sheets
@@ -631,6 +687,7 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 ### Screenshot Quality Issues
 
 **Symptoms:**
+
 - Blurry or pixelated images
 - Wrong dimensions
 - Missing content
@@ -638,6 +695,7 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 **Solutions:**
 
 1. **Adjust Screenshot Area**:
+
    ```bash
    --includesheetpart 1    # Just sheet content
    --includesheetpart 2    # Include sheet title
@@ -645,10 +703,11 @@ export http_proxy=http://user:pass@proxy.company.com:8080
    ```
 
 2. **Browser Settings**:
+
    ```bash
    # Try different browser
    --browser firefox
-   
+
    # Ensure browser is up to date
    butler-sheet-icons browser install --browser chrome
    ```
@@ -658,11 +717,13 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 ### Windows Issues
 
 **Common Problems:**
+
 - Windows Defender blocking binary
 - PowerShell execution policy
 - Path length limitations
 
 **Solutions:**
+
 ```powershell
 # Allow binary in Windows Defender
 # Add exclusion for butler-sheet-icons.exe
@@ -677,11 +738,13 @@ cd C:\BSI
 ### macOS Issues
 
 **Common Problems:**
+
 - Gatekeeper blocking unsigned binary
 - Permission issues
 - Notarization warnings
 
 **Solutions:**
+
 ```bash
 # Allow unsigned binary (if needed)
 sudo spctl --master-disable
@@ -696,11 +759,13 @@ xattr -d com.apple.quarantine butler-sheet-icons-macos
 ### Linux Issues
 
 **Common Problems:**
+
 - Missing dependencies
 - Permission issues
 - Display server issues in headless environments
 
 **Solutions:**
+
 ```bash
 # Install missing libraries
 sudo apt-get update
@@ -718,6 +783,7 @@ export DISPLAY=:99
 ### Slow Performance
 
 **Symptoms:**
+
 - Very long execution times
 - Timeout errors
 - High memory usage
@@ -725,22 +791,24 @@ export DISPLAY=:99
 **Solutions:**
 
 1. **Optimize Settings**:
+
    ```bash
    # Reduce page wait time for simple sheets
    --pagewait 3
-   
+
    # Use headless mode
    --headless true
-   
+
    # Process fewer apps per run
    ```
 
 2. **System Resources**:
+
    ```bash
    # Check system resources
    top
    free -h
-   
+
    # Close other applications
    # Add more RAM if consistently hitting limits
    ```
@@ -757,6 +825,35 @@ butler-sheet-icons qscloud create-sheet-icons \
   --headless false \
   > debug.log 2>&1
 ```
+
+### Capture Node Stack Traces
+
+If you get errors or warnings while using the pre-built Butler Sheet Icons binaries, try re-running the command with Node trace flags to capture stack traces from the embedded runtime.  
+Butler Sheet Icons automatically restarts itself with those flags when you append them directly (for example `--trace-warnings`), but setting `NODE_OPTIONS` makes it easy to reuse the same flags while you troubleshoot.
+
+With these flags set the warning and error messages are likely more verbose and may reveal the root cause of the problem.
+
+```bash
+# macOS/Linux one-off command
+NODE_OPTIONS="--trace-warnings --trace-deprecation --trace-uncaught" \
+   butler-sheet-icons qscloud create-sheet-icons --loglevel debug ...
+```
+
+```powershell
+# Windows PowerShell
+$env:NODE_OPTIONS = "--trace-warnings --trace-deprecation --trace-uncaught"
+butler-sheet-icons qscloud create-sheet-icons --loglevel debug ...
+Remove-Item Env:NODE_OPTIONS
+```
+
+```cmd
+REM Windows Command Prompt
+set "NODE_OPTIONS=--trace-warnings --trace-deprecation --trace-uncaught"
+butler-sheet-icons qscloud create-sheet-icons --loglevel debug ...
+set NODE_OPTIONS=
+```
+
+These traces pair well with `--loglevel debug` or `--loglevel silly`, and clearing `NODE_OPTIONS` afterward prevents the flags from affecting unrelated Node processes.
 
 ### Gather System Information
 
@@ -779,6 +876,7 @@ When reporting issues, include:
 ### Contribution
 
 If you find and fix an issue:
+
 1. Fork the repository
 2. Create a fix
 3. Submit a pull request

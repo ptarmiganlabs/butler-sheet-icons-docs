@@ -12,50 +12,51 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 
 ### Required options (create)
 
-| Option          | Description         | Example                   |
-| --------------- | ------------------- | ------------------------- |
-| `--tenanturl`   | QS Cloud tenant URL | `tenant.eu.qlikcloud.com` |
-| `--apikey`      | QS Cloud API key    | `eyJhbGciOiJFUzM4NC...`   |
-| `--logonuserid` | Login username      | `user@company.com`        |
-| `--logonpwd`    | Login password      | `password123`             |
+| Option          | Environment Variable            | Description         | Default | Example                   |
+| --------------- | ------------------------------- | ------------------- | ------- | ------------------------- |
+| `--tenanturl`   | `BSI_QSCLOUD_CST_TENANTURL`     | QS Cloud tenant URL |         | `tenant.eu.qlikcloud.com` |
+| `--apikey`      | `BSI_QSCLOUD_CST_APIKEY`        | QS Cloud API key    |         | `eyJhbGciOiJFUzM4NC...`   |
+| `--logonuserid` | `BSI_QSCLOUD_CST_LOGON_USER_ID` | Login username      |         | `user@company.com`        |
+| `--logonpwd`    | `BSI_QSCLOUD_CST_LOGON_PWD`     | Login password      |         | `password123`             |
 
 ### App selection (choose one)
 
-| Option           | Description                   | Example                                |
-| ---------------- | ----------------------------- | -------------------------------------- |
-| `--appid`        | Single app ID                 | `12345678-1234-1234-1234-123456789012` |
-| `--collectionid` | Collection ID for bulk update | `collection-uuid`                      |
+| Option           | Environment Variable            | Description                   | Default | Example                                |
+| ---------------- | ------------------------------- | ----------------------------- | ------- | -------------------------------------- |
+| `--appid`        | `BSI_QSCLOUD_CST_APP_ID`        | Single app ID                 |         | `12345678-1234-1234-1234-123456789012` |
+| `--collectionid` | `BSI_QSCLOUD_CST_COLLECTION_ID` | Collection ID for bulk update | `""`    | `collection-uuid`                      |
 
 ### Optional Settings
 
-| Option               | Description               | Default  | Example                           |
-| -------------------- | ------------------------- | -------- | --------------------------------- |
-| `--headless`         | Hide browser              | `true`   | `--headless false`                |
-| `--pagewait`         | Seconds to wait per sheet | `5`      | `--pagewait 7`                    |
-| `--imagedir`         | Screenshot directory      | `./img`  | `--imagedir ./screenshots`        |
-| `--includesheetpart` | Screenshot area           | `1`      | `--includesheetpart 2`            |
-| `--browser`          | Browser type              | `chrome` | `--browser firefox`               |
-| `--browser-version`  | Browser version           | `latest` | `--browser-version 121.0.6167.85` |
-| `--skip-login`       | Skip login page           | `false`  | `--skip-login`                    |
+| Option                   | Environment Variable                 | Description                                         | Default  | Example                           |
+| ------------------------ | ------------------------------------ | --------------------------------------------------- | -------- | --------------------------------- |
+| `--headless`             | `BSI_QSCLOUD_CST_HEADLESS`           | Hide browser                                        | `true`   | `--headless false`                |
+| `--pagewait`             | `BSI_QSCLOUD_CST_PAGE_WAIT`          | Seconds to wait per sheet                           | `5`      | `--pagewait 7`                    |
+| `--browser-page-timeout` | `BSI_BROWSER_PAGE_TIMEOUT`           | Seconds to wait for a page to load                  | `90`     | `--browser-page-timeout 120`      |
+| `--imagedir`             | `BSI_QSCLOUD_CST_IMAGE_DIR`          | Screenshot directory                                | `./img`  | `--imagedir ./screenshots`        |
+| `--includesheetpart`     | `BSI_QSCLOUD_CST_INCLUDE_SHEET_PART` | Screenshot area (1 = content, 2 = +title, 4 = full) | `1`      | `--includesheetpart 2`            |
+| `--browser`              | `BSI_QSCLOUD_CST_BROWSER`            | Browser type                                        | `chrome` | `--browser firefox`               |
+| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser version                                     | `latest` | `--browser-version 121.0.6167.85` |
+| `--skip-login`           | `BSI_QSCLOUD_CST_SKIP_LOGIN`         | Skip login page                                     | `false`  | `--skip-login`                    |
 
 ### Sheet Filtering
 
 **Exclusion Options:**
 
-| Option                   | Description         | Example                                   |
-| ------------------------ | ------------------- | ----------------------------------------- |
-| `--exclude-sheet-number` | Exclude by position | `--exclude-sheet-number 1 2 3`            |
-| `--exclude-sheet-title`  | Exclude by title    | `--exclude-sheet-title "Welcome" "Help"`  |
-| `--exclude-sheet-status` | Exclude by status   | `--exclude-sheet-status published public` |
+| Option                   | Environment Variable                   | Description         | Default | Example                                   |
+| ------------------------ | -------------------------------------- | ------------------- | ------- | ----------------------------------------- |
+| `--exclude-sheet-number` | `BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER` | Exclude by position |         | `--exclude-sheet-number 1 2 3`            |
+| `--exclude-sheet-title`  | `BSI_QSCLOUD_CST_EXCLUDE_SHEET_TITLE`  | Exclude by title    |         | `--exclude-sheet-title "Welcome" "Help"`  |
+| `--exclude-sheet-status` | `BSI_QSCLOUD_CST_EXCLUDE_SHEET_STATUS` | Exclude by status   | `[]`    | `--exclude-sheet-status published public` |
 
 **Blurring Options:**
 
-| Option                | Description             | Example                               |
-| --------------------- | ----------------------- | ------------------------------------- |
-| `--blur-sheet-number` | Blur by position        | `--blur-sheet-number 2 4`             |
-| `--blur-sheet-title`  | Blur by title           | `--blur-sheet-title "Financial Data"` |
-| `--blur-sheet-status` | Blur by status          | `--blur-sheet-status published`       |
-| `--blur-factor`       | Blur intensity (0-1000) | `--blur-factor 10`                    |
+| Option                | Environment Variable                | Description             | Default | Example                               |
+| --------------------- | ----------------------------------- | ----------------------- | ------- | ------------------------------------- |
+| `--blur-sheet-number` | `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` | Blur by position        |         | `--blur-sheet-number 2 4`             |
+| `--blur-sheet-title`  | `BSI_QSCLOUD_CST_BLUR_SHEET_TITLE`  | Blur by title           |         | `--blur-sheet-title "Financial Data"` |
+| `--blur-sheet-status` | `BSI_QSCLOUD_CST_BLUR_SHEET_STATUS` | Blur by status          | `[]`    | `--blur-sheet-status published`       |
+| `--blur-factor`       | `BSI_QSCLOUD_CST_BLUR_FACTOR`       | Blur intensity (0-1000) | `5`     | `--blur-factor 10`                    |
 
 ### Complete Example
 
@@ -68,6 +69,7 @@ butler-sheet-icons qscloud create-sheet-icons \
   --appid 12345678-1234-1234-1234-123456789012 \
   --collectionid collection-uuid \
   --pagewait 7 \
+  --browser-page-timeout 120 \
   --includesheetpart 2 \
   --exclude-sheet-status published public \
   --blur-sheet-number 3 \
@@ -85,17 +87,17 @@ butler-sheet-icons qscloud remove-sheet-icons [options]
 
 ### Required options (remove)
 
-| Option        | Description         |
-| ------------- | ------------------- |
-| `--tenanturl` | QS Cloud tenant URL |
-| `--apikey`    | QS Cloud API key    |
+| Option        | Environment Variable        | Description         | Default | Example                   |
+| ------------- | --------------------------- | ------------------- | ------- | ------------------------- |
+| `--tenanturl` | `BSI_QSCLOUD_RSI_TENANTURL` | QS Cloud tenant URL |         | `tenant.eu.qlikcloud.com` |
+| `--apikey`    | `BSI_QSCLOUD_RSI_APIKEY`    | QS Cloud API key    |         | `eyJhbGciOiJFUzM4NC...`   |
 
 ### App selection (remove)
 
-| Option           | Description   |
-| ---------------- | ------------- |
-| `--appid`        | Single app ID |
-| `--collectionid` | Collection ID |
+| Option           | Environment Variable           | Description   | Default | Example                                |
+| ---------------- | ------------------------------ | ------------- | ------- | -------------------------------------- |
+| `--appid`        | `BSI_QSCLOUD_RSI_APPID`        | Single app ID |         | `12345678-1234-1234-1234-123456789012` |
+| `--collectionid` | `BSI_QSCLOUD_RSI_COLLECTIONID` | Collection ID | `""`    | `collection-uuid`                      |
 
 ### Example: remove from single app
 
@@ -116,16 +118,16 @@ butler-sheet-icons qscloud list-collections [options]
 
 ### Required options (list-collections)
 
-| Option        | Description         |
-| ------------- | ------------------- |
-| `--tenanturl` | QS Cloud tenant URL |
-| `--apikey`    | QS Cloud API key    |
+| Option        | Environment Variable       | Description         | Default | Example                   |
+| ------------- | -------------------------- | ------------------- | ------- | ------------------------- |
+| `--tenanturl` | `BSI_QSCLOUD_LC_TENANTURL` | QS Cloud tenant URL |         | `tenant.eu.qlikcloud.com` |
+| `--apikey`    | `BSI_QSCLOUD_LC_APIKEY`    | QS Cloud API key    |         | `eyJhbGciOiJFUzM4NC...`   |
 
 ### Optional Options
 
-| Option           | Description   | Default |
-| ---------------- | ------------- | ------- |
-| `--outputformat` | Output format | `table` |
+| Option           | Environment Variable          | Description   | Default | Example               |
+| ---------------- | ----------------------------- | ------------- | ------- | --------------------- |
+| `--outputformat` | `BSI_QSCLOUD_LC_OUTPUTFORMAT` | Output format | `table` | `--outputformat json` |
 
 ### Example
 
