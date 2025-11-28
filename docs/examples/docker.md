@@ -304,7 +304,7 @@ services:
 
 Create `.env` file:
 
-```env
+```dotenv
 API_KEY=your-api-key-here
 USER_ID=user@company.com
 PASSWORD=your-password
