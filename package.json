@@ -20,6 +20,9 @@
   ],
   "author": "Ptarmigan Labs",
   "license": "MIT",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "devDependencies": {
     "gh-pages": "^6.3.0",
     "mermaid": "^11.11.0",
