@@ -52,9 +52,26 @@ If `PUPPETEER_EXECUTABLE_PATH` is set, BSI treats that as the preferred browser:
 
 ### 2. Cached browser (medium priority)
 
-If no system browser is configured, BSI looks in the Puppeteer cache directory (for example `C:\Users\<user>\.cache\puppeteer` on Windows).
+If no system browser is configured, BSI looks in the Puppeteer cache directory (for example `C:\Users\<user>\.cache\puppeteer` on Windows, or `~/.cache/puppeteer` on macOS and Linux).
 
-If a compatible browser is found there, that browser is used and no download is needed.
+A cached browser is used when it matches **both** of these:
+
+- **Browser type** — the browser asked for with `--browser` (`chrome` or `firefox`).
+- **Version** — if you specify an exact `--browser-version`, only a cached browser with exactly that build ID is used. If a different version is cached, BSI treats it as no match and downloads the version you asked for. If `--browser-version` is `latest` (the default), any cached build of the requested browser type is accepted.
+
+When a cached browser matches, it is used as-is and nothing is downloaded. This is what makes repeat runs fast: the browser is downloaded once and reused on every later run, with no network access needed for the browser itself.
+
+Use `butler-sheet-icons browser list-installed` to see which browsers are currently cached, and `browser install` to add one deliberately — for example when preparing a machine that will later run without internet access.
+
+::: tip "latest" means "anything cached", not "the newest available"
+With `--browser-version latest`, BSI does **not** check whether a newer browser has been released. Any cached build of the requested type is accepted, so a cached browser never updates itself. To move to a newer build, install it explicitly with `browser install --browser chrome --browser-version <build id>`, or clear the cache with `browser uninstall-all` and let the next run download a fresh one.
+
+If several builds of the same browser are cached, do not rely on which one gets picked. Pin `--browser-version` to an exact build ID whenever the exact version matters.
+:::
+
+::: warning Requires BSI 3.12.0 or later
+In earlier versions a defect prevented BSI from ever finding a cached browser, so in practice it re-downloaded a browser on **every run** unless `PUPPETEER_EXECUTABLE_PATH` was set. From 3.12.0 the cache is used as described above. Nothing needs to be reconfigured — the improvement applies automatically, and repeat runs start faster and use far less bandwidth.
+:::
 
 ### 3. Download browser (lowest priority)
 
@@ -65,6 +82,40 @@ If no system browser and no cached browser are found, BSI downloads a browser fr
 - Future runs can reuse this cached browser, including in air‑gapped environments (after the first download)
 
 If the environment has no internet access and no browser can be found via steps 1–2, BSI will fail with clear log messages.
+
+## Which browser commands need internet access?
+
+Creating thumbnails does not need internet access for the browser itself, as long as step 1 or step 2 above finds one. The `browser` management commands are different — only some of them reach out to the internet:
+
+| Command                              | Needs internet? |
+| ------------------------------------ | --------------- |
+| `browser list-installed`             | **No.** Reads the local Puppeteer cache only. |
+| `browser uninstall` / `uninstall-all` | **No.** Removes browsers from the local cache. |
+| `browser list-available`             | **Yes**, for Chrome. It asks Google's Chrome version history service which versions exist. (For Firefox the command only reports that `latest` is the sole supported version, and makes no network call.) |
+| `browser install`                    | **Yes**, always. BSI verifies that the requested build can actually be downloaded before installing it, so the command needs internet access even when that version is already in the cache. |
+
+On a machine with no internet access — an air-gapped server, or one behind a proxy that blocks outbound HTTPS — `browser list-available` reports:
+
+```
+error: Could not reach versionhistory.googleapis.com to look up available browser versions.
+error: Butler Sheet Icons needs internet access for this command. If this machine is offline or
+       behind a proxy, use "butler-sheet-icons browser list-installed" to see the browsers already
+       available locally.
+```
+
+This is expected, not a fault in BSI. Use `browser list-installed` to see what is already available on the machine.
+
+If the version history service is reachable but answers with an error, the message says so explicitly and quotes the HTTP status instead — so a proxy returning `403` is easy to tell apart from having no connectivity at all. A captive portal or intercepting proxy that answers with an HTML login page is reported as an unexpected response from the service.
+
+::: tip Preparing an offline machine
+Run `browser install` once while the machine still has internet access. The browser is stored in the Puppeteer cache and reused on every later run, so thumbnail creation itself works without connectivity.
+
+Setting `PUPPETEER_EXECUTABLE_PATH` to a browser installed by other means works too, and is the usual approach for Docker and centrally managed environments. See [Strategy 2](#strategy-2-use-a-system-browser-via-puppeteer-executable-path-controlled) and [Strategy 3](#strategy-3-use-a-pre-cached-browser-semi-offline) below.
+:::
+
+::: warning Requires BSI 3.12.0 or later
+Earlier versions reported a failed `browser list-available` on an offline machine as a raw stack trace (`TypeError: Cannot read properties of undefined (reading 'status')`) with line numbers from inside the BSI binary — nothing an administrator could act on. From 3.12.0 the messages above are shown instead.
+:::
 
 ## Key environment variables
 
@@ -171,7 +222,7 @@ butler-sheet-icons qseow create-sheet-thumbnails `
   --imagedir .\img
 ```
 
-### Strategy 3: Use a pre‑cached browser (semi‑offline)
+### Strategy 3: Use a pre-cached browser (semi-offline)
 
 **Good for:** environments where you can briefly connect to the internet to pre‑download browsers, then run offline.
 

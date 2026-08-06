@@ -35,7 +35,7 @@ When running Butler Sheet Icons for the first time, you have several options. Th
 
 ### Automatic Download (Default)
 
-If no browser is specified, BSI will automatically download the latest stable version of Chrome (when needed):
+If no browser is specified, BSI will automatically download the latest stable version of Chrome (when needed). From BSI 3.12.0 the download happens only once — later runs find the browser in the cache and reuse it, needing no download and no internet access for the browser itself. See [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables#_2-cached-browser-medium-priority) for the exact matching rules.
 
 ::: code-group
 
