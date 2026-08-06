@@ -18,14 +18,16 @@ butler-sheet-icons browser [command] [options]
 
 ### Available Commands
 
-| Command          | Description                                                              |
-| ---------------- | ------------------------------------------------------------------------ |
-| `list-installed` | Show which browsers are currently installed and available for use by BSI |
-| `list-available` | Show which browsers are available for download and installation          |
-| `install`        | Install a browser into the BSI cache                                     |
-| `uninstall`      | Uninstall a specific browser from the BSI cache                          |
-| `uninstall-all`  | Uninstall all browsers from the BSI cache                                |
-| `help`           | Display help for browser commands                                        |
+| Command          | Description                                                              | Needs internet? |
+| ---------------- | ------------------------------------------------------------------------ | --------------- |
+| `list-installed` | Show which browsers are currently installed and available for use by BSI | No              |
+| `list-available` | Show which browsers are available for download and installation          | Yes (Chrome)    |
+| `install`        | Install a browser into the BSI cache                                     | Yes             |
+| `uninstall`      | Uninstall a specific browser from the BSI cache                          | No              |
+| `uninstall-all`  | Uninstall all browsers from the BSI cache                                | No              |
+| `help`           | Display help for browser commands                                        | No              |
+
+On a machine without internet access, only the commands marked "No" above will work. See [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access) for what the offline failures look like and how to prepare an air-gapped machine.
 
 ## Commands Reference
 
@@ -90,6 +92,19 @@ butler-sheet-icons browser list-available [options]
 Note the build IDs (e.g., 121.0.6167.85) in the output. These are the exact identifiers to use when installing specific Chrome versions.
 :::
 
+::: warning Needs internet access
+For Chrome, this command asks Google's Chrome version history service which versions exist, so it only works on a machine that can reach the internet. On an offline machine, or behind a proxy that blocks outbound HTTPS, it reports:
+
+```
+error: Could not reach versionhistory.googleapis.com to look up available browser versions.
+error: Butler Sheet Icons needs internet access for this command. If this machine is offline or
+       behind a proxy, use "butler-sheet-icons browser list-installed" to see the browsers already
+       available locally.
+```
+
+Use `browser list-installed` instead to see what is already available locally. For Firefox, the command makes no network call — it simply reports that `latest` is the only supported version.
+:::
+
 ### install
 
 Downloads and installs a browser into the BSI cache. By default, installs the latest stable version of Chrome.
@@ -146,6 +161,10 @@ Install latest Firefox (macOS):
 
 ::: warning Older Chrome Versions
 If you try to install an older Chrome version that's no longer available, you'll get a 404 error. The Chrome team periodically removes older versions from their download servers. Use a newer version instead.
+:::
+
+::: warning Needs internet access
+`browser install` always needs internet access — it verifies that the requested build can actually be downloaded before installing it, so the check runs even when that version is already in the cache. Run it once while the machine is connected; the browser is then stored in the cache and reused on later runs without connectivity. See [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access).
 :::
 
 ### uninstall
@@ -311,13 +330,15 @@ butler-sheet-icons qseow create-sheet-thumbnails \
 
 ## Browser Cache Location
 
-BSI stores browsers in platform-specific cache directories:
+BSI stores browsers in a cache directory under the home directory of the user running BSI:
 
 - **Windows:** `%USERPROFILE%\.cache\puppeteer\`
-- **macOS:** `~/Library/Caches/puppeteer/` or `~/.cache/puppeteer/`
+- **macOS:** `~/.cache/puppeteer/`
 - **Linux:** `~/.cache/puppeteer/`
 
 These directories contain the actual browser binaries and are managed automatically by BSI.
+
+Because the cache lives under the user's home directory, a browser installed by one user account is not visible to another. When BSI runs as a service account — for example from a scheduled task — install the browser as that same account, or point all accounts at one shared browser with `PUPPETEER_EXECUTABLE_PATH`.
 
 ## Related Documentation
 

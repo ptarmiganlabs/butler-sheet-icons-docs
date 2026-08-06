@@ -272,6 +272,60 @@ Browser-related problems are among the most common issues when using Butler Shee
    butler-sheet-icons browser install --browser chrome --browser-version latest
    ```
 
+### Browser Commands Fail on a Machine Without Internet Access
+
+**Symptoms:**
+
+- `browser list-available` reports that `versionhistory.googleapis.com` could not be reached
+- `browser install` reports that the requested version "cannot be downloaded"
+- On BSI versions before 3.12.0, `browser list-available` instead printed a raw stack trace such as `TypeError: Cannot read properties of undefined (reading 'status')`, with line numbers from inside the BSI binary
+
+**Cause:**
+
+Two of the `browser` commands need internet access, and the rest do not:
+
+| Command                               | Needs internet? |
+| ------------------------------------- | --------------- |
+| `browser list-installed`              | No              |
+| `browser uninstall` / `uninstall-all` | No              |
+| `browser list-available`              | Yes, for Chrome |
+| `browser install`                     | Yes, always     |
+
+On an air-gapped server, or one behind a proxy that blocks outbound HTTPS, the two commands that need internet access will fail. This is expected behaviour, not a fault in BSI.
+
+**Solutions:**
+
+1. **See what is already available locally** — this works offline:
+
+   ```bash
+   butler-sheet-icons browser list-installed
+   ```
+
+2. **Prepare the machine while it still has connectivity**:
+
+   ```bash
+   # Run once on a connected machine; the browser is cached and reused afterwards
+   butler-sheet-icons browser install --browser chrome --browser-version latest
+   ```
+
+3. **Or point BSI at a browser installed by other means** — no download and no internet access needed:
+
+   ::: code-group
+
+   ```powershell [PowerShell]
+   $env:PUPPETEER_EXECUTABLE_PATH = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+   ```
+
+   ```bash [Bash]
+   export PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
+   ```
+
+   :::
+
+4. **If a proxy is in the way**, and the service is reachable but answers with an error, BSI reports the HTTP status instead (for example `403`). That points at proxy rules rather than missing connectivity — see [Proxy Configuration](/guide/advanced/proxy).
+
+Creating thumbnails itself does not need internet access once a browser is available locally. For the full picture, see [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access).
+
 ### Browser Runtime Crashes
 
 **Symptoms:**
