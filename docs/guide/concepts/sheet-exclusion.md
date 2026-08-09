@@ -24,6 +24,22 @@ QSEoW only:
 - --exclude-sheet-tag <value...>
   Exclude sheets that have one or more specified tags (set in QMC > App objects). Tags don’t exist for individual sheets in QS Cloud.
 
+::: danger Several exclude tags matched nothing before BSI 4.0.0
+Giving two or more tags — `--exclude-sheet-tag "Finance" "HR"` — did not exclude anything. Butler Sheet Icons joined them into the single name `Finance,HR` and asked Qlik Sense for sheets carrying a tag with that exact name. No such tag exists, so nothing matched and **every sheet had its icon updated**, including the ones you had tagged to keep out.
+
+There was no error and no warning; the run looked completely normal. A single `--exclude-sheet-tag` was not affected by this.
+
+**If you use two or more exclude tags, review those apps.** From 4.0.0 sheets carrying **any** of the tags are excluded, which is what the option always described — but icons already replaced are not restored automatically, because Butler Sheet Icons has no record of what they were. Re-run once the exclusions work, or set those sheet icons back by hand.
+:::
+
+::: warning Punctuation in tag and content library names — BSI 4.0.0 or later
+Before 4.0.0, a name containing `&`, `'`, `#`, `?`, `/` or `%` was sent to Qlik Sense unprotected, and the lookup failed outright. This affected `--qliksensetag`, `--exclude-sheet-tag` and `--contentlibrary`.
+
+Names such as `R&D`, `Q1'25`, `Finance/HR` or `Sprint #4` now work, quoted on the command line exactly as any other name containing spaces. If you renamed a tag to work around this — `R&D` to `RandD` — you can rename it back, remembering to update the option or environment variable that names it.
+
+See [Tag or content library name fails or matches nothing](/guide/troubleshooting#tag-or-content-library-name-fails-or-matches-nothing) for the errors each character produced.
+:::
+
 Example parameters usage:
 
 ```bash
