@@ -479,8 +479,8 @@ Creating thumbnails itself does not need internet access once a browser is avail
 2. **Browser Selection and Versions**:
 
    ```bash
-   # Try different browser
-   --browser firefox
+   # Thumbnails are rendered with Chrome only
+   --browser chrome
 
    # Use specific stable browser version
    butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
@@ -548,12 +548,8 @@ Creating thumbnails itself does not need internet access once a browser is avail
 3. **Browser Compatibility Testing**:
 
    ```bash
-   # Test with both Chrome and Firefox
-   # Chrome:
+   # Watch the run in a visible browser
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --headless false ...
-
-   # Firefox:
-   butler-sheet-icons qscloud create-sheet-icons --browser firefox --headless false ...
    ```
 
 4. **SSO and Login Page Issues**:
@@ -599,12 +595,14 @@ Creating thumbnails itself does not need internet access once a browser is avail
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
    ```
 
-3. **Firefox as Alternative**:
+3. **Try a different Chrome build**:
    ```bash
-   # If Chrome versions have issues, try Firefox
-   butler-sheet-icons browser install --browser firefox
-   butler-sheet-icons qscloud create-sheet-icons --browser firefox ...
+   # If one Chrome build has issues, install and use another
+   butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
+   butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
    ```
+
+   Firefox is not an alternative here — it cannot render thumbnails. See [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ### Browser Cache and Permissions
 
@@ -928,8 +926,8 @@ See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-seve
 2. **Browser Settings**:
 
    ```bash
-   # Try different browser
-   --browser firefox
+   # Thumbnails are rendered with Chrome only
+   --browser chrome
 
    # Ensure browser is up to date
    butler-sheet-icons browser install --browser chrome

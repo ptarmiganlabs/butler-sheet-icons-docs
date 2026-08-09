@@ -103,7 +103,7 @@ butler-sheet-icons qseow create-sheet-thumbnails \
   --contentlibrary "Butler sheet thumbnails" \
   --sense-version 2024-May \
   --browser chrome \
-  --browser-version latest \
+  --browser-version recommended \
   --secure true \
   --includesheetpart 2 \
   --browser-page-timeout 120 \

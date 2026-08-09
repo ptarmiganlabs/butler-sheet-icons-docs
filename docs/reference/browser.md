@@ -6,7 +6,7 @@ For details on how BSI decides which browser to use at runtime, and how environm
 
 ## Overview
 
-BSI uses its own browser cache system and does not rely on browsers installed elsewhere on your system. This ensures consistency and allows for precise version control. The browser command supports Chrome and Firefox across Windows, macOS, and Linux platforms.
+BSI uses its own browser cache system and does not rely on browsers installed elsewhere on your system. This ensures consistency and allows for precise version control. The `browser` command manages both Chrome and Firefox across Windows, macOS, and Linux. Note that only Chrome can render sheet thumbnails — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ## Basic Usage
 
@@ -121,7 +121,7 @@ butler-sheet-icons browser install [options]
 | --------------------------------- | ------------------------------- | -------------------------------------------------------- | -------- | --------------------------------- |
 | `--loglevel, --log-level <level>` | `BSI_BROWSER_I_LOG_LEVEL`       | Set log level (error, warn, info, verbose, debug, silly) | `info`   | `--loglevel debug`                |
 | `--browser <browser>`             | `BSI_BROWSER_I_BROWSER`         | Browser to install (chrome, firefox)                     | `chrome` | `--browser firefox`               |
-| `--browser-version <version>`     | `BSI_BROWSER_I_BROWSER_VERSION` | Specific version/build ID to install                     | `latest` | `--browser-version 121.0.6167.85` |
+| `--browser-version <version>`     | `BSI_BROWSER_I_BROWSER_VERSION` | Keyword (`recommended`, `stable`), channel, or build ID   | `recommended` | `--browser-version 121.0.6167.85` |
 | `-h, --help`                      | `-`                             | Display help for command                                 | `-`      | `--help`                          |
 
 **Examples:**
@@ -321,11 +321,12 @@ butler-sheet-icons qscloud create-sheet-thumbnails \
   --browser chrome \
   --browser-version 121.0.6167.85
 
-# Use Firefox for QSEoW
+# Pin a different Chrome build for QSEoW
 butler-sheet-icons qseow create-sheet-thumbnails \
   --host sense.company.com \
   --app-id "app-456" \
-  --browser firefox
+  --browser chrome \
+  --browser-version 120.0.6099.109
 ```
 
 ## Browser Cache Location
