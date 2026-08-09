@@ -42,9 +42,11 @@ Two long-lived branches.
 ### Which branch does my change go to?
 
 **`next`. Always.** Branch off an up-to-date `next`, PR into `next`. There is no decision
-to make.
+to make, and no exception — `.github/` templates and workflows included.
 
-`main` is reached only by merging `next` at release time, per the procedure below.
+`next` is the repository's **default branch**, so a fresh clone or worktree already starts
+there, GitHub reads the pull request and issue templates from it, and Dependabot targets
+it. `main` is reached only by merging `next` at release time, per the procedure below.
 
 The site is single-version: there is exactly one copy of the docs and no per-release
 archive. So content merged to `main` is presented as documentation for the current
@@ -57,11 +59,16 @@ The cost is that a correction to an already-live page waits for the next release
 If something on production genuinely cannot wait, that is a deliberate hotfix branched
 off `main` — an exception, not one of two normal options.
 
-There is one other narrow exception. GitHub reads a few repository files **only from the
-default branch**, `main` — the pull request template and the issue templates under
-`.github/`. A fix to those has no effect until it is on `main`, so it targets `main`
-directly. This does not extend to anything under `docs/`, which is site content and
-always goes to `next`.
+A repository ruleset covers **both** `main` and `next`: pull requests are required, and
+direct and force pushes are rejected. No approvals are required, so you can merge your own
+once checks pass.
+
+> [!WARNING]
+> **If you ever change the default branch again**, check the ruleset first. It lists
+> `refs/heads/main` and `refs/heads/next` explicitly, but also carries the symbolic
+> `~DEFAULT_BRANCH`, which **follows** whichever branch is default. Relying on that alone
+> silently unprotects the branch you just demoted — which is exactly what happened when
+> `next` was made default. Keep the explicit refs.
 
 ### At release time
 

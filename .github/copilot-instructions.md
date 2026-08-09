@@ -152,10 +152,12 @@ This site is **not** deployed via GitHub Pages. There is no `gh-pages` branch in
 
 ### Branch Model
 
-**All work goes to `next`.** Branch off `next`, PR into `next`. There is no per-change branch decision.
+**All work goes to `next`.** Branch off `next`, PR into `next`. There is no per-change branch decision and no exception — `.github/` templates and workflows included.
 
-- `next` — where all documentation work goes. Preview URL only.
+- `next` — the repository's **default branch**, and where all documentation work goes. A fresh clone or worktree already starts here. Preview URL only.
 - `main` — production, what the public site serves. Reached only by merging `next` at BSI release time.
+
+A repository ruleset covers both branches: pull requests are required, direct and force pushes rejected, no approvals needed.
 
 The site is single-version — one copy of the docs, no per-release archive — so anything on `main` is presented as documentation for the current BSI release whatever it actually describes, and Cloudflare publishes it within minutes. Routing everything through `next` keeps unreleased documentation off the public site. Writing to `main` directly is a deliberate production hotfix, not a normal option.
 

@@ -5,7 +5,9 @@ published at <https://butler-sheet-icons.ptarmiganlabs.com>.
 
 ## Branch rule
 
-**All work goes to `next`.** Branch off an up-to-date `next`, PR into `next`.
+**All work goes to `next`.** It is the repository's default branch, so a fresh clone or worktree
+already starts there. Branch off an up-to-date `next`, PR into `next`. There are no exceptions —
+`.github/` templates and workflows included.
 
 `main` is production — it is what the public site serves, and Cloudflare Pages publishes it
 automatically within minutes of a merge. It is reached only by merging `next` at BSI release time,
@@ -14,13 +16,15 @@ which is a separate maintenance step documented in [README_DEPLOY.md](./README_D
 Writing to `main` directly is a deliberate production hotfix, not a normal option. Do not choose
 it without being asked to.
 
-One narrow exception: GitHub reads the pull request template and the issue templates under
-`.github/` **only from the default branch**, so a change to those has no effect until it is on
-`main` and targets `main` directly. This does not extend to anything under `docs/` — that is site
-content and always goes to `next`.
+**Check your starting point before your first edit**, not before your first commit — editing a tree
+that predates `next` produces content that duplicates or contradicts what is already there:
 
-A repository ruleset requires a pull request for `main` and rejects direct and force pushes. No
-approvals are required.
+```bash
+git fetch origin && git merge-base --is-ancestor origin/next HEAD || git rebase origin/next
+```
+
+A repository ruleset covers both `main` and `next`: pull requests are required, and direct and
+force pushes are rejected. No approvals are required, so you can merge your own once checks pass.
 
 ## Where new documentation comes from
 
