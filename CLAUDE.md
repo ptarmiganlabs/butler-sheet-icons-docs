@@ -14,6 +14,14 @@ which is a separate maintenance step documented in [README_DEPLOY.md](./README_D
 Writing to `main` directly is a deliberate production hotfix, not a normal option. Do not choose
 it without being asked to.
 
+One narrow exception: GitHub reads the pull request template and the issue templates under
+`.github/` **only from the default branch**, so a change to those has no effect until it is on
+`main` and targets `main` directly. This does not extend to anything under `docs/` — that is site
+content and always goes to `next`.
+
+A repository ruleset requires a pull request for `main` and rejects direct and force pushes. No
+approvals are required.
+
 ## Where new documentation comes from
 
 Most new content originates in the **BSI repo**, not here. Behaviour changes are staged there as

@@ -57,14 +57,24 @@ The cost is that a correction to an already-live page waits for the next release
 If something on production genuinely cannot wait, that is a deliberate hotfix branched
 off `main` — an exception, not one of two normal options.
 
+There is one other narrow exception. GitHub reads a few repository files **only from the
+default branch**, `main` — the pull request template and the issue templates under
+`.github/`. A fix to those has no effect until it is on `main`, so it targets `main`
+directly. This does not extend to anything under `docs/`, which is site content and
+always goes to `next`.
+
 ### At release time
 
 Order matters, because the version label in the site nav follows the **latest GitHub
 release** of Butler Sheet Icons (see "Version label" below):
 
 1. Release Butler Sheet Icons first, so `releases/latest` points at the new version.
-2. Merge `next` → `main`.
+2. Open a pull request from `next` into `main` and merge it. A repository ruleset
+   requires a pull request for `main` — direct pushes and force pushes are rejected —
+   though no approvals are required, so you can merge your own.
 3. Cloudflare publishes; the nav label picks up the new version on that build.
+4. Update `BSI_DOCS_VERSION` on the Cloudflare **preview** environment to the next
+   upcoming version, or clear it. It does not update itself.
 
 Merging before the BSI release ships puts new content on the site under the *old*
 version number for however long the gap lasts.
