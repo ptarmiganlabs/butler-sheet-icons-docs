@@ -402,6 +402,20 @@ jobs:
 
 ## Kubernetes Deployment
 
+::: danger Use `args:`, never `command:`
+In Kubernetes, `command:` replaces the image's entrypoint and `args:` replaces its arguments. Butler Sheet Icons does real work in its entrypoint — it decides which user to run as, based on who owns the directory the thumbnails are written to, and makes sure that user has a usable home directory.
+
+A manifest that sets `command:` skips all of that, and also has to name the application's path inside the image correctly. Get it slightly wrong and the pod exits immediately:
+
+```
+Error: Cannot find module '/nodeapp/butler-sheet-icons.js'
+```
+
+Put the Butler Sheet Icons command in `args:` instead, exactly as you would type it after `docker run`. The examples below do that.
+
+This is the one place where Kubernetes and Docker Compose disagree. The `command:` used in the [Docker Compose](#docker-compose) examples above is correct there — in Compose it supplies the arguments, which is what Kubernetes calls `args:`. Same word, different meaning.
+:::
+
 ### Job Example
 
 ```yaml
@@ -414,14 +428,12 @@ spec:
     spec:
       containers:
         - name: butler-sheet-icons
-          image: ptarmiganlabs/butler-sheet-icons:latest
-          command:
-            - "node"
-            - "butler-sheet-icons.js"
+          image: ptarmiganlabs/butler-sheet-icons:4.0.0
+          args:
             - "qscloud"
-            - "create-sheet-icons"
+            - "create-sheet-thumbnails"
             - "--imagedir"
-            - "/app/images"
+            - "./img"
           env:
             - name: BSI_QSCLOUD_CST_TENANTURL
               valueFrom:
@@ -450,13 +462,17 @@ spec:
                   key: collection-id
           volumeMounts:
             - name: images-volume
-              mountPath: /app/images
+              mountPath: /nodeapp/img
       volumes:
         - name: images-volume
           emptyDir: {}
       restartPolicy: Never
   backoffLimit: 3
 ```
+
+::: tip The thumbnails do not need to survive the pod
+`emptyDir` is thrown away when the pod ends, which is fine here. Butler Sheet Icons uploads each thumbnail to Qlik Sense as it goes — the files on disk are working copies, not the result. Mount something durable only if you also want to keep the images yourself.
+:::
 
 ### CronJob Example
 
@@ -473,14 +489,12 @@ spec:
         spec:
           containers:
             - name: butler-sheet-icons
-              image: ptarmiganlabs/butler-sheet-icons:latest
-              command:
-                [
-                  "node",
-                  "butler-sheet-icons.js",
-                  "qscloud",
-                  "create-sheet-icons",
-                ]
+              image: ptarmiganlabs/butler-sheet-icons:4.0.0
+              args:
+                - "qscloud"
+                - "create-sheet-thumbnails"
+                - "--imagedir"
+                - "./img"
               env:
                 - name: BSI_QSCLOUD_CST_TENANTURL
                   valueFrom:
@@ -488,8 +502,22 @@ spec:
                       name: qlik-credentials
                       key: tenant-url
               # ... other environment variables
+              volumeMounts:
+                - name: images-volume
+                  mountPath: /nodeapp/img
+          volumes:
+            - name: images-volume
+              emptyDir: {}
           restartPolicy: OnFailure
 ```
+
+::: warning If a security policy forces a fixed user
+Where `securityContext.runAsUser` is mandatory, the image detects that it was not started as root and hands straight over to the user you named. That is supported, but the container can then no longer adapt to the volume for you — it is up to you to make sure the account can write to the directory given by `--imagedir`.
+:::
+
+::: tip Pin the image on anything scheduled
+Both examples use `:4.0.0` rather than `:latest`, so an unattended nightly job does not change version underneath you. See [Decide which version you are approving](/guide/advanced/docker#decide-which-version-you-are-approving) for the full list of published tags.
+:::
 
 ## Troubleshooting
 
