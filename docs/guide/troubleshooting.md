@@ -31,6 +31,72 @@ butler-sheet-icons qscloud create-sheet-icons --headless false
 butler-sheet-icons browser list-installed
 ```
 
+## Run Failures and Exit Codes
+
+::: warning Requires BSI 3.12.0 or later
+Earlier versions always exited with `0`. If your automation never reported a failure before upgrading, that is why — see [Exit codes and job status](/guide/advanced/ci-cd#exit-codes-and-job-status).
+:::
+
+An exit code of `1` means the run failed, or finished with apps it could not process. Butler Sheet Icons logs a reason. Match the message you see below.
+
+### `Failed to process N of M app(s)`
+
+Some apps in the run could not be processed. The other apps were still attempted — one bad app does not stop the rest — and this line is the summary at the end.
+
+Each failed app has its own line earlier in the log naming the cause:
+
+```
+CLOUD PROCESS APP: Failed to process app b: engine unreachable
+Failed to process 1 of 3 app(s)
+```
+
+**What to do:** find the per-app lines and treat each cause separately. They are ordinary failures — an unreachable engine, an app the account cannot write to, a published app — and are covered by the sections below.
+
+### `No apps to process`
+
+The options you supplied matched no apps at all. This is reported as a failure, not a silent success: work was requested and none happened.
+
+```
+No apps to process. Check the --appid and --collectionid options.
+```
+
+On Qlik Sense Enterprise on Windows the hint names `--appid` and `--qliksensetag` instead.
+
+**What to do:** check the selection options themselves. Common causes are a collection that exists but contains no apps, a tag that no app carries, or an app ID that has been deleted. On QS Cloud, `butler-sheet-icons qscloud list-collections` shows which collections exist.
+
+### `Failed to update N of M sheet(s) in app <id>`
+
+One or more sheets in an app could not be updated, or their icons could not be removed. The app is reported as failed, and therefore so is the run.
+
+```
+CLOUD UPDATE SHEETS: Failed to update sheet 1 ('Sales overview', ID abc-123) in app 97089caf: Sheet is read-only
+Failed to update 1 of 2 sheet(s) in app 97089caf
+```
+
+Every other sheet is still attempted first, and the engine session is always released — only at the end is the app reported as failed.
+
+**Reading the counts:** the number is of sheets Butler Sheet Icons **tried** to update. Sheets deliberately left alone — because you excluded them, or because no thumbnail was generated for them — are counted in neither figure. So "1 of 2" means two sheets were attempted and one failed, regardless of how many sheets the app has in total.
+
+The per-sheet line names the sheet by title and ID, which is what you need to find it in Qlik Sense. The number is the sheet's position in the app, counting from 1.
+
+**What to do:** open the named sheet. A read-only or published sheet cannot be updated by the account BSI is running as. See [App Access Issues](#app-access-issues).
+
+### `Connection test to tenant ... returned a response with no user in it`
+
+The Qlik Sense Cloud connection test reached something, but the response did not describe a user.
+
+```
+Connection test to tenant mytenant.eu.qlikcloud.com returned a response with no user in it. Check that --tenanturl points at a Qlik Sense Cloud tenant and that --apikey is a valid, unexpired API key for it.
+```
+
+In earlier versions this printed `Connection to tenant … successful.` followed by four lines reading `undefined`, and the run then failed later for reasons that looked unrelated.
+
+**What to do:** verify `--tenanturl` points at a Qlik Sense Cloud tenant and that `--apikey` is valid and unexpired. See [QS Cloud Authentication Problems](#qs-cloud-authentication-problems).
+
+### The run failed — has anything changed in Qlik Sense?
+
+An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
+
 ## Authentication Issues
 
 ### QS Cloud Authentication Problems
