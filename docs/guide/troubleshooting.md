@@ -33,7 +33,7 @@ butler-sheet-icons browser list-installed
 
 ## Run Failures and Exit Codes
 
-::: warning Requires BSI 3.12.0 or later
+::: warning Requires BSI 4.0.0 or later
 Earlier versions always exited with `0`. If your automation never reported a failure before upgrading, that is why — see [Exit codes and job status](/guide/advanced/ci-cd#exit-codes-and-job-status).
 :::
 
@@ -109,7 +109,7 @@ On Qlik Sense Enterprise on Windows the message names the content library instea
 QSEOW: qseowProcessApp (stack): QseowError: Failed to upload 2 of 5 thumbnail image(s) to content library BSI thumbnails
 ```
 
-::: warning Requires BSI 3.12.0 or later
+::: warning Requires BSI 4.0.0 or later
 In earlier versions the run carried on after a failed upload and repointed **every** sheet at an image that was not there, replacing working icons with broken ones — and reported no error. If apps are showing broken sheet icons from an earlier run, see "Repairing apps affected before upgrading" below.
 :::
 
@@ -129,7 +129,7 @@ If earlier runs left apps showing broken sheet icons, re-running `create-sheet-t
 
 A single sheet missing its layout data caused the **whole app** to be abandoned before any thumbnail was created or removed. Every other sheet in that app was left untouched.
 
-::: warning Requires BSI 3.12.0 or later
+::: warning Requires BSI 4.0.0 or later
 Fixed. Such sheets are now sorted to the end of the sheet list and processed like any other, so the app completes.
 :::
 
@@ -404,7 +404,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 
 - `browser list-available` reports that `versionhistory.googleapis.com` could not be reached
 - `browser install` reports that the requested version "cannot be downloaded"
-- On BSI versions before 3.12.0, `browser list-available` instead printed a raw stack trace such as `TypeError: Cannot read properties of undefined (reading 'status')`, with line numbers from inside the BSI binary
+- On BSI versions before 4.0.0, `browser list-available` instead printed a raw stack trace such as `TypeError: Cannot read properties of undefined (reading 'status')`, with line numbers from inside the BSI binary
 
 **Cause:**
 
@@ -851,7 +851,7 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 
 **Cause:**
 
-Butler Sheet Icons before 3.12.0 read these two options incorrectly, in two ways at once:
+Butler Sheet Icons before 4.0.0 read these two options incorrectly, in two ways at once:
 
 - Only the last number you listed was used. `--exclude-sheet-number 3 7` behaved as though you had written `--exclude-sheet-number 7`.
 - That number was then matched as a text fragment rather than as a whole sheet number, so `--exclude-sheet-number 12` also excluded sheets 1 and 2.
@@ -876,7 +876,7 @@ Blurred sheet thumbnail (via sheet number): 1: 'Sales overview', ...
 
 **Solutions:**
 
-1. **Upgrade to BSI 3.12.0 or later.** Both options now keep every number you list and match each as a whole sheet number.
+1. **Upgrade to BSI 4.0.0 or later.** Both options now keep every number you list and match each as a whole sheet number.
 
 2. **Re-check your options before re-running.** If you worked around the old behaviour — listing sheet numbers one run at a time, or picking numbers that avoided the overlap — those workarounds are no longer needed and will now produce the wrong result.
 

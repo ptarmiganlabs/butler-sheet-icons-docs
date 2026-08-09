@@ -69,8 +69,8 @@ With `--browser-version latest`, BSI does **not** check whether a newer browser 
 If several builds of the same browser are cached, do not rely on which one gets picked. Pin `--browser-version` to an exact build ID whenever the exact version matters.
 :::
 
-::: warning Requires BSI 3.12.0 or later
-In earlier versions a defect prevented BSI from ever finding a cached browser, so in practice it re-downloaded a browser on **every run** unless `PUPPETEER_EXECUTABLE_PATH` was set. From 3.12.0 the cache is used as described above. Nothing needs to be reconfigured — the improvement applies automatically, and repeat runs start faster and use far less bandwidth.
+::: warning Requires BSI 4.0.0 or later
+In earlier versions a defect prevented BSI from ever finding a cached browser, so in practice it re-downloaded a browser on **every run** unless `PUPPETEER_EXECUTABLE_PATH` was set. From 4.0.0 the cache is used as described above. Nothing needs to be reconfigured — the improvement applies automatically, and repeat runs start faster and use far less bandwidth.
 :::
 
 ### 3. Download browser (lowest priority)
@@ -113,8 +113,8 @@ Run `browser install` once while the machine still has internet access. The brow
 Setting `PUPPETEER_EXECUTABLE_PATH` to a browser installed by other means works too, and is the usual approach for Docker and centrally managed environments. See [Strategy 2](#strategy-2-use-a-system-browser-via-puppeteer-executable-path-controlled) and [Strategy 3](#strategy-3-use-a-pre-cached-browser-semi-offline) below.
 :::
 
-::: warning Requires BSI 3.12.0 or later
-Earlier versions reported a failed `browser list-available` on an offline machine as a raw stack trace (`TypeError: Cannot read properties of undefined (reading 'status')`) with line numbers from inside the BSI binary — nothing an administrator could act on. From 3.12.0 the messages above are shown instead.
+::: warning Requires BSI 4.0.0 or later
+Earlier versions reported a failed `browser list-available` on an offline machine as a raw stack trace (`TypeError: Cannot read properties of undefined (reading 'status')`) with line numbers from inside the BSI binary — nothing an administrator could act on. From 4.0.0 the messages above are shown instead.
 :::
 
 ## Key environment variables

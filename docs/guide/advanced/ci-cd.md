@@ -146,11 +146,11 @@ export https_proxy='http://username:password@proxy.example.com:port'
 
 ## Exit codes and job status
 
-::: danger Action may be required — requires BSI 3.12.0 or later
+::: danger Action may be required — requires BSI 4.0.0 or later
 This change can turn a scheduled job that always reported success into one that reports failure. That is intended, but read this before upgrading so it does not surprise you at 3am.
 :::
 
-Until BSI 3.12.0, Butler Sheet Icons always exited with `0`. A run in which every app failed finished with the same exit code as a run in which everything worked — the only way to tell them apart was to read the log. A pipeline step that checked the exit code was, in effect, checking nothing.
+Until BSI 4.0.0, Butler Sheet Icons always exited with `0`. A run in which every app failed finished with the same exit code as a run in which everything worked — the only way to tell them apart was to read the log. A pipeline step that checked the exit code was, in effect, checking nothing.
 
 BSI now exits `1` when the run failed or completed with apps it could not process. See [Exit codes](/reference/commands#exit-codes) for exactly what counts as a failure.
 
