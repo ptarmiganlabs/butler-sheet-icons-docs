@@ -227,29 +227,9 @@ For issues with the tool itself, use the [main repository](https://github.com/pt
 
 ### Pull Request Template
 
-```markdown
-## Description
-
-Brief description of changes made.
-
-## Type of Change
-
-- [ ] Documentation update
-- [ ] New content
-- [ ] Bug fix (broken link, typo, etc.)
-- [ ] Enhancement (improved explanation, new examples)
-
-## Testing
-
-- [ ] Tested locally with `npm run docs:dev`
-- [ ] Verified all links work
-- [ ] Checked images display correctly
-- [ ] Built successfully with `npm run docs:build`
-
-## Additional Notes
-
-Any additional context or considerations.
-```
+GitHub fills the PR description from [`.github/PULL_REQUEST_TEMPLATE.md`](./PULL_REQUEST_TEMPLATE.md)
+automatically — there is nothing to copy by hand. Work through its checklist before requesting
+review.
 
 ### Review Process
 
