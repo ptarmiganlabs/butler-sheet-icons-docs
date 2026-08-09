@@ -1,12 +1,25 @@
 /**
- * Fetch latest Butler Sheet Icons release tag and write to docs/.vitepress/version.js
- * This runs before docs:dev and docs:build. If the request fails, we keep the last
- * generated file (if any) and continue, so docs still build.
+ * Fetch the Butler Sheet Icons version to show in the site nav and write it to
+ * docs/.vitepress/version.js. This runs before docs:dev and docs:build. If a lookup
+ * fails, we keep the last generated file (if any) and continue, so docs still build.
  *
- * Set BSI_DOCS_VERSION to override the lookup entirely. The `next` branch documents
- * a BSI release that is not out yet, so its Cloudflare preview would otherwise be
- * labelled with the *previous* version. Set BSI_DOCS_VERSION on the preview
- * environment to the upcoming version instead. See README_DEPLOY.md.
+ * Which version is "right" depends on what is being built:
+ *
+ *   - `main` is production and documents the current release, so it uses the latest
+ *     GitHub release.
+ *   - `next` documents a release that is not out yet, so the latest release would
+ *     label it with the *previous* version. Instead we ask release-please what the
+ *     next version is going to be, by reading `.release-please-manifest.json` from
+ *     its release branch.
+ *
+ * Asking release-please matters because the upcoming version is not knowable in
+ * advance and is not stable once guessed: release-please recomputes the bump as
+ * commits land, and retitles the same pull request. A 3.12.0 release became 4.0.0
+ * that way once two breaking changes arrived, after several doc pages had already
+ * been written against 3.12.0. Reading it per build means the label corrects itself.
+ *
+ * Set BSI_DOCS_VERSION to override everything below. It is an escape hatch, not the
+ * normal path — see README_DEPLOY.md.
  */
 
 import fs from "node:fs/promises";
@@ -14,7 +27,33 @@ import path from "node:path";
 
 const OWNER = "ptarmiganlabs";
 const REPO = "butler-sheet-icons";
-const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/releases/latest`;
+const API_ROOT = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const LATEST_RELEASE_URL = `${API_ROOT}/releases/latest`;
+
+/**
+ * Branch release-please keeps its pending release on. The name is derived from its
+ * config — `release-please--branches--<target>--components--<component>` — and is
+ * stable for as long as that config is.
+ *
+ * Read directly rather than found by listing open pull requests, because that would
+ * cost a second API call on every preview build. Anonymous builds share Cloudflare's
+ * IPs against a 60 req/hour limit, so halving the calls is worth the coupling: if the
+ * branch is ever renamed this 404s, which is handled as "no pending release" and falls
+ * through to the latest release.
+ */
+const RELEASE_BRANCH =
+  "release-please--branches--main--components--butler-sheet-icons";
+
+/**
+ * Key in `.release-please-manifest.json` for the root component, i.e. Butler Sheet
+ * Icons itself. The file also carries `"src"`, which tracks separately and is not
+ * the product version.
+ */
+const MANIFEST_ROOT_COMPONENT = ".";
+
+/** Cloudflare Pages production branch. Anything else is a preview build. */
+const PRODUCTION_BRANCH = "main";
+
 const outFile = path.resolve("./docs/.vitepress/version.js");
 
 async function ensureDirExists(filePath) {
@@ -32,8 +71,111 @@ function isValidTag(tag) {
   return typeof tag === "string" && tag.trim().length > 0;
 }
 
+/** Normalize a release tag: keep from the first 'v' on, so 'x-v3.8.0' -> 'v3.8.0'. */
+function normalizeTag(rawTag) {
+  const vIndex = rawTag.indexOf("v");
+  return vIndex >= 0 ? rawTag.slice(vIndex) : rawTag;
+}
+
+function buildHeaders() {
+  const headers = { "User-Agent": "bsi-docs-build-script" };
+  // Use a token if provided. Build IPs are shared, so the anonymous limit is reachable.
+  const token =
+    process.env.GITHUB_TOKEN ||
+    process.env.GH_TOKEN ||
+    process.env.GITHUB_AUTH_TOKEN;
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
+async function getJson(url, { nullOn404 = false } = {}) {
+  const res = await fetch(url, { headers: buildHeaders() });
+  if (res.status === 404 && nullOn404) return null;
+  if (!res.ok) {
+    throw new Error(`GitHub API failed with ${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
+/**
+ * The branch being built, as reported by Cloudflare Pages. Unset locally, which is
+ * why local builds fall through to the latest release rather than the pending one.
+ */
+function currentBranch() {
+  return process.env.CF_PAGES_BRANCH?.trim() || "";
+}
+
+function isPreviewBuild() {
+  const branch = currentBranch();
+  return branch !== "" && branch !== PRODUCTION_BRANCH;
+}
+
+/**
+ * Asks release-please what the next version will be.
+ *
+ * Reads the manifest rather than parsing the release pull request's title: the manifest
+ * is structured, and the title is prose that has changed format before.
+ *
+ * @returns {Promise<string|null>} Version prefixed with 'v', or null when there is no
+ * pending release — the normal state just after a release ships, and also what a renamed
+ * release branch looks like from here.
+ */
+async function fetchPendingReleaseVersion() {
+  const manifest = await getJson(
+    `${API_ROOT}/contents/.release-please-manifest.json?ref=${encodeURIComponent(
+      RELEASE_BRANCH
+    )}`,
+    { nullOn404: true }
+  );
+
+  if (manifest === null) return null;
+
+  if (typeof manifest?.content !== "string") {
+    throw new Error("Release manifest response carried no content");
+  }
+
+  const parsed = JSON.parse(
+    Buffer.from(manifest.content, "base64").toString("utf8")
+  );
+  const version = parsed?.[MANIFEST_ROOT_COMPONENT];
+
+  if (!isValidTag(version)) {
+    throw new Error(
+      `Release manifest has no usable "${MANIFEST_ROOT_COMPONENT}" version`
+    );
+  }
+
+  console.log(`[bsi-docs] Pending release on ${RELEASE_BRANCH}: ${version}`);
+
+  return `v${version}`;
+}
+
+async function fetchLatestReleaseVersion() {
+  const data = await getJson(LATEST_RELEASE_URL);
+  const rawTag = data.tag_name;
+  if (!isValidTag(rawTag)) {
+    throw new Error("Invalid tag_name in GitHub API response");
+  }
+  return normalizeTag(rawTag);
+}
+
+/** Keeps a previously generated file if there is one, otherwise writes a safe default. */
+async function writeFallbackVersion() {
+  try {
+    const existing = await fs.readFile(outFile, "utf8");
+    if (existing) {
+      console.log("[bsi-docs] Using existing generated version.js");
+      return;
+    }
+  } catch {}
+
+  const fallback = "v0.0.0";
+  await writeVersionFile(fallback);
+  console.log(`[bsi-docs] Wrote fallback version ${fallback}`);
+}
+
 async function main() {
-  // An explicit override wins over the API lookup, and never falls back.
+  // An explicit override wins over every lookup, and never falls back.
   const override = process.env.BSI_DOCS_VERSION?.trim();
   if (override) {
     await writeVersionFile(override);
@@ -41,46 +183,40 @@ async function main() {
     return;
   }
 
+  const branch = currentBranch();
+  console.log(
+    `[bsi-docs] Branch: ${branch || "(not a Cloudflare build)"}, preview: ${isPreviewBuild()}`
+  );
+
+  // Preview builds document the release that is coming, not the one that shipped.
+  // A failure here is not fatal: fall through to the latest release below.
+  if (isPreviewBuild()) {
+    try {
+      const pending = await fetchPendingReleaseVersion();
+      if (pending) {
+        await writeVersionFile(pending);
+        console.log(`[bsi-docs] Using pending release version: ${pending}`);
+        return;
+      }
+      console.log(
+        "[bsi-docs] No pending release; using the latest release instead"
+      );
+    } catch (err) {
+      console.warn(
+        `[bsi-docs] Warning: Could not read the pending release version: ${err.message}`
+      );
+    }
+  }
+
   try {
-    const headers = { "User-Agent": "bsi-docs-build-script" };
-    // Use token if provided to avoid rate limiting
-    const token =
-      process.env.GITHUB_TOKEN ||
-      process.env.GH_TOKEN ||
-      process.env.GITHUB_AUTH_TOKEN;
-    if (token) headers.Authorization = `Bearer ${token}`;
-
-    const res = await fetch(API_URL, { headers });
-    if (!res.ok) {
-      throw new Error(`GitHub API failed with ${res.status} ${res.statusText}`);
-    }
-    const data = await res.json();
-    const rawTag = data.tag_name;
-    if (!isValidTag(rawTag)) {
-      throw new Error("Invalid tag_name in GitHub API response");
-    }
-
-    // Normalize: keep from first 'v' onwards (e.g., 'butler-sheet-icons-v3.8.0' -> 'v3.8.0')
-    const vIndex = rawTag.indexOf("v");
-    const tag = vIndex >= 0 ? rawTag.slice(vIndex) : rawTag;
-
+    const tag = await fetchLatestReleaseVersion();
     await writeVersionFile(tag);
     console.log(`[bsi-docs] Latest ${REPO} version: ${tag}`);
   } catch (err) {
     console.warn(
       `[bsi-docs] Warning: Could not fetch latest release tag: ${err.message}`
     );
-    // If the file already exists, keep it. Otherwise write a safe default.
-    try {
-      const existing = await fs.readFile(outFile, "utf8");
-      if (existing) {
-        console.log("[bsi-docs] Using existing generated version.js");
-        return;
-      }
-    } catch {}
-    const fallback = "v0.0.0";
-    await writeVersionFile(fallback);
-    console.log(`[bsi-docs] Wrote fallback version ${fallback}`);
+    await writeFallbackVersion();
   }
 }
 
