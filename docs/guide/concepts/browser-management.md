@@ -145,6 +145,8 @@ Both work for Chrome and Firefox, so you do not need to know what each vendor ca
 
 Choose `stable` only if you specifically need the newest stable release — for example because a security policy requires it. Be aware that it follows whatever the vendor has promoted, which can be a build newer than Butler Sheet Icons has been tested against.
 
+It also means a lookup on every run: on an offline or proxied machine that costs you connectivity you may not have. See [What `--browser-version` costs on an offline machine](/guide/concepts/browser-detection-and-environment-variables#what-browser-version-costs-on-an-offline-machine).
+
 Release **channels** are also accepted, and like `stable` they are resolved at run time: `beta`, `dev` and `canary` for Chrome; `beta`, `nightly`, `devedition` and `esr` for Firefox.
 
 ::: tip A browser is never bundled with Butler Sheet Icons
