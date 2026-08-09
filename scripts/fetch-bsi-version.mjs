@@ -10,7 +10,7 @@
  *   - `next` documents a release that is not out yet, so the latest release would
  *     label it with the *previous* version. Instead we ask release-please what the
  *     next version is going to be, by reading `.release-please-manifest.json` from
- *     its open release pull request.
+ *     its release branch.
  *
  * Asking release-please matters because the upcoming version is not knowable in
  * advance and is not stable once guessed: release-please recomputes the bump as
@@ -30,8 +30,19 @@ const REPO = "butler-sheet-icons";
 const API_ROOT = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const LATEST_RELEASE_URL = `${API_ROOT}/releases/latest`;
 
-/** Head-branch prefix release-please uses for its release pull requests. */
-const RELEASE_PR_BRANCH_PREFIX = "release-please--";
+/**
+ * Branch release-please keeps its pending release on. The name is derived from its
+ * config — `release-please--branches--<target>--components--<component>` — and is
+ * stable for as long as that config is.
+ *
+ * Read directly rather than found by listing open pull requests, because that would
+ * cost a second API call on every preview build. Anonymous builds share Cloudflare's
+ * IPs against a 60 req/hour limit, so halving the calls is worth the coupling: if the
+ * branch is ever renamed this 404s, which is handled as "no pending release" and falls
+ * through to the latest release.
+ */
+const RELEASE_BRANCH =
+  "release-please--branches--main--components--butler-sheet-icons";
 
 /**
  * Key in `.release-please-manifest.json` for the root component, i.e. Butler Sheet
@@ -77,8 +88,9 @@ function buildHeaders() {
   return headers;
 }
 
-async function getJson(url) {
+async function getJson(url, { nullOn404 = false } = {}) {
   const res = await fetch(url, { headers: buildHeaders() });
+  if (res.status === 404 && nullOn404) return null;
   if (!res.ok) {
     throw new Error(`GitHub API failed with ${res.status} ${res.statusText}`);
   }
@@ -101,26 +113,22 @@ function isPreviewBuild() {
 /**
  * Asks release-please what the next version will be.
  *
- * Reads the manifest from the open release pull request's branch rather than parsing
- * the PR title: the manifest is structured, and the title is prose that has changed
- * format before.
+ * Reads the manifest rather than parsing the release pull request's title: the manifest
+ * is structured, and the title is prose that has changed format before.
  *
  * @returns {Promise<string|null>} Version prefixed with 'v', or null when there is no
- * open release pull request — which is the normal state just after a release ships.
+ * pending release — the normal state just after a release ships, and also what a renamed
+ * release branch looks like from here.
  */
 async function fetchPendingReleaseVersion() {
-  const pulls = await getJson(`${API_ROOT}/pulls?state=open&per_page=100`);
-  const releasePr = pulls.find((pr) =>
-    pr?.head?.ref?.startsWith(RELEASE_PR_BRANCH_PREFIX)
-  );
-
-  if (!releasePr) return null;
-
   const manifest = await getJson(
     `${API_ROOT}/contents/.release-please-manifest.json?ref=${encodeURIComponent(
-      releasePr.head.ref
-    )}`
+      RELEASE_BRANCH
+    )}`,
+    { nullOn404: true }
   );
+
+  if (manifest === null) return null;
 
   if (typeof manifest?.content !== "string") {
     throw new Error("Release manifest response carried no content");
@@ -137,9 +145,7 @@ async function fetchPendingReleaseVersion() {
     );
   }
 
-  console.log(
-    `[bsi-docs] Release PR #${releasePr.number} targets ${version}`
-  );
+  console.log(`[bsi-docs] Pending release on ${RELEASE_BRANCH}: ${version}`);
 
   return `v${version}`;
 }
@@ -193,7 +199,7 @@ async function main() {
         return;
       }
       console.log(
-        "[bsi-docs] No open release PR; using the latest release instead"
+        "[bsi-docs] No pending release; using the latest release instead"
       );
     } catch (err) {
       console.warn(

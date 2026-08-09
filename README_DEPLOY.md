@@ -121,7 +121,7 @@ document different releases:
 | Build | Source | Why |
 | --- | --- | --- |
 | Production (`main`) | Latest GitHub release, tag normalised (`butler-sheet-icons-v4.0.0` → `v4.0.0`) | Production documents the release that has shipped |
-| Preview (any other branch) | The version in `.release-please-manifest.json` on the open release-please pull request's branch | `next` documents a release that is not out yet, so the latest release would label it with the *previous* version |
+| Preview (any other branch) | The version in `.release-please-manifest.json` on release-please's release branch | `next` documents a release that is not out yet, so the latest release would label it with the *previous* version |
 | Local (`npm run docs:dev`) | Latest GitHub release | `CF_PAGES_BRANCH` is unset outside Cloudflare |
 
 **Do not try to set the upcoming version by hand.** It is not knowable in advance and
