@@ -95,6 +95,42 @@ Two things about the dev server that will otherwise waste your time:
 
 Stop the server when you are done.
 
+## Always give the user the Cloudflare preview URL
+
+Every branch pushed to GitHub is built by Cloudflare Pages and published to its own URL. **Include
+that URL whenever you report work on a branch.** It is how the user reviews rendered output without
+checking anything out, and it works from any device.
+
+Read it from the Cloudflare Pages check run rather than constructing it:
+
+```bash
+sha=$(gh pr view <PR> --repo ptarmiganlabs/butler-sheet-icons-docs --json headRefOid --jq '.headRefOid')
+gh api repos/ptarmiganlabs/butler-sheet-icons-docs/commits/$sha/check-runs \
+  --jq '.check_runs[]|select(.name|test("Cloudflare"))|.output.summary'
+```
+
+That output contains two URLs. Give the **branch alias** — it follows the branch as you push more
+commits. The other is pinned to a single commit (an 8-hex-character prefix); use it only when you
+deliberately want a link that will not move.
+
+**Do not assume the alias is the branch name.** Cloudflare lowercases it, replaces every
+non-alphanumeric character with `-`, and **truncates to 28 characters**:
+
+| Branch | Alias |
+| --- | --- |
+| `next` | `next.butler-sheet-icons-docs.pages.dev` |
+| `docs/exit-code-reflects-failures` | `docs-exit-code-reflects-fail.butler-sheet-icons-docs.pages.dev` |
+| `docs/local-testing-instructions` | `docs-local-testing-instructi.butler-sheet-icons-docs.pages.dev` |
+
+Branch names over 28 characters are cut mid-word, so a guessed URL 404s. Read it from the check run.
+
+Two things to mention alongside the link when they apply:
+
+- The build takes a minute or two after a push, so a URL given immediately may 404 briefly.
+- A branch with no rendered changes — one that only touches `CLAUDE.md`, workflows or other
+  repository files — has nothing to look at. Say so rather than sending the user to an identical
+  page.
+
 ## Verify before reporting done
 
 ```bash

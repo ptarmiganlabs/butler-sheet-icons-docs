@@ -71,6 +71,16 @@ Two things worth knowing about the dev server:
 - **`curl` will not show page content.** It returns an empty SPA shell and renders client-side, so grepping the response for a heading you just added finds nothing even when the page is fine. Use a browser, or build with `npm run docs:build` and read `docs/.vitepress/dist/` for static HTML.
 - **`Failed to resolve dependency: debug, present in 'optimizeDeps.include'` is expected** on startup and harmless.
 
+### Always share the Cloudflare preview URL
+
+Every pushed branch is built by Cloudflare Pages and published to its own URL. **Include that URL whenever you report work on a branch** — it lets the change be reviewed rendered, without checking anything out.
+
+Read it from the "Cloudflare Pages" check run on the branch's head commit rather than constructing it. Give the branch alias, which follows the branch; the other URL in that output is pinned to a single commit.
+
+**The alias is not simply the branch name.** Cloudflare lowercases it, replaces non-alphanumeric characters with `-`, and truncates to 28 characters, so `docs/exit-code-reflects-failures` becomes `docs-exit-code-reflects-fail.butler-sheet-icons-docs.pages.dev`. Guessed URLs 404 for anything longer.
+
+Allow a minute or two after pushing for the build to finish, and say so when a branch has no rendered changes to look at.
+
 ## Content Guidelines
 
 ### Writing Style
