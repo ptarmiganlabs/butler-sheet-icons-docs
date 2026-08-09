@@ -52,6 +52,35 @@ npm run docs:preview      # Preview production build locally
 
 There is no deploy script. Deployment is automatic — see "Deployment & Hosting" below.
 
+### Viewing the site locally
+
+Run the dev server and open it in a browser to see changes rendered:
+
+```bash
+npm run docs:dev
+```
+
+The server runs until stopped. Open the URL printed at the end of its output — **read the port from that output rather than assuming 5173**, because VitePress falls back to 5174, 5175 and so on when the port is taken:
+
+```
+  ➜  Local:   http://localhost:5174/
+```
+
+Two things worth knowing about the dev server:
+
+- **`curl` will not show page content.** It returns an empty SPA shell and renders client-side, so grepping the response for a heading you just added finds nothing even when the page is fine. Use a browser, or build with `npm run docs:build` and read `docs/.vitepress/dist/` for static HTML.
+- **`Failed to resolve dependency: debug, present in 'optimizeDeps.include'` is expected** on startup and harmless.
+
+### Always share the Cloudflare preview URL
+
+Every pushed branch is built by Cloudflare Pages and published to its own URL. **Include that URL whenever you report work on a branch** — it lets the change be reviewed rendered, without checking anything out.
+
+Read it from the "Cloudflare Pages" check run on the branch's head commit rather than constructing it. Give the branch alias, which follows the branch; the other URL in that output is pinned to a single commit.
+
+**The alias is not simply the branch name.** Cloudflare lowercases it, replaces non-alphanumeric characters with `-`, and truncates to 28 characters, so `docs/exit-code-reflects-failures` becomes `docs-exit-code-reflects-fail.butler-sheet-icons-docs.pages.dev`. Guessed URLs 404 for anything longer.
+
+Allow a minute or two after pushing for the build to finish, and say so when a branch has no rendered changes to look at.
+
 ## Content Guidelines
 
 ### Writing Style
@@ -123,10 +152,12 @@ This site is **not** deployed via GitHub Pages. There is no `gh-pages` branch in
 
 ### Branch Model
 
-**All work goes to `next`.** Branch off `next`, PR into `next`. There is no per-change branch decision.
+**All work goes to `next`.** Branch off `next`, PR into `next`. There is no per-change branch decision and no exception — `.github/` templates and workflows included.
 
-- `next` — where all documentation work goes. Preview URL only.
+- `next` — the repository's **default branch**, and where all documentation work goes. A fresh clone or worktree already starts here. Preview URL only.
 - `main` — production, what the public site serves. Reached only by merging `next` at BSI release time.
+
+A repository ruleset covers both branches: pull requests are required, direct and force pushes rejected, no approvals needed.
 
 The site is single-version — one copy of the docs, no per-release archive — so anything on `main` is presented as documentation for the current BSI release whatever it actually describes, and Cloudflare publishes it within minutes. Routing everything through `next` keeps unreleased documentation off the public site. Writing to `main` directly is a deliberate production hotfix, not a normal option.
 

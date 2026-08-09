@@ -157,7 +157,7 @@ butler-sheet-icons qscloud create-sheet-icons \
 
 :::
 
-### Specify browser type (Chrome/Firefox)
+### Specify browser type
 
 ::: code-group
 
@@ -183,7 +183,7 @@ butler-sheet-icons qscloud create-sheet-icons \
 
 :::
 
-Using Firefox works the same, set `--browser firefox`.
+`chrome` is the only value the thumbnail commands accept. Firefox can be installed and removed with the `browser` commands, but cannot render thumbnails — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ### Use a specific browser version
 
@@ -233,10 +233,10 @@ Browsers in Docker are downloaded inside the container.
 # List browsers in container
 docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser list-installed
 
-# Install Firefox in container
-docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser install --browser firefox
+# Install a specific Chrome build in container
+docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser install --browser chrome --browser-version 121.0.6167.85
 
-# Use Firefox for sheet icons
+# Use that build for sheet icons
 docker run -it --rm \
   -v $(pwd)/images:/nodeapp/img \
   ptarmiganlabs/butler-sheet-icons:latest \
@@ -246,7 +246,8 @@ docker run -it --rm \
   --logonuserid user@company.com \
   --logonpwd mypassword \
   --appid 12345678-1234-1234-1234-123456789012 \
-  --browser firefox \
+  --browser chrome \
+  --browser-version 121.0.6167.85 \
   --headless true
 ```
 
@@ -254,10 +255,10 @@ docker run -it --rm \
 # List browsers in container
 docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser list-installed
 
-# Install Firefox in container
-docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser install --browser firefox
+# Install a specific Chrome build in container
+docker run -it --rm ptarmiganlabs/butler-sheet-icons:latest browser install --browser chrome --browser-version 121.0.6167.85
 
-# Use Firefox for sheet icons
+# Use that build for sheet icons
 docker run -it --rm `
   -v ${PWD}/images:/nodeapp/img `
   ptarmiganlabs/butler-sheet-icons:latest `
@@ -267,7 +268,8 @@ docker run -it --rm `
   --logonuserid user@company.com `
   --logonpwd mypassword `
   --appid 12345678-1234-1234-1234-123456789012 `
-  --browser firefox `
+  --browser chrome `
+  --browser-version 121.0.6167.85 `
   --headless true
 ```
 
@@ -397,7 +399,7 @@ docker run -it --rm `
 1. Use visible mode when debugging login issues
 2. Keep multiple browser versions for compatibility testing
 3. Use verbose logging to understand behavior
-4. Test with both Chrome and Firefox
+4. Test against more than one Chrome build before pinning one
 
 ### CI/CD
 

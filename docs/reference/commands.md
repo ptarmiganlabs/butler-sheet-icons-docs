@@ -14,19 +14,21 @@ butler-sheet-icons <platform> <command> [options]
 
 ## Quick Reference
 
-| Platform  | Command                   | Purpose                              |
-| --------- | ------------------------- | ------------------------------------ |
-| `qscloud` | `create-sheet-icons`      | Create thumbnails for QS Cloud apps  |
-| `qscloud` | `remove-sheet-icons`      | Remove thumbnails from QS Cloud apps |
-| `qscloud` | `list-collections`        | List available collections           |
-| `qseow`   | `create-sheet-thumbnails` | Create thumbnails for QSEoW apps     |
-| `qseow`   | `create-sheet-icons`      | Alias of create-sheet-thumbnails     |
-| `qseow`   | `remove-sheet-icons`      | Remove thumbnails from QSEoW apps    |
-| `browser` | `install`                 | Install browser for BSI              |
-| `browser` | `list-installed`          | Show installed browsers              |
-| `browser` | `list-available`          | Show available browsers for download |
-| `browser` | `uninstall`               | Remove specific browser              |
-| `browser` | `uninstall-all`           | Remove all browsers                  |
+| Platform  | Command                   | Purpose                              | Alias                     |
+| --------- | ------------------------- | ------------------------------------ | ------------------------- |
+| `qscloud` | `create-sheet-thumbnails` | Create thumbnails for QS Cloud apps  | `create-sheet-icons`      |
+| `qscloud` | `remove-sheet-icons`      | Remove thumbnails from QS Cloud apps | `remove-sheet-thumbnails` |
+| `qscloud` | `list-collections`        | List available collections           | —                         |
+| `qseow`   | `create-sheet-thumbnails` | Create thumbnails for QSEoW apps     | `create-sheet-icons`      |
+| `browser` | `install`                 | Install browser for BSI              | —                         |
+| `browser` | `list-installed`          | Show installed browsers              | —                         |
+| `browser` | `list-available`          | Show available browsers for download | —                         |
+| `browser` | `uninstall`               | Remove specific browser              | —                         |
+| `browser` | `uninstall-all`           | Remove all browsers                  | —                         |
+
+::: warning No `remove-sheet-icons` on QSEoW
+Removing sheet icons is available for Qlik Sense Cloud only. There is no `qseow remove-sheet-icons` command — `create-sheet-thumbnails` is the only `qseow` command.
+:::
 
 ## Global Options
 
@@ -46,6 +48,31 @@ These options are available for most commands:
 - `verbose` - Detailed operation info
 - `debug` - Debug information
 - `silly` - Everything including websocket traffic
+
+## Exit codes
+
+::: warning Requires BSI 4.0.0 or later
+Earlier versions always exited with `0`, whatever happened during the run.
+:::
+
+Every command reports its outcome in the process exit code:
+
+| Exit code | Meaning                                                                       |
+| --------- | ----------------------------------------------------------------------------- |
+| `0`       | The command completed, and everything it was asked to do succeeded.           |
+| `1`       | The command failed, or finished with one or more apps it could not process.   |
+
+### What counts as a failure
+
+- **An app that could not be processed.** Other apps in the same run are still attempted — one bad app does not stop the rest — but the run reports failure at the end.
+- **A connection that could not be established** to the Qlik Sense server or Qlik Sense Cloud tenant.
+- **A selection that matched no apps at all**, for example a `--collectionid` that exists but contains no apps, or a `--qliksensetag` that no app carries. Work was requested and none happened, so this is a failure rather than a silent no-op.
+- **A sheet that could not be updated, or whose icon could not be removed.** The remaining sheets in that app are still attempted; the app is reported as failed at the end.
+- **A Qlik Sense Cloud connection test that returns a response containing no user.**
+
+If you run Butler Sheet Icons from a scheduled task, CI pipeline or shell script, read [Exit codes and job status](/guide/advanced/ci-cd#exit-codes-and-job-status) before upgrading — a job that always reported success may start reporting failure.
+
+For the log messages that accompany a non-zero exit code, see [Run failures and exit codes](/guide/troubleshooting#run-failures-and-exit-codes) in Troubleshooting.
 
 ## Detailed command references
 

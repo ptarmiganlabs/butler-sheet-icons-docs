@@ -5,7 +5,9 @@ published at <https://butler-sheet-icons.ptarmiganlabs.com>.
 
 ## Branch rule
 
-**All work goes to `next`.** Branch off an up-to-date `next`, PR into `next`.
+**All work goes to `next`.** It is the repository's default branch, so a fresh clone or worktree
+already starts there. Branch off an up-to-date `next`, PR into `next`. There are no exceptions —
+`.github/` templates and workflows included.
 
 `main` is production — it is what the public site serves, and Cloudflare Pages publishes it
 automatically within minutes of a merge. It is reached only by merging `next` at BSI release time,
@@ -14,13 +16,15 @@ which is a separate maintenance step documented in [README_DEPLOY.md](./README_D
 Writing to `main` directly is a deliberate production hotfix, not a normal option. Do not choose
 it without being asked to.
 
-One narrow exception: GitHub reads the pull request template and the issue templates under
-`.github/` **only from the default branch**, so a change to those has no effect until it is on
-`main` and targets `main` directly. This does not extend to anything under `docs/` — that is site
-content and always goes to `next`.
+**Check your starting point before your first edit**, not before your first commit — editing a tree
+that predates `next` produces content that duplicates or contradicts what is already there:
 
-A repository ruleset requires a pull request for `main` and rejects direct and force pushes. No
-approvals are required.
+```bash
+git fetch origin && git merge-base --is-ancestor origin/next HEAD || git rebase origin/next
+```
+
+A repository ruleset covers both `main` and `next`: pull requests are required, and direct and
+force pushes are rejected. No approvals are required, so you can merge your own once checks pass.
 
 ## Where new documentation comes from
 
@@ -65,6 +69,72 @@ reviewable without diffing the branch.
   only by search.
 - Write for **Qlik Sense administrators**, not Node.js developers.
 
+## Testing the site locally
+
+You can run the site and look at it yourself. Do this whenever a change is visual, structural, or
+worth seeing rendered — do not ask the user to check something you can check.
+
+```bash
+npm run docs:dev
+```
+
+The server runs until stopped, so start it in the background. Then open the URL printed at the end
+of its output in a browser and navigate the site as a reader would.
+
+**Read the port from that output — do not assume 5173.** VitePress falls back to 5174, 5175 and so
+on whenever the port is already taken, which happens often:
+
+```
+  ➜  Local:   http://localhost:5174/
+```
+
+Two things about the dev server that will otherwise waste your time:
+
+- **`curl` cannot see page content.** The dev server returns an empty SPA shell and renders
+  everything client-side, so `curl … | grep 'my new heading'` finds nothing even when the page is
+  perfectly fine. Use a real browser. If you want HTML you can grep, run `npm run docs:build` and
+  read `docs/.vitepress/dist/` instead.
+- **`Failed to resolve dependency: debug, present in 'optimizeDeps.include'` is expected noise.**
+  It appears on most starts and the server works regardless. Do not chase it.
+
+Stop the server when you are done.
+
+## Always give the user the Cloudflare preview URL
+
+Every branch pushed to GitHub is built by Cloudflare Pages and published to its own URL. **Include
+that URL whenever you report work on a branch.** It is how the user reviews rendered output without
+checking anything out, and it works from any device.
+
+Read it from the Cloudflare Pages check run rather than constructing it:
+
+```bash
+sha=$(gh pr view <PR> --repo ptarmiganlabs/butler-sheet-icons-docs --json headRefOid --jq '.headRefOid')
+gh api repos/ptarmiganlabs/butler-sheet-icons-docs/commits/$sha/check-runs \
+  --jq '.check_runs[]|select(.name|test("Cloudflare"))|.output.summary'
+```
+
+That output contains two URLs. Give the **branch alias** — it follows the branch as you push more
+commits. The other is pinned to a single commit (an 8-hex-character prefix); use it only when you
+deliberately want a link that will not move.
+
+**Do not assume the alias is the branch name.** Cloudflare lowercases it, replaces every
+non-alphanumeric character with `-`, and **truncates to 28 characters**:
+
+| Branch | Alias |
+| --- | --- |
+| `next` | `next.butler-sheet-icons-docs.pages.dev` |
+| `docs/exit-code-reflects-failures` | `docs-exit-code-reflects-fail.butler-sheet-icons-docs.pages.dev` |
+| `docs/local-testing-instructions` | `docs-local-testing-instructi.butler-sheet-icons-docs.pages.dev` |
+
+Branch names over 28 characters are cut mid-word, so a guessed URL 404s. Read it from the check run.
+
+Two things to mention alongside the link when they apply:
+
+- The build takes a minute or two after a push, so a URL given immediately may 404 briefly.
+- A branch with no rendered changes — one that only touches `CLAUDE.md`, workflows or other
+  repository files — has nothing to look at. Say so rather than sending the user to an identical
+  page.
+
 ## Verify before reporting done
 
 ```bash
@@ -73,7 +143,7 @@ npm run docs:build
 
 Fails on dead internal links, so a passing build proves every internal link resolves. It does
 **not** validate `#anchor` fragments — check those against the generated HTML in
-`docs/.vitepress/dist/`.
+`docs/.vitepress/dist/`, e.g. `grep -o 'id="[^"]*"' docs/.vitepress/dist/reference/commands.html`.
 
 ## Deployment
 

@@ -14,10 +14,28 @@ In addition to the cached browsers managed by BSI, you can also point BSI at a s
 
 ## Supported Browsers
 
-Butler Sheet Icons supports two major browsers:
+Butler Sheet Icons manages two browsers, but they are not interchangeable:
 
-- **Chrome**: Full version control available, including specific build numbers
-- **Firefox**: Latest version available (specific version control pending)
+- **Chrome**: the only browser that can render sheet thumbnails. Full version control available, including specific build numbers.
+- **Firefox**: can be installed, listed and removed with the `browser` commands, but **cannot be used to create thumbnails**.
+
+::: warning Firefox is not available for thumbnails — BSI 4.0.0 or later
+`--browser firefox` is rejected by `qseow create-sheet-thumbnails` and `qscloud create-sheet-thumbnails`:
+
+```
+error: option '--browser <browser>' argument 'firefox' is invalid. Allowed choices are chrome.
+```
+
+The same applies when the value comes from an environment variable:
+
+```
+error: option '--browser <browser>' value 'firefox' from env 'BSI_QSEOW_CST_BROWSER' is invalid. Allowed choices are chrome.
+```
+
+Firefox never actually worked for thumbnail creation — the rendering path drives the browser over the Chrome DevTools Protocol with a Chromium-only argument list — but earlier versions accepted the option and then failed later, in a way that was hard to interpret. It is now rejected up front.
+
+`browser install`, `browser uninstall`, `browser uninstall-all` and `browser list-available` still accept `--browser firefox`.
+:::
 
 ## Browser Cache Location
 
@@ -35,7 +53,7 @@ When running Butler Sheet Icons for the first time, you have several options. Th
 
 ### Automatic Download (Default)
 
-If no browser is specified, BSI will automatically download the latest stable version of Chrome (when needed). From BSI 3.12.0 the download happens only once — later runs find the browser in the cache and reuse it, needing no download and no internet access for the browser itself. See [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables#_2-cached-browser-medium-priority) for the exact matching rules.
+If no browser is specified, BSI will automatically download the latest stable version of Chrome (when needed). From BSI 4.0.0 the download happens only once — later runs find the browser in the cache and reuse it, needing no download and no internet access for the browser itself. See [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables#_2-cached-browser-medium-priority) for the exact matching rules.
 
 ::: code-group
 
@@ -88,22 +106,16 @@ When running sheet icon creation commands, you can specify which browser to use 
 ::: code-group
 
 ```bash [Bash]
-# Use Chrome (default)
+# Use Chrome (the only browser accepted here, and the default)
 butler-sheet-icons qscloud create-sheet-icons --browser chrome ...
-
-# Use Firefox
-butler-sheet-icons qscloud create-sheet-icons --browser firefox ...
 
 # Use specific Chrome version
 butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 121.0.6167.85 ...
 ```
 
 ```powershell [PowerShell]
-# Use Chrome (default)
+# Use Chrome (the only browser accepted here, and the default)
 butler-sheet-icons qscloud create-sheet-icons --browser chrome ...
-
-# Use Firefox
-butler-sheet-icons qscloud create-sheet-icons --browser firefox ...
 
 # Use specific Chrome version
 butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 121.0.6167.85 ...
@@ -125,7 +137,7 @@ Chrome versions use build numbers (e.g., `121.0.6167.85`). Butler Sheet Icons su
 
 ### Firefox Versions
 
-Firefox currently supports only the latest version. Specific version control is planned for future releases.
+Firefox is managed only by the `browser` commands — it cannot render thumbnails, so its version affects nothing about a thumbnail run. Firefox build ids are channel-prefixed, for example `stable_153.0.3`.
 
 ## Headless vs. Visible Browser
 
@@ -250,23 +262,23 @@ For testing different configurations:
 ::: code-group
 
 ```bash [Bash]
-# Test with Chrome
+# Test a specific Chrome build
 butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
 butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 121.0.6167.85 ...
 
-# Test with Firefox
-butler-sheet-icons browser install --browser firefox
-butler-sheet-icons qscloud create-sheet-icons --browser firefox ...
+# Test another Chrome build
+butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
+butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
 ```
 
 ```powershell [PowerShell]
-# Test with Chrome
+# Test a specific Chrome build
 butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
 butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 121.0.6167.85 ...
 
-# Test with Firefox
-butler-sheet-icons browser install --browser firefox
-butler-sheet-icons qscloud create-sheet-icons --browser firefox ...
+# Test another Chrome build
+butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
+butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
 ```
 
 :::

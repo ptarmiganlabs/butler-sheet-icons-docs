@@ -20,7 +20,7 @@ Filters mirror the exclusion options but use the `--blur-sheet-...` prefix. You 
 Available in QS Cloud and QSEoW:
 
 - `--blur-sheet-number <numbers...>`
-  Blur by position in the app (1 = first sheet). Example: `--blur-sheet-number 1 3 5`.
+  Blur by position in the app (1 = first sheet). Example: `--blur-sheet-number 1 3 5`. Sheet numbers come from the sheets' display order — see [How sheet numbers are decided](/guide/concepts/sheet-exclusion#how-sheet-numbers-are-decided).
 - `--blur-sheet-title <titles...>`
   Blur by exact sheet title. Titles with spaces must be quoted.
 - `--blur-sheet-status <status...>`
@@ -31,20 +31,39 @@ QSEoW only:
 - `--blur-sheet-tag <value...>`
   Blur sheets that have one or more specified tags (set in QMC > App objects). Tags don’t exist for individual sheets in QS Cloud.
 
+::: warning Sheet numbers were matched incorrectly before BSI 4.0.0
+In earlier versions `--blur-sheet-number` blurred sheets you had not selected — only the last number you listed was used, and it was matched as a text fragment rather than as a whole sheet number. `--blur-sheet-number 12` also blurred sheets 1 and 2.
+
+`--blur-sheet-title`, `--blur-sheet-status` and `--blur-sheet-tag` were not affected. See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers) for the full description, and [Sheets you did not select were skipped or blurred](/guide/troubleshooting#sheets-you-did-not-select-were-skipped-or-blurred) for what to check and re-run.
+:::
+
 ## Blur intensity
 
 Control blur strength with `--blur-factor <factor>`.
 
-- Range: 0 = no blur … 1000 = full blur.
-- CLI help shows default: 10. Choose a value that balances privacy with recognizability.
+- **Range: 1–100.** 1 is the lightest blur, 100 the heaviest.
+- **Default: 5.** Choose a value that balances privacy with recognizability.
+
+Two things are worth knowing before you pick a value:
+
+- **A value above 100 is accepted but capped at 100.** `--blur-factor 1000` runs without an error or a warning and produces exactly the same image as `--blur-factor 100`.
+- **`--blur-factor 0` does not mean "no blur".** Values below 1 are treated as 1, so the lightest blur you can ask for is 1. To leave a sheet unblurred, do not select it with any of the `--blur-sheet-...` filters.
+
+A value that is not a non-negative whole number is rejected before Butler Sheet Icons connects to Qlik Sense:
+
+```
+error: option '--blur-factor <factor>' argument 'abc' is invalid. Blur factor must be a non-negative integer.
+```
 
 ### Blur effect examples
 
+The first row is the unmodified thumbnail, shown for comparison — it is not a `--blur-factor` value.
+
 | Blur Factor | Result                                                           |
 | ----------- | ---------------------------------------------------------------- |
-| 0           | ![No blur](/images/blur-factor-0.png "No blur applied")          |
-| 5           | ![Light blur](/images/blur-factor-5.png "Light blur applied")    |
-| 10          | ![Medium blur](/images/blur-factor-10.png "Medium blur applied") |
+| Not blurred | ![Unblurred sheet thumbnail](/images/blur-factor-0.png "Thumbnail with no blur applied") |
+| 5           | ![Sheet thumbnail with light blur](/images/blur-factor-5.png "Light blur applied")    |
+| 10          | ![Sheet thumbnail with medium blur](/images/blur-factor-10.png "Medium blur applied") |
 
 ## Examples
 

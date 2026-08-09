@@ -35,8 +35,8 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 | `--browser-page-timeout` | `BSI_BROWSER_PAGE_TIMEOUT`           | Seconds to wait for a page to load                  | `90`     | `--browser-page-timeout 120`      |
 | `--imagedir`             | `BSI_QSCLOUD_CST_IMAGE_DIR`          | Screenshot directory                                | `./img`  | `--imagedir ./screenshots`        |
 | `--includesheetpart`     | `BSI_QSCLOUD_CST_INCLUDE_SHEET_PART` | Screenshot area (1 = content, 2 = +title, 4 = full) | `1`      | `--includesheetpart 2`            |
-| `--browser`              | `BSI_QSCLOUD_CST_BROWSER`            | Browser type                                        | `chrome` | `--browser firefox`               |
-| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser version                                     | `latest` | `--browser-version 121.0.6167.85` |
+| `--browser`              | `BSI_QSCLOUD_CST_BROWSER`            | Browser type (`chrome` only)                        | `chrome` | `--browser chrome`                |
+| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser version                                     | `recommended` | `--browser-version 121.0.6167.85` |
 | `--skip-login`           | `BSI_QSCLOUD_CST_SKIP_LOGIN`         | Skip login page                                     | `false`  | `--skip-login`                    |
 
 ### Sheet Filtering
@@ -56,7 +56,17 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 | `--blur-sheet-number` | `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` | Blur by position        |         | `--blur-sheet-number 2 4`             |
 | `--blur-sheet-title`  | `BSI_QSCLOUD_CST_BLUR_SHEET_TITLE`  | Blur by title           |         | `--blur-sheet-title "Financial Data"` |
 | `--blur-sheet-status` | `BSI_QSCLOUD_CST_BLUR_SHEET_STATUS` | Blur by status          | `[]`    | `--blur-sheet-status published`       |
-| `--blur-factor`       | `BSI_QSCLOUD_CST_BLUR_FACTOR`       | Blur intensity (0-1000) | `5`     | `--blur-factor 10`                    |
+| `--blur-factor`       | `BSI_QSCLOUD_CST_BLUR_FACTOR`       | Blur intensity (1-100)  | `5`     | `--blur-factor 10`                    |
+
+::: tip One sheet number per environment variable
+`BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
+
+```
+error: option '--exclude-sheet-number <number...>' value '1 2 12' from env 'BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER' is invalid. Exclude sheet number must be a non-negative integer.
+```
+
+To select several sheets, pass `--exclude-sheet-number` or `--blur-sheet-number` on the command line instead. See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers).
+:::
 
 ### Complete Example
 

@@ -31,6 +31,132 @@ butler-sheet-icons qscloud create-sheet-icons --headless false
 butler-sheet-icons browser list-installed
 ```
 
+## Run Failures and Exit Codes
+
+::: warning Requires BSI 4.0.0 or later
+Earlier versions always exited with `0`. If your automation never reported a failure before upgrading, that is why — see [Exit codes and job status](/guide/advanced/ci-cd#exit-codes-and-job-status).
+:::
+
+An exit code of `1` means the run failed, or finished with apps it could not process. Butler Sheet Icons logs a reason. Match the message you see below.
+
+### `Failed to process N of M app(s)`
+
+Some apps in the run could not be processed. The other apps were still attempted — one bad app does not stop the rest — and this line is the summary at the end.
+
+Each failed app has its own line earlier in the log naming the cause:
+
+```
+CLOUD PROCESS APP: Failed to process app b: engine unreachable
+Failed to process 1 of 3 app(s)
+```
+
+**What to do:** find the per-app lines and treat each cause separately. They are ordinary failures — an unreachable engine, an app the account cannot write to, a published app — and are covered by the sections below.
+
+### `No apps to process`
+
+The options you supplied matched no apps at all. This is reported as a failure, not a silent success: work was requested and none happened.
+
+```
+No apps to process. Check the --appid and --collectionid options.
+```
+
+On Qlik Sense Enterprise on Windows the hint names `--appid` and `--qliksensetag` instead.
+
+**What to do:** check the selection options themselves. Common causes are a collection that exists but contains no apps, a tag that no app carries, or an app ID that has been deleted. On QS Cloud, `butler-sheet-icons qscloud list-collections` shows which collections exist.
+
+### `Failed to update N of M sheet(s) in app <id>`
+
+One or more sheets in an app could not be updated, or their icons could not be removed. The app is reported as failed, and therefore so is the run.
+
+```
+CLOUD UPDATE SHEETS: Failed to update sheet 1 ('Sales overview', ID abc-123) in app 97089caf: Sheet is read-only
+Failed to update 1 of 2 sheet(s) in app 97089caf
+```
+
+Every other sheet is still attempted first, and the engine session is always released — only at the end is the app reported as failed.
+
+**Reading the counts:** the number is of sheets Butler Sheet Icons **tried** to update. Sheets deliberately left alone — because you excluded them, or because no thumbnail was generated for them — are counted in neither figure. So "1 of 2" means two sheets were attempted and one failed, regardless of how many sheets the app has in total.
+
+The per-sheet line names the sheet by title and ID, which is what you need to find it in Qlik Sense. The number is the sheet's position in the app, counting from 1.
+
+**What to do:** open the named sheet. A read-only or published sheet cannot be updated by the account BSI is running as. See [App Access Issues](#app-access-issues).
+
+### `Connection test to tenant ... returned a response with no user in it`
+
+The Qlik Sense Cloud connection test reached something, but the response did not describe a user.
+
+```
+Connection test to tenant mytenant.eu.qlikcloud.com returned a response with no user in it. Check that --tenanturl points at a Qlik Sense Cloud tenant and that --apikey is a valid, unexpired API key for it.
+```
+
+In earlier versions this printed `Connection to tenant … successful.` followed by four lines reading `undefined`, and the run then failed later for reasons that looked unrelated.
+
+**What to do:** verify `--tenanturl` points at a Qlik Sense Cloud tenant and that `--apikey` is valid and unexpired. See [QS Cloud Authentication Problems](#qs-cloud-authentication-problems).
+
+### `Failed to upload N of M thumbnail image(s)`
+
+Thumbnail images were generated but could not be uploaded, so **the app was left untouched** and its sheets keep the icons they already had.
+
+On Qlik Sense Cloud:
+
+```
+CLOUD APP (stack): CloudError: Failed to upload 2 of 5 thumbnail image(s) to Qlik Sense Cloud app abc-123
+```
+
+On Qlik Sense Enterprise on Windows the message names the content library instead:
+
+```
+QSEOW: qseowProcessApp (stack): QseowError: Failed to upload 2 of 5 thumbnail image(s) to content library BSI thumbnails
+```
+
+::: warning Requires BSI 4.0.0 or later
+In earlier versions the run carried on after a failed upload and repointed **every** sheet at an image that was not there, replacing working icons with broken ones — and reported no error. If apps are showing broken sheet icons from an earlier run, see "Repairing apps affected before upgrading" below.
+:::
+
+**What to do:**
+
+1. **Your sheets are safe.** Nothing in the app was changed, so its existing icons are intact. There is no cleanup to do.
+2. **Read the lines immediately above**, prefixed `CLOUD UPLOAD 1` or `QSEOW UPLOAD 1`. Those name the underlying reason — that is where the actual cause is. Common ones are an image larger than the tenant or server accepts, a content library that does not exist or that the account cannot write to, and network interruptions.
+3. **Fix the cause and re-run.** The command is safe to run again.
+
+Every image is attempted before the run stops, so one failure does not hide the others — the count tells you how widespread the problem is.
+
+#### Repairing apps affected before upgrading
+
+If earlier runs left apps showing broken sheet icons, re-running `create-sheet-thumbnails` against those apps repairs them, once the upload problem itself is resolved. To clear the icons instead of regenerating them, use `qscloud remove-sheet-icons` — note this exists only for Qlik Sense Cloud.
+
+### `TypeError: Cannot read properties of undefined (reading 'rank')`
+
+A single sheet missing its layout data caused the **whole app** to be abandoned before any thumbnail was created or removed. Every other sheet in that app was left untouched.
+
+::: warning Requires BSI 4.0.0 or later
+Fixed. Such sheets are now sorted to the end of the sheet list and processed like any other, so the app completes.
+:::
+
+Search your logs for `reading 'rank'` — that phrase is identical in every case. The text before it varies by platform and by how far the run had got:
+
+| Platform | Stage | Log line begins |
+| --- | --- | --- |
+| Qlik Sense Cloud | Creating thumbnails | `CLOUD APP (stack):` |
+| Qlik Sense Cloud | Applying thumbnails to sheets | `CLOUD UPDATE SHEETS (stack):` |
+| Qlik Sense Cloud | Removing sheet icons | `CLOUD REMOVE SHEET ICONS 1 (stack):` |
+| Enterprise on Windows | Creating thumbnails | `QSEOW: qseowProcessApp (stack):` |
+| Enterprise on Windows | Applying thumbnails to sheets | `QSEOW UPDATE SHEETS (stack):` |
+
+A closely related failure, `reading 'showCondition'`, is fixed by the same change and is worth searching for too. It struck slightly later — after thumbnails had been generated but before they were uploaded, so the work was still discarded.
+
+**What to do:** upgrade and re-run. The affected apps should now complete.
+
+**What causes it:** the sheet is missing its layout data — the part carrying its position in the app and its show condition. This comes from Qlik Sense rather than Butler Sheet Icons, and is uncommon. It has been seen with sheets that are partially created or partially deleted, and with sheets whose owner no longer exists. Such a sheet is now named in the log as it is processed, so you can still find it in Qlik Sense to repair or delete it.
+
+**One consequence to be aware of:** sheet numbers come from this sort order, so in an app containing such a sheet the numbering can differ from before — see [Sheet exclusion](/guide/concepts/sheet-exclusion) and [Sheet blurring](/guide/concepts/sheet-blurring).
+
+**Not covered by this fix:** a sheet missing its **title and description** — a different part of the sheet record — can still interrupt a run. That case is less common and is being addressed separately.
+
+### The run failed — has anything changed in Qlik Sense?
+
+An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
+
 ## Authentication Issues
 
 ### QS Cloud Authentication Problems
@@ -278,7 +404,7 @@ Browser-related problems are among the most common issues when using Butler Shee
 
 - `browser list-available` reports that `versionhistory.googleapis.com` could not be reached
 - `browser install` reports that the requested version "cannot be downloaded"
-- On BSI versions before 3.12.0, `browser list-available` instead printed a raw stack trace such as `TypeError: Cannot read properties of undefined (reading 'status')`, with line numbers from inside the BSI binary
+- On BSI versions before 4.0.0, `browser list-available` instead printed a raw stack trace such as `TypeError: Cannot read properties of undefined (reading 'status')`, with line numbers from inside the BSI binary
 
 **Cause:**
 
@@ -353,8 +479,8 @@ Creating thumbnails itself does not need internet access once a browser is avail
 2. **Browser Selection and Versions**:
 
    ```bash
-   # Try different browser
-   --browser firefox
+   # Thumbnails are rendered with Chrome only
+   --browser chrome
 
    # Use specific stable browser version
    butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
@@ -422,12 +548,8 @@ Creating thumbnails itself does not need internet access once a browser is avail
 3. **Browser Compatibility Testing**:
 
    ```bash
-   # Test with both Chrome and Firefox
-   # Chrome:
+   # Watch the run in a visible browser
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --headless false ...
-
-   # Firefox:
-   butler-sheet-icons qscloud create-sheet-icons --browser firefox --headless false ...
    ```
 
 4. **SSO and Login Page Issues**:
@@ -473,12 +595,14 @@ Creating thumbnails itself does not need internet access once a browser is avail
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
    ```
 
-3. **Firefox as Alternative**:
+3. **Try a different Chrome build**:
    ```bash
-   # If Chrome versions have issues, try Firefox
-   butler-sheet-icons browser install --browser firefox
-   butler-sheet-icons qscloud create-sheet-icons --browser firefox ...
+   # If one Chrome build has issues, install and use another
+   butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
+   butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
    ```
+
+   Firefox is not an alternative here — it cannot render thumbnails. See [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ### Browser Cache and Permissions
 
@@ -715,6 +839,49 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 
 ## Sheet-Specific Issues
 
+### Sheets you did not select were skipped or blurred
+
+**Symptoms:**
+
+- Sheets you never listed in `--exclude-sheet-number` kept their old icons
+- Sheets you never listed in `--blur-sheet-number` came out blurred
+- The run reported success — there was no error or warning
+
+**Cause:**
+
+Butler Sheet Icons before 4.0.0 read these two options incorrectly, in two ways at once:
+
+- Only the last number you listed was used. `--exclude-sheet-number 3 7` behaved as though you had written `--exclude-sheet-number 7`.
+- That number was then matched as a text fragment rather than as a whole sheet number, so `--exclude-sheet-number 12` also excluded sheets 1 and 2.
+
+The more digits in the number, the more sheets were wrongly affected. A single one-digit number was always handled correctly. No other sheet filter was affected — `--exclude-sheet-status`, `--exclude-sheet-tag`, `--exclude-sheet-title`, `--blur-sheet-status` and `--blur-sheet-title` always worked as documented.
+
+**How to confirm from an old log:**
+
+At the default log level (`info`) Butler Sheet Icons logs one line per sheet it skipped or blurred, so a log from an earlier run tells you which sheets were affected:
+
+```
+Excluded sheet: 1: 'Sales overview', ...
+Using blurred thumbnail for sheet 1: ...
+```
+
+These lines say **that** a sheet was skipped or blurred, not **why** — status, tag and title filters produce the same lines. To see the reason, re-run with `--loglevel verbose`, which adds a line naming the filter that matched:
+
+```
+Excluded sheet (via sheet number): 1: 'Sales overview', ...
+Blurred sheet thumbnail (via sheet number): 1: 'Sales overview', ...
+```
+
+**Solutions:**
+
+1. **Upgrade to BSI 4.0.0 or later.** Both options now keep every number you list and match each as a whole sheet number.
+
+2. **Re-check your options before re-running.** If you worked around the old behaviour — listing sheet numbers one run at a time, or picking numbers that avoided the overlap — those workarounds are no longer needed and will now produce the wrong result.
+
+3. **Re-run thumbnail generation.** Nothing corrects itself: sheets that were wrongly excluded still have their old icons, and sheets that were wrongly blurred still have blurred ones, until Butler Sheet Icons runs again.
+
+See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers) for how the options behave now.
+
 ### Sheets Not Loading
 
 **Symptoms:**
@@ -759,8 +926,8 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 2. **Browser Settings**:
 
    ```bash
-   # Try different browser
-   --browser firefox
+   # Thumbnails are rendered with Chrome only
+   --browser chrome
 
    # Ensure browser is up to date
    butler-sheet-icons browser install --browser chrome

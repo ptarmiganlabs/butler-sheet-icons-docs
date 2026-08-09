@@ -333,8 +333,8 @@ BSI can update icons for Public, Published, and Private sheets in both published
 
 ```bash
 # Browser selection
---browser chrome              # or firefox
---browser-version latest      # or specific version
+--browser chrome              # chrome is the only accepted value
+--browser-version recommended # or stable, a channel, or an exact build
 --headless false              # Show browser for debugging
 ```
 
