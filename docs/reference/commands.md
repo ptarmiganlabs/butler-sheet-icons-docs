@@ -51,7 +51,7 @@ These options are available for most commands:
 
 ## Exit codes
 
-::: warning Requires BSI 3.12.0 or later
+::: warning Requires BSI 4.0.0 or later
 Earlier versions always exited with `0`, whatever happened during the run.
 :::
 

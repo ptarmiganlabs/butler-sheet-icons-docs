@@ -43,7 +43,7 @@ graph TD
 
 ### When the app is saved
 
-::: warning Requires BSI 3.12.0 or later
+::: warning Requires BSI 4.0.0 or later
 Earlier versions saved the app once per sheet.
 :::
 

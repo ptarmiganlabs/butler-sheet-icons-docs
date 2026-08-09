@@ -38,10 +38,10 @@ Tip: Titles with spaces must be wrapped in quotes.
 
 `--exclude-sheet-number` and `--blur-sheet-number` refer to a sheet's position in the app, where 1 is the first sheet. That position comes from the sheets' display order in Qlik Sense, which Butler Sheet Icons reads from the engine before doing anything else.
 
-::: warning Numbering can shift in apps with an incomplete sheet — BSI 3.12.0 or later
+::: warning Numbering can shift in apps with an incomplete sheet — BSI 4.0.0 or later
 A sheet missing its layout data has no usable position, so it is placed **at the end** of the sheet list. In an app containing such a sheet, numbering can therefore differ from what you might expect.
 
-In practice there is nothing to migrate: before BSI 3.12.0 those apps failed outright rather than being processed with different numbers. See [`TypeError: Cannot read properties of undefined (reading 'rank')`](/guide/troubleshooting#typeerror-cannot-read-properties-of-undefined-reading-rank) in Troubleshooting.
+In practice there is nothing to migrate: before BSI 4.0.0 those apps failed outright rather than being processed with different numbers. See [`TypeError: Cannot read properties of undefined (reading 'rank')`](/guide/troubleshooting#typeerror-cannot-read-properties-of-undefined-reading-rank) in Troubleshooting.
 
 Apps whose sheets all have complete layout data are numbered exactly as before.
 :::
@@ -65,7 +65,7 @@ error: option '--exclude-sheet-number <number...>' argument 'abc' is invalid. Ex
 
 Each of these two options can also be set through an environment variable, but a variable holds **one** sheet number only — see [QSEoW reference](/reference/qseow#sheet-filtering) and [QS Cloud reference](/reference/qscloud#sheet-filtering). To select several sheets, use the command-line option.
 
-::: warning Sheet numbers were matched incorrectly before BSI 3.12.0
+::: warning Sheet numbers were matched incorrectly before BSI 4.0.0
 In earlier versions `--exclude-sheet-number` and `--blur-sheet-number` selected the wrong sheets. Two faults combined:
 
 - **Only the last number you listed was used.** `--exclude-sheet-number 3 7` behaved as though you had written `--exclude-sheet-number 7`, so sheet 3 was processed as normal.
