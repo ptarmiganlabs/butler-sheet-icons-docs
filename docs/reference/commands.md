@@ -14,19 +14,21 @@ butler-sheet-icons <platform> <command> [options]
 
 ## Quick Reference
 
-| Platform  | Command                   | Purpose                              |
-| --------- | ------------------------- | ------------------------------------ |
-| `qscloud` | `create-sheet-icons`      | Create thumbnails for QS Cloud apps  |
-| `qscloud` | `remove-sheet-icons`      | Remove thumbnails from QS Cloud apps |
-| `qscloud` | `list-collections`        | List available collections           |
-| `qseow`   | `create-sheet-thumbnails` | Create thumbnails for QSEoW apps     |
-| `qseow`   | `create-sheet-icons`      | Alias of create-sheet-thumbnails     |
-| `qseow`   | `remove-sheet-icons`      | Remove thumbnails from QSEoW apps    |
-| `browser` | `install`                 | Install browser for BSI              |
-| `browser` | `list-installed`          | Show installed browsers              |
-| `browser` | `list-available`          | Show available browsers for download |
-| `browser` | `uninstall`               | Remove specific browser              |
-| `browser` | `uninstall-all`           | Remove all browsers                  |
+| Platform  | Command                   | Purpose                              | Alias                     |
+| --------- | ------------------------- | ------------------------------------ | ------------------------- |
+| `qscloud` | `create-sheet-thumbnails` | Create thumbnails for QS Cloud apps  | `create-sheet-icons`      |
+| `qscloud` | `remove-sheet-icons`      | Remove thumbnails from QS Cloud apps | `remove-sheet-thumbnails` |
+| `qscloud` | `list-collections`        | List available collections           | —                         |
+| `qseow`   | `create-sheet-thumbnails` | Create thumbnails for QSEoW apps     | `create-sheet-icons`      |
+| `browser` | `install`                 | Install browser for BSI              | —                         |
+| `browser` | `list-installed`          | Show installed browsers              | —                         |
+| `browser` | `list-available`          | Show available browsers for download | —                         |
+| `browser` | `uninstall`               | Remove specific browser              | —                         |
+| `browser` | `uninstall-all`           | Remove all browsers                  | —                         |
+
+::: warning No `remove-sheet-icons` on QSEoW
+Removing sheet icons is available for Qlik Sense Cloud only. There is no `qseow remove-sheet-icons` command — `create-sheet-thumbnails` is the only `qseow` command.
+:::
 
 ## Global Options
 
