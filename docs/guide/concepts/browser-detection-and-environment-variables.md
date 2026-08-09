@@ -305,6 +305,8 @@ This means:
 - No additional browser setup is needed
 - The image works in air‑gapped environments as long as you can transfer the image itself
 
+For how to transfer the image across an air gap, what network access the container still needs, and how to verify the embedded browser before going near production, see [Air-gapped environments](/guide/advanced/docker#air-gapped-environments).
+
 **Windows / PowerShell example (using the embedded browser):**
 
 ```powershell
