@@ -65,6 +65,36 @@ reviewable without diffing the branch.
   only by search.
 - Write for **Qlik Sense administrators**, not Node.js developers.
 
+## Testing the site locally
+
+You can run the site and look at it yourself. Do this whenever a change is visual, structural, or
+worth seeing rendered — do not ask the user to check something you can check.
+
+```bash
+npm run docs:dev
+```
+
+The server runs until stopped, so start it in the background. Then open the URL printed at the end
+of its output in a browser and navigate the site as a reader would.
+
+**Read the port from that output — do not assume 5173.** VitePress falls back to 5174, 5175 and so
+on whenever the port is already taken, which happens often:
+
+```
+  ➜  Local:   http://localhost:5174/
+```
+
+Two things about the dev server that will otherwise waste your time:
+
+- **`curl` cannot see page content.** The dev server returns an empty SPA shell and renders
+  everything client-side, so `curl … | grep 'my new heading'` finds nothing even when the page is
+  perfectly fine. Use a real browser. If you want HTML you can grep, run `npm run docs:build` and
+  read `docs/.vitepress/dist/` instead.
+- **`Failed to resolve dependency: debug, present in 'optimizeDeps.include'` is expected noise.**
+  It appears on most starts and the server works regardless. Do not chase it.
+
+Stop the server when you are done.
+
 ## Verify before reporting done
 
 ```bash
@@ -73,7 +103,7 @@ npm run docs:build
 
 Fails on dead internal links, so a passing build proves every internal link resolves. It does
 **not** validate `#anchor` fragments — check those against the generated HTML in
-`docs/.vitepress/dist/`.
+`docs/.vitepress/dist/`, e.g. `grep -o 'id="[^"]*"' docs/.vitepress/dist/reference/commands.html`.
 
 ## Deployment
 

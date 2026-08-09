@@ -52,6 +52,25 @@ npm run docs:preview      # Preview production build locally
 
 There is no deploy script. Deployment is automatic — see "Deployment & Hosting" below.
 
+### Viewing the site locally
+
+Run the dev server and open it in a browser to see changes rendered:
+
+```bash
+npm run docs:dev
+```
+
+The server runs until stopped. Open the URL printed at the end of its output — **read the port from that output rather than assuming 5173**, because VitePress falls back to 5174, 5175 and so on when the port is taken:
+
+```
+  ➜  Local:   http://localhost:5174/
+```
+
+Two things worth knowing about the dev server:
+
+- **`curl` will not show page content.** It returns an empty SPA shell and renders client-side, so grepping the response for a heading you just added finds nothing even when the page is fine. Use a browser, or build with `npm run docs:build` and read `docs/.vitepress/dist/` for static HTML.
+- **`Failed to resolve dependency: debug, present in 'optimizeDeps.include'` is expected** on startup and harmless.
+
 ## Content Guidelines
 
 ### Writing Style
