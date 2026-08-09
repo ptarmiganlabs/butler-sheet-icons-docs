@@ -13,7 +13,7 @@ Exclude sheets when creating thumbnails to keep special-purpose sheets unchanged
 Available in both QS Cloud and QSEoW:
 
 - --exclude-sheet-number <numbers...>
-  Exclude by position in the app (1 = first sheet).
+  Exclude by position in the app (1 = first sheet). See [How sheet numbers are decided](#how-sheet-numbers-are-decided).
 - --exclude-sheet-title <titles...>
   Exclude by exact sheet title. Titles with spaces must be quoted.
 - --exclude-sheet-status <status...>
@@ -33,6 +33,20 @@ Example parameters usage:
 ```
 
 Tip: Titles with spaces must be wrapped in quotes.
+
+## How sheet numbers are decided
+
+`--exclude-sheet-number` and `--blur-sheet-number` refer to a sheet's position in the app, where 1 is the first sheet. That position comes from the sheets' display order in Qlik Sense, which Butler Sheet Icons reads from the engine before doing anything else.
+
+::: warning Numbering can shift in apps with an incomplete sheet — BSI 3.12.0 or later
+A sheet missing its layout data has no usable position, so it is placed **at the end** of the sheet list. In an app containing such a sheet, numbering can therefore differ from what you might expect.
+
+In practice there is nothing to migrate: before BSI 3.12.0 those apps failed outright rather than being processed with different numbers. See [`TypeError: Cannot read properties of undefined (reading 'rank')`](/guide/troubleshooting#typeerror-cannot-read-properties-of-undefined-reading-rank) in Troubleshooting.
+
+Apps whose sheets all have complete layout data are numbered exactly as before.
+:::
+
+If you rely on sheet numbers, check them in the log of a successful run before trusting them — Butler Sheet Icons names each sheet by number, title and ID as it processes it.
 
 ## Excluding sheets based on the sheet's status
 

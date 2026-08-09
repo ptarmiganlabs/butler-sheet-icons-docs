@@ -37,7 +37,7 @@ graph TD
 
 1. Process images — Resizes to thumbnail and optionally produces a blurred variant for sensitive content. Details in [Sheet blurring](/guide/concepts/sheet-blurring).
 
-1. Upload and assign — Uploads images (QSEoW via QRS content libraries, QS Cloud via cloud APIs) and assigns them to sheets. Options are covered in the platform-specific configuration pages.
+1. Upload and assign — Uploads images (QSEoW via QRS content libraries, QS Cloud via cloud APIs) and assigns them to sheets. Options are covered in the platform-specific configuration pages. **If any image fails to upload, the app is left alone** rather than being pointed at images that are not there — see [`Failed to upload N of M thumbnail image(s)`](/guide/troubleshooting#failed-to-upload-n-of-m-thumbnail-image-s).
 
 1. Save the app — Once every sheet has been dealt with, the app is saved **once**. See below.
 

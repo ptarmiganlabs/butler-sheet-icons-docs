@@ -93,6 +93,66 @@ In earlier versions this printed `Connection to tenant … successful.` followed
 
 **What to do:** verify `--tenanturl` points at a Qlik Sense Cloud tenant and that `--apikey` is valid and unexpired. See [QS Cloud Authentication Problems](#qs-cloud-authentication-problems).
 
+### `Failed to upload N of M thumbnail image(s)`
+
+Thumbnail images were generated but could not be uploaded, so **the app was left untouched** and its sheets keep the icons they already had.
+
+On Qlik Sense Cloud:
+
+```
+CLOUD APP (stack): CloudError: Failed to upload 2 of 5 thumbnail image(s) to Qlik Sense Cloud app abc-123
+```
+
+On Qlik Sense Enterprise on Windows the message names the content library instead:
+
+```
+QSEOW: qseowProcessApp (stack): QseowError: Failed to upload 2 of 5 thumbnail image(s) to content library BSI thumbnails
+```
+
+::: warning Requires BSI 3.12.0 or later
+In earlier versions the run carried on after a failed upload and repointed **every** sheet at an image that was not there, replacing working icons with broken ones — and reported no error. If apps are showing broken sheet icons from an earlier run, see "Repairing apps affected before upgrading" below.
+:::
+
+**What to do:**
+
+1. **Your sheets are safe.** Nothing in the app was changed, so its existing icons are intact. There is no cleanup to do.
+2. **Read the lines immediately above**, prefixed `CLOUD UPLOAD 1` or `QSEOW UPLOAD 1`. Those name the underlying reason — that is where the actual cause is. Common ones are an image larger than the tenant or server accepts, a content library that does not exist or that the account cannot write to, and network interruptions.
+3. **Fix the cause and re-run.** The command is safe to run again.
+
+Every image is attempted before the run stops, so one failure does not hide the others — the count tells you how widespread the problem is.
+
+#### Repairing apps affected before upgrading
+
+If earlier runs left apps showing broken sheet icons, re-running `create-sheet-thumbnails` against those apps repairs them, once the upload problem itself is resolved. To clear the icons instead of regenerating them, use `qscloud remove-sheet-icons` — note this exists only for Qlik Sense Cloud.
+
+### `TypeError: Cannot read properties of undefined (reading 'rank')`
+
+A single sheet missing its layout data caused the **whole app** to be abandoned before any thumbnail was created or removed. Every other sheet in that app was left untouched.
+
+::: warning Requires BSI 3.12.0 or later
+Fixed. Such sheets are now sorted to the end of the sheet list and processed like any other, so the app completes.
+:::
+
+Search your logs for `reading 'rank'` — that phrase is identical in every case. The text before it varies by platform and by how far the run had got:
+
+| Platform | Stage | Log line begins |
+| --- | --- | --- |
+| Qlik Sense Cloud | Creating thumbnails | `CLOUD APP (stack):` |
+| Qlik Sense Cloud | Applying thumbnails to sheets | `CLOUD UPDATE SHEETS (stack):` |
+| Qlik Sense Cloud | Removing sheet icons | `CLOUD REMOVE SHEET ICONS 1 (stack):` |
+| Enterprise on Windows | Creating thumbnails | `QSEOW: qseowProcessApp (stack):` |
+| Enterprise on Windows | Applying thumbnails to sheets | `QSEOW UPDATE SHEETS (stack):` |
+
+A closely related failure, `reading 'showCondition'`, is fixed by the same change and is worth searching for too. It struck slightly later — after thumbnails had been generated but before they were uploaded, so the work was still discarded.
+
+**What to do:** upgrade and re-run. The affected apps should now complete.
+
+**What causes it:** the sheet is missing its layout data — the part carrying its position in the app and its show condition. This comes from Qlik Sense rather than Butler Sheet Icons, and is uncommon. It has been seen with sheets that are partially created or partially deleted, and with sheets whose owner no longer exists. Such a sheet is now named in the log as it is processed, so you can still find it in Qlik Sense to repair or delete it.
+
+**One consequence to be aware of:** sheet numbers come from this sort order, so in an app containing such a sheet the numbering can differ from before — see [Sheet exclusion](/guide/concepts/sheet-exclusion) and [Sheet blurring](/guide/concepts/sheet-blurring).
+
+**Not covered by this fix:** a sheet missing its **title and description** — a different part of the sheet record — can still interrupt a run. That case is less common and is being addressed separately.
+
 ### The run failed — has anything changed in Qlik Sense?
 
 An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).

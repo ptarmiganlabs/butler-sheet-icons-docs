@@ -20,7 +20,7 @@ Filters mirror the exclusion options but use the `--blur-sheet-...` prefix. You 
 Available in QS Cloud and QSEoW:
 
 - `--blur-sheet-number <numbers...>`
-  Blur by position in the app (1 = first sheet). Example: `--blur-sheet-number 1 3 5`.
+  Blur by position in the app (1 = first sheet). Example: `--blur-sheet-number 1 3 5`. Sheet numbers come from the sheets' display order — see [How sheet numbers are decided](/guide/concepts/sheet-exclusion#how-sheet-numbers-are-decided).
 - `--blur-sheet-title <titles...>`
   Blur by exact sheet title. Titles with spaces must be quoted.
 - `--blur-sheet-status <status...>`
