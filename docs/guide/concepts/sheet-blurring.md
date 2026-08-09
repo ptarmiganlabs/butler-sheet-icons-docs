@@ -31,6 +31,12 @@ QSEoW only:
 - `--blur-sheet-tag <value...>`
   Blur sheets that have one or more specified tags (set in QMC > App objects). Tags don’t exist for individual sheets in QS Cloud.
 
+::: warning Sheet numbers were matched incorrectly before BSI 3.12.0
+In earlier versions `--blur-sheet-number` blurred sheets you had not selected — only the last number you listed was used, and it was matched as a text fragment rather than as a whole sheet number. `--blur-sheet-number 12` also blurred sheets 1 and 2.
+
+`--blur-sheet-title`, `--blur-sheet-status` and `--blur-sheet-tag` were not affected. See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers) for the full description, and [Sheets you did not select were skipped or blurred](/guide/troubleshooting#sheets-you-did-not-select-were-skipped-or-blurred) for what to check and re-run.
+:::
+
 ## Blur intensity
 
 Control blur strength with `--blur-factor <factor>`.

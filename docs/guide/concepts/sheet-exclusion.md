@@ -48,6 +48,36 @@ Apps whose sheets all have complete layout data are numbered exactly as before.
 
 If you rely on sheet numbers, check them in the log of a successful run before trusting them — Butler Sheet Icons names each sheet by number, title and ID as it processes it.
 
+## Listing several sheet numbers
+
+`--exclude-sheet-number` and `--blur-sheet-number` both take one or more whole numbers, separated by spaces, where 1 is the first sheet in the app:
+
+```bash
+--exclude-sheet-number 1 2 12
+--blur-sheet-number 4 7
+```
+
+A value that is not a non-negative whole number is rejected before Butler Sheet Icons connects to Qlik Sense:
+
+```
+error: option '--exclude-sheet-number <number...>' argument 'abc' is invalid. Exclude sheet number must be a non-negative integer.
+```
+
+Each of these two options can also be set through an environment variable, but a variable holds **one** sheet number only — see [QSEoW reference](/reference/qseow#sheet-filtering) and [QS Cloud reference](/reference/qscloud#sheet-filtering). To select several sheets, use the command-line option.
+
+::: warning Sheet numbers were matched incorrectly before BSI 3.12.0
+In earlier versions `--exclude-sheet-number` and `--blur-sheet-number` selected the wrong sheets. Two faults combined:
+
+- **Only the last number you listed was used.** `--exclude-sheet-number 3 7` behaved as though you had written `--exclude-sheet-number 7`, so sheet 3 was processed as normal.
+- **Numbers were matched as text fragments rather than as whole sheet numbers.** `--exclude-sheet-number 12` also excluded sheets 1 and 2, and `--exclude-sheet-number 123` also excluded sheets 1, 2, 3, 12 and 23.
+
+A single one-digit number, such as `--exclude-sheet-number 3`, was always handled correctly — no other sheet number hides inside "3".
+
+No error or warning was produced and the run reported success, so there was nothing to notice at the time. If you use either option, see [Sheets you did not select were skipped or blurred](/guide/troubleshooting#sheets-you-did-not-select-were-skipped-or-blurred) for how to check what happened and what to re-run.
+
+The other sheet filters — `--exclude-sheet-status`, `--exclude-sheet-tag`, `--exclude-sheet-title`, `--blur-sheet-status` and `--blur-sheet-title` — were never affected.
+:::
+
 ## Excluding sheets based on the sheet's status
 
 Sheets can have different statuses, and how they are handled differs between QS Cloud and QSEoW:

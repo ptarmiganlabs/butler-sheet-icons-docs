@@ -58,6 +58,16 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 | `--blur-sheet-status` | `BSI_QSCLOUD_CST_BLUR_SHEET_STATUS` | Blur by status          | `[]`    | `--blur-sheet-status published`       |
 | `--blur-factor`       | `BSI_QSCLOUD_CST_BLUR_FACTOR`       | Blur intensity (0-1000) | `5`     | `--blur-factor 10`                    |
 
+::: tip One sheet number per environment variable
+`BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
+
+```
+error: option '--exclude-sheet-number <number...>' value '1 2 12' from env 'BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER' is invalid. Exclude sheet number must be a non-negative integer.
+```
+
+To select several sheets, pass `--exclude-sheet-number` or `--blur-sheet-number` on the command line instead. See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers).
+:::
+
 ### Complete Example
 
 ```bash

@@ -78,6 +78,16 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | `--blur-sheet-tag`    | `BSI_QSEOW_CST_BLUR_SHEET_TAG`    | Blur by tag            |         | `--blur-sheet-tag "sensitive"`        |
 | `--blur-factor`       | `BSI_QSEOW_CST_BLUR_FACTOR`       | Blur intensity (0-100) | `5`     | `--blur-factor 10`                    |
 
+::: tip One sheet number per environment variable
+`BSI_QSEOW_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSEOW_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
+
+```
+error: option '--exclude-sheet-number <number...>' value '1 2 12' from env 'BSI_QSEOW_CST_EXCLUDE_SHEET_NUMBER' is invalid. Exclude sheet number must be a non-negative integer.
+```
+
+To select several sheets, pass `--exclude-sheet-number` or `--blur-sheet-number` on the command line instead. See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers).
+:::
+
 ### Example: create thumbnails
 
 ```bash
