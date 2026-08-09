@@ -102,12 +102,12 @@ error: Butler Sheet Icons needs internet access for this command. If this machin
        available locally.
 ```
 
-Use `browser list-installed` instead to see what is already available locally. For Firefox, the command makes no network call — it simply reports that `latest` is the only supported version.
+Use `browser list-installed` instead to see what is already available locally.
 :::
 
 ### install
 
-Downloads and installs a browser into the BSI cache. By default, installs the latest stable version of Chrome.
+Downloads and installs a browser into the BSI cache. By default, installs the Chrome build Butler Sheet Icons is tested with (`recommended`).
 
 **Usage:**
 
@@ -148,16 +148,11 @@ Install latest Firefox (macOS):
 
 #### Browser Version Notes
 
-**Chrome Versions:**
+**Chrome:** a milestone (`151`), a build prefix (`151.0.7922`) or a full build id (`151.0.7922.77`). Some older builds may no longer be downloadable — use `list-available` to see what is currently offered.
 
-- Chrome supports specific build IDs (e.g., `121.0.6167.85`)
-- Some older Chrome versions may no longer be available for download
-- Use `list-available` to see what versions are currently downloadable
+**Firefox:** a channel-prefixed build id such as `stable_153.0.3`. A bare version number is rejected, because it would be interpreted as a nightly build.
 
-**Firefox Versions:**
-
-- Currently, only the `latest` version of Firefox is supported
-- Specific version support for Firefox is pending
+Both also accept the keywords `recommended` and `stable`, and a release channel. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
 
 ::: warning Older Chrome Versions
 If you try to install an older Chrome version that's no longer available, you'll get a 404 error. The Chrome team periodically removes older versions from their download servers. Use a newer version instead.
@@ -183,7 +178,7 @@ butler-sheet-icons browser uninstall [options]
 | --------------------------------- | -------------------------------- | -------------------------------------------------------- | -------- | --------------------------------- |
 | `--loglevel, --log-level <level>` | `BSI_BROWSER_UI_LOG_LEVEL`       | Set log level (error, warn, info, verbose, debug, silly) | `info`   | `--loglevel warn`                 |
 | `--browser <browser>`             | `BSI_BROWSER_UI_BROWSER`         | Browser to uninstall (chrome, firefox)                   | `chrome` | `--browser firefox`               |
-| `--browser-version <version>`     | `BSI_BROWSER_UI_BROWSER_VERSION` | Specific version/build ID to uninstall                   | `-`      | `--browser-version 121.0.6167.85` |
+| `--browser-version <version>`     | `BSI_BROWSER_UI_BROWSER_VERSION` | Exact build id, or `recommended`. Not `stable`/`latest`. | `-`      | `--browser-version 121.0.6167.85` |
 | `-h, --help`                      | `-`                              | Display help for command                                 | `-`      | `--help`                          |
 
 **Example (Windows):**

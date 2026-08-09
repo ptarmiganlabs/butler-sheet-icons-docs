@@ -56,6 +56,8 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | `--pagewait`             | `BSI_QSEOW_CST_PAGE_WAIT`          | Seconds to wait per sheet          | `5`                       | `--pagewait 6`                               |
 | `--browser-page-timeout` | `BSI_BROWSER_PAGE_TIMEOUT`         | Seconds to wait for a page to load | `90`                      | `--browser-page-timeout 120`                 |
 | `--imagedir`             | `BSI_QSEOW_CST_IMAGE_DIR`          | Screenshot directory               | `./img`                   | `--imagedir ./img`                           |
+| `--browser`              | `BSI_QSEOW_CST_BROWSER`            | Browser type (`chrome` only)       | `chrome`                  | `--browser chrome`                           |
+| `--browser-version`      | `BSI_QSEOW_CST_BROWSER_VERSION`    | Browser build to use               | `recommended`             | `--browser-version stable`                   |
 
 ### Sheet filtering
 
@@ -86,6 +88,10 @@ error: option '--exclude-sheet-number <number...>' value '1 2 12' from env 'BSI_
 ```
 
 To select several sheets, pass `--exclude-sheet-number` or `--blur-sheet-number` on the command line instead. See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers).
+:::
+
+::: tip Which browser build?
+`--browser-version` accepts `recommended` (the build Butler Sheet Icons is tested with, and the default), `stable`, a release channel, or an exact build id. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
 :::
 
 ### Example: create thumbnails
