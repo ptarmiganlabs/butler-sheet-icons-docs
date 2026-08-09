@@ -6,10 +6,103 @@ Butler Sheet Icons (BSI) is available as an official Docker image, making it eas
 - Runs headless; suitable for CI/CD and servers
 - Same features as pre-built binaries
 - Includes an embedded Chromium browser, so it needs no internet access at all — see [Air-gapped environments](#air-gapped-environments)
+- Contains third-party software with its own licences — see [What is inside the image](#what-is-inside-the-image)
 
 For details on how the container decides which browser to use, and how to override the embedded browser with a cached or system browser, see [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
 
 For concrete container commands (including QS Cloud, QSEoW, volume mounts, and docker-compose), see the dedicated [Docker Examples](/examples/docker) page.
+
+## What is inside the image
+
+The image is not only Butler Sheet Icons. It also contains a **Chromium browser**, because Butler Sheet Icons works by opening your Qlik Sense sheets in a browser and photographing them.
+
+Shipping the browser inside the image is deliberate. It is what allows the container to run in an environment with no internet access — nothing has to be downloaded the first time you use it.
+
+Chromium accounts for roughly 260 MB of the image. That is most of the reason the image is as large as it is.
+
+### Chromium is not Google Chrome
+
+This distinction matters if someone in your organization has to approve the image, and the two names are used interchangeably almost everywhere else:
+
+- **Google Chrome** and **Chrome for Testing** are Google-branded browsers, distributed under Google's own terms. The Butler Sheet Icons image contains neither of them.
+- **Chromium** is the open-source project that Chrome is built from. The image uses the Chromium package published by Alpine Linux, the same one Alpine ships to everybody else. It is recorded as BSD-3-Clause.
+
+When you run Butler Sheet Icons **outside** Docker — as a pre-built binary — it downloads Chrome for Testing onto your own machine the first time it needs a browser. That is a download you perform, not something Butler Sheet Icons redistributes, which is why the two situations are handled differently.
+
+### Where to find the licence information
+
+::: warning Requires BSI 4.0.1 or later
+The `/nodeapp/licenses/` directory described below does not exist in earlier images, and earlier images also stripped most licence files out of `node_modules` to save space. On a 4.0.0 image the `find` command below returns 23 results; from 4.0.1 it returns 162.
+
+The Chromium credits page and the Alpine package database are present in older images too.
+:::
+
+Every licence that applies to the image is inside the image, so a review can be completed without searching the internet for any of it.
+
+Start with the notice file, which lists each component and where its licence and source can be found:
+
+```bash
+docker run --rm --entrypoint sh ptarmiganlabs/butler-sheet-icons:latest \
+  -c 'cat /nodeapp/licenses/NOTICE.md'
+```
+
+The same directory holds the full licence text for Butler Sheet Icons itself and for Chromium:
+
+```bash
+docker run --rm --entrypoint sh ptarmiganlabs/butler-sheet-icons:latest \
+  -c 'ls /nodeapp/licenses/'
+```
+
+Three further sources, all inside the image:
+
+| What | How to see it |
+| --- | --- |
+| The 740 components bundled inside Chromium, with their licences | The `chrome://credits` page built into the browser — see below |
+| Licences of the Node.js packages Butler Sheet Icons uses | `find /nodeapp/node_modules -iname "LICENSE*"` |
+| Licences of every Alpine system package | `grep -E "^(P\|V\|L):" /lib/apk/db/installed` |
+
+To check which Chromium version a particular image contains:
+
+```bash
+docker run --rm --entrypoint /usr/bin/chromium-browser \
+  ptarmiganlabs/butler-sheet-icons:latest --version
+```
+
+### Reading the Chromium credits page
+
+Chromium bundles 740 further components, under licences including LGPL, MPL and MIT. They are listed on the browser's own `chrome://credits` page, which is built into the binary and needs no internet access.
+
+Getting at that page is more awkward than it looks, because a `chrome://` page cannot be reached from outside the container. This command drives the browser from inside it and saves the page as a file:
+
+::: details Command to save the credits page
+
+```bash
+docker run --rm --network none --entrypoint node \
+    ptarmiganlabs/butler-sheet-icons:latest --input-type=module -e "
+import puppeteer from 'puppeteer-core';
+const browser = await puppeteer.launch({
+  executablePath: '/usr/bin/chromium-browser',
+  headless: true,
+  args: ['--no-sandbox', '--disable-gpu'],
+});
+const page = await browser.newPage();
+await page.goto('chrome://credits', { waitUntil: 'domcontentloaded' });
+console.log(await page.content());
+await browser.close();
+" > chromium-credits.html
+```
+
+:::
+
+That writes about 18 MB of HTML containing all 740 components and their full licence texts. Open `chromium-credits.html` in any browser. It renders unstyled, because its stylesheets are `chrome://` addresses that only exist inside Chromium — which suits a review, since every licence text appears inline rather than hidden behind a control, and the file can be searched or printed as it is.
+
+The same command is in `NOTICE.md` inside the image, so it is available to a reviewer who has the image but not this page.
+
+::: tip Media codecs
+The Chromium build in the image can decode the H.264 and AAC media formats. These are covered by patent pools, which is a separate question from the licences above.
+
+Butler Sheet Icons never decodes audio or video — it takes still pictures of Qlik Sense sheets — so this capability is present only because it comes as part of the standard Chromium package. It is mentioned here because organizations with strict patent-licensing policies will want to know it is there.
+:::
 
 ## Writing thumbnails to a mounted folder on Linux
 
@@ -107,7 +200,7 @@ Qlik Sense Cloud lives on the public internet, so a genuinely air-gapped host ca
 
 ### Why the image is the easiest option
 
-The image already contains a Chromium browser — around 260 MB of the image, and the reason it is as large as it is.
+The image already contains a Chromium browser — around 260 MB of the image, and the reason it is as large as it is. See [What is inside the image](#what-is-inside-the-image) for the full inventory and its licensing.
 
 Two environment variables are set inside the image and point Butler Sheet Icons at that browser:
 
