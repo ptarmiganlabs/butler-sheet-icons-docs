@@ -144,14 +144,57 @@ export http_proxy='http://username:password@proxy.example.com:port'
 export https_proxy='http://username:password@proxy.example.com:port'
 ```
 
+## Exit codes and job status
+
+::: danger Action may be required — requires BSI 3.12.0 or later
+This change can turn a scheduled job that always reported success into one that reports failure. That is intended, but read this before upgrading so it does not surprise you at 3am.
+:::
+
+Until BSI 3.12.0, Butler Sheet Icons always exited with `0`. A run in which every app failed finished with the same exit code as a run in which everything worked — the only way to tell them apart was to read the log. A pipeline step that checked the exit code was, in effect, checking nothing.
+
+BSI now exits `1` when the run failed or completed with apps it could not process. See [Exit codes](/reference/commands#exit-codes) for exactly what counts as a failure.
+
+### Before you upgrade
+
+**If you only run BSI interactively, there is nothing to do** — the exit code is not something you normally see.
+
+**If you run it from automation, check what your job does with a non-zero exit code.** Most schedulers treat it as a failed job and may raise an alert, stop the pipeline, or skip later steps.
+
+Run your existing command once by hand after upgrading and inspect the exit code:
+
+::: code-group
+
+```powershell [PowerShell]
+butler-sheet-icons qscloud create-sheet-thumbnails --tenanturl $env:BSI_TENANT_URL --apikey $env:BSI_API_KEY
+Write-Host "exit code: $LASTEXITCODE"
+```
+
+```bash [Bash]
+butler-sheet-icons qscloud create-sheet-thumbnails --tenanturl "$BSI_TENANT_URL" --apikey "$BSI_API_KEY"
+echo "exit code: $?"
+```
+
+:::
+
+**If it returns `1`, that is a real problem that was already happening** — it was simply invisible before. Read the log for the messages listed in [Run failures and exit codes](/guide/troubleshooting#run-failures-and-exit-codes) and fix the underlying cause.
+
+If you need the job to keep running while you investigate, most schedulers let you ignore a step's exit code. Treat that as temporary: the exit code is telling you that sheet icons are not being updated the way you asked.
+
+### Retrying a failed run
+
+An app is saved once, after all its sheets have been dealt with. If that save fails, nothing about the app changes and its sheets keep the icons they had, so re-running is a clean retry rather than a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
+
 ## Troubleshooting in CI
 
 - Use `--headless true` (default) on build agents. Consider `--headless false` only for local debugging.
 - For QSEoW, always provide `--sense-version` that matches your server.
 - In Qlik Cloud, updating published apps affects only private sheets—use sheet status filters to avoid “Access denied”.
+- A non-zero exit code is now meaningful — see [Exit codes and job status](#exit-codes-and-job-status) above.
 
 ## Related
 
-- Environment Variables: naming scheme and examples
-- Docker Usage: tips and troubleshooting for running BSI in containers
-- Sheet Exclusion and Sheet Blurring: control visibility vs. privacy in pipelines
+- [Exit codes](/reference/commands#exit-codes): what `0` and `1` mean, and what counts as a failure
+- [Environment variables](/guide/concepts/environment-variables): naming scheme and examples
+- [Docker usage](/guide/advanced/docker): tips and troubleshooting for running BSI in containers
+- [Sheet exclusion](/guide/concepts/sheet-exclusion) and [Sheet blurring](/guide/concepts/sheet-blurring): control visibility vs. privacy in pipelines
+- [Troubleshooting](/guide/troubleshooting): symptom-based diagnosis
