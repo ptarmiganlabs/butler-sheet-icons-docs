@@ -6,7 +6,7 @@ Thank you for your interest in improving the Butler Sheet Icons documentation! T
 
 ### Prerequisites
 
-- Node.js 18+ (LTS recommended)
+- Node.js 24 (see `.nvmrc`)
 - npm (comes with Node.js)
 - Git
 - Text editor (VS Code recommended for markdown editing)
@@ -16,10 +16,24 @@ Thank you for your interest in improving the Butler Sheet Icons documentation! T
 1. Fork this repository
 2. Clone your fork locally
 3. Install dependencies: `npm install`
-4. Start development server: `npm run docs:dev`
-5. Make your changes
-6. Test locally and preview
-7. Submit a pull request
+4. Branch from `next` — see "Which branch?" below
+5. Start development server: `npm run docs:dev`
+6. Make your changes
+7. Test locally and preview
+8. Submit a pull request against `next`
+
+### Which branch?
+
+**`next`, always.** Branch from `next`, PR into `next`. There is no decision to make.
+
+`main` is production — it is what the public site serves, and it is updated only by merging
+`next` when a Butler Sheet Icons release ships. Please do not open pull requests against it.
+
+The reason is that the site is single-version: there is one copy of the docs and no
+per-release archive, so anything on `main` is published as documentation for the current
+release, whatever it actually describes — and it goes live within minutes. Routing
+everything through `next` means documentation cannot reach the public site ahead of the
+release it describes.
 
 ## 📝 Content Guidelines
 
@@ -43,7 +57,7 @@ Thank you for your interest in improving the Butler Sheet Icons documentation! T
 - Use descriptive headings that follow a logical hierarchy
 - Include code blocks with appropriate language syntax highlighting
 - Add alt text to all images for accessibility
-- Use relative links for internal navigation
+- Use absolute, extensionless links for internal navigation (e.g. `/guide/quick-start`)
 - Test all links before submitting
 
 ## 🏗️ Content Structure
@@ -82,7 +96,7 @@ sidebar: {
 
 ### Image Guidelines
 
-- Store all images in `docs/public/img/`
+- Store all images in `docs/public/images/`
 - Use descriptive filenames: `qscloud-authentication-flow.png`
 - Optimize images for web (compress without losing clarity)
 - Include descriptive alt text for accessibility
@@ -96,7 +110,7 @@ sidebar: {
 ### Adding Images
 
 ```markdown
-![Descriptive alt text](/img/your-image.png)
+![Descriptive alt text](/images/your-image.png)
 ```
 
 ## 🧪 Testing Your Changes
@@ -207,8 +221,9 @@ For issues with the tool itself, use the [main repository](https://github.com/pt
 
 1. Test your changes thoroughly
 2. Update any affected cross-references
-3. Add yourself to contributors if making significant changes
-4. Write a clear pull request description
+3. Confirm your pull request targets `next`, not `main`
+4. Add yourself to contributors if making significant changes
+5. Write a clear pull request description
 
 ### Pull Request Template
 
@@ -238,10 +253,11 @@ Any additional context or considerations.
 
 ### Review Process
 
-1. Automated checks will run (build, link validation)
-2. Maintainers will review for accuracy and clarity
-3. Address any requested changes
-4. Once approved, changes will be merged and deployed
+1. Automated checks will run. The VitePress build fails on dead internal links, so a green build means every internal link resolves.
+2. Cloudflare Pages comments a preview URL on the pull request — use it to check the rendered result.
+3. Maintainers will review for accuracy and clarity
+4. Address any requested changes
+5. Once approved and merged into `next`, Cloudflare updates the `next` preview. The change reaches the public site later, when `next` is merged into `main` at the next Butler Sheet Icons release.
 
 ## 🤝 Community Guidelines
 

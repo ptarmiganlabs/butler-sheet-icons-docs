@@ -4,13 +4,13 @@ This repository contains the VitePress documentation site for [Butler Sheet Icon
 
 ## 📖 View Documentation
 
-Documentation for Butler Sheet Icons can be found at [https://butler-sheet-icons.ptarmiganlabs.com](https://butler-sheet-icons.ptarmiganlabs.com), which redirects to [https://ptarmiganlabs.github.io/butler-sheet-icons-docs/](https://ptarmiganlabs.github.io/butler-sheet-icons-docs/).
+Documentation for Butler Sheet Icons can be found at [https://butler-sheet-icons.ptarmiganlabs.com](https://butler-sheet-icons.ptarmiganlabs.com).
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js LTS
+- Node.js 24 (see `.nvmrc`; `package.json` pins `engines.node` to `>=24 <25`)
 - npm (bundled with Node.js)
 
 ### Install & Run
@@ -35,12 +35,13 @@ The version fetch script populates `docs/.vitepress/version.js` with the latest 
 
 | File/Path                       | Purpose                                                                        |
 | ------------------------------- | ------------------------------------------------------------------------------ |
-| `package.json`                  | Scripts (build, deploy), dev deps, version fetch hook                          |
+| `package.json`                  | Scripts (dev, build, preview), dev deps, version fetch hook                    |
 | `scripts/fetch-bsi-version.mjs` | Fetch latest Butler Sheet Icons release tag → `docs/.vitepress/version.js`     |
-| `README_DEPLOY.md`              | Detailed deployment & ops instructions                                         |
-| `.github/workflows/deploy.yml`  | GitHub Pages build + deploy workflow                                           |
+| `README_DEPLOY.md`              | Detailed deployment, branching & ops instructions                              |
+| `.github/workflows/build.yml`   | Build validation on PRs and pushes (does not deploy)                           |
+| `.nvmrc`                        | Node version used by Cloudflare Pages and CI                                   |
 | `docs/.vitepress/config.js`     | VitePress site configuration (nav, head tags, analytics, version import)       |
-| `docs/.vitepress/version.js`    | Auto‑generated during build (git-ignored if applicable)                        |
+| `docs/.vitepress/version.js`    | Auto‑generated during build; git-ignored                                       |
 | `docs/index.md`                 | Landing page                                                                   |
 | `docs/guide/`                   | Guides (intro, quick start, installation, concepts, advanced, troubleshooting) |
 | `docs/reference/`               | Command & version reference                                                    |
@@ -110,30 +111,41 @@ Output is generated in `docs/.vitepress/dist/`
 
 Site theming, navigation, and analytics are defined in `docs/.vitepress/config.js`. Add custom CSS/components via standard VitePress extension points if/when needed.
 
-## 🚀 Deployment (GitHub Pages)
+## 🚀 Deployment (Cloudflare Pages)
 
-Deployed via GitHub Pages using the workflow in `.github/workflows/deploy.yml` + standard `gh-pages` branch publishing.
+The site is built and published by **Cloudflare Pages** (project `butler-sheet-icons-docs`), which watches this repository and deploys on its own. There is no manual deploy step and no deploy script — push a commit and it goes out. Cloudflare reports each build as a "Cloudflare Pages" check run and comments preview URLs on pull requests.
 
-| Script                 | Purpose                                                 |
-| ---------------------- | ------------------------------------------------------- |
-| `npm run docs:dev`     | Start local dev server (runs version fetch first)       |
-| `npm run docs:build`   | Build static site (generates version file)              |
-| `npm run docs:preview` | Preview built site locally                              |
-| `npm run deploy`       | Build then publish `docs/.vitepress/dist` to `gh-pages` |
-| `npm run deploy:ci`    | Build only (used by Pages workflow)                     |
+| Script                 | Purpose                                           |
+| ---------------------- | ------------------------------------------------- |
+| `npm run docs:dev`     | Start local dev server (runs version fetch first) |
+| `npm run docs:build`   | Build static site (generates version file)        |
+| `npm run docs:preview` | Preview built site locally                        |
 
-The build step runs `scripts/fetch-bsi-version.mjs` which writes `docs/.vitepress/version.js` with the latest Butler Sheet Icons release tag (fallback `v0.0.0` if API unavailable). Provide `GITHUB_TOKEN` locally to avoid GitHub API rate limiting.
+The build step runs `scripts/fetch-bsi-version.mjs` which writes `docs/.vitepress/version.js` with the latest Butler Sheet Icons release tag (fallback `v0.0.0` if the API is unavailable). Provide `GITHUB_TOKEN` locally to avoid GitHub API rate limiting.
 
-Full operational details (custom domain, env vars, troubleshooting) are in [README_DEPLOY.md](./README_DEPLOY.md). This repository intentionally only supports GitHub Pages for hosting.
+Full operational details (branch model, custom domain, env vars, troubleshooting) are in [README_DEPLOY.md](./README_DEPLOY.md).
+
+## 🌿 Branches
+
+**All work goes to `next`.** `main` is production and is reached only by merging `next` at release time.
+
+| Branch | Role                                          | Published to              |
+| ------ | --------------------------------------------- | ------------------------- |
+| `next` | Where all documentation work goes             | Preview URL only          |
+| `main` | Production — what the public site serves      | Production domain, public |
+
+The site is single-version — one copy of the docs, no per-release archive — so anything on `main` is presented as documentation for the current BSI release, whatever it actually describes, and Cloudflare publishes it within minutes. Routing everything through `next` keeps unreleased documentation off the public site.
+
+At release time: release Butler Sheet Icons first, then merge `next` → `main`. The nav version label follows the latest GitHub release, so merging early labels new content with the old version. See [README_DEPLOY.md](./README_DEPLOY.md) for the full procedure.
 
 ## 🤝 Contributing (Docs)
 
-1. Branch from `main`.
+1. Branch from `next` — never from `main`.
 2. Edit or add markdown in `docs/`.
 3. Run `npm run docs:dev` and verify navigation + sidebar.
 4. Ensure external links work; keep screenshots lightweight.
-5. Run `npm run docs:build` before opening PR.
-6. Open a PR with a concise summary (link related issues if any).
+5. Run `npm run docs:build` before opening a PR — the build fails on dead internal links.
+6. Open a PR against `next`, with a concise summary (link related issues if any).
 
 ## 🔗 Links
 
