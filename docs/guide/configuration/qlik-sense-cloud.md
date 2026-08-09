@@ -217,8 +217,8 @@ butler-sheet-icons qscloud create-sheet-icons `
 ### Browser Configuration
 
 ```bash
-# Use specific browser
---browser firefox
+# Browser selection (chrome is the only accepted value)
+--browser chrome
 
 # Show browser (for debugging)
 --headless false

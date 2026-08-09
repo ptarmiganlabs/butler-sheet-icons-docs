@@ -56,7 +56,7 @@ If no system browser is configured, BSI looks in the Puppeteer cache directory (
 
 A cached browser is used when it matches **both** of these:
 
-- **Browser type** — the browser asked for with `--browser` (`chrome` or `firefox`).
+- **Browser type** — the browser asked for with `--browser`. The thumbnail commands accept `chrome` only; the `browser` commands also accept `firefox`.
 - **Version** — if you specify an exact `--browser-version`, only a cached browser with exactly that build ID is used. If a different version is cached, BSI treats it as no match and downloads the version you asked for. If `--browser-version` is `latest` (the default), any cached build of the requested browser type is accepted.
 
 When a cached browser matches, it is used as-is and nothing is downloaded. This is what makes repeat runs fast: the browser is downloaded once and reused on every later run, with no network access needed for the browser itself.

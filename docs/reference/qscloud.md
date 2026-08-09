@@ -35,8 +35,8 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 | `--browser-page-timeout` | `BSI_BROWSER_PAGE_TIMEOUT`           | Seconds to wait for a page to load                  | `90`     | `--browser-page-timeout 120`      |
 | `--imagedir`             | `BSI_QSCLOUD_CST_IMAGE_DIR`          | Screenshot directory                                | `./img`  | `--imagedir ./screenshots`        |
 | `--includesheetpart`     | `BSI_QSCLOUD_CST_INCLUDE_SHEET_PART` | Screenshot area (1 = content, 2 = +title, 4 = full) | `1`      | `--includesheetpart 2`            |
-| `--browser`              | `BSI_QSCLOUD_CST_BROWSER`            | Browser type                                        | `chrome` | `--browser firefox`               |
-| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser version                                     | `latest` | `--browser-version 121.0.6167.85` |
+| `--browser`              | `BSI_QSCLOUD_CST_BROWSER`            | Browser type (`chrome` only)                        | `chrome` | `--browser chrome`                |
+| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser version                                     | `recommended` | `--browser-version 121.0.6167.85` |
 | `--skip-login`           | `BSI_QSCLOUD_CST_SKIP_LOGIN`         | Skip login page                                     | `false`  | `--skip-login`                    |
 
 ### Sheet Filtering

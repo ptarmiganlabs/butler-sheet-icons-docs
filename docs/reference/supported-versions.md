@@ -122,9 +122,9 @@ butler-sheet-icons qscloud create-sheet-icons \
   --browser chrome \
   --browser-version 121.0.6167.85
 
-# Use Firefox (latest only)
-butler-sheet-icons qscloud create-sheet-icons --browser firefox
 ```
+
+Chrome is the only browser accepted by the thumbnail commands — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ### Browser Management
 
