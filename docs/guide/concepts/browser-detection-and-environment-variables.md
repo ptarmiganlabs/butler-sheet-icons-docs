@@ -326,37 +326,110 @@ docker run --rm `
 
 ### Docker image with external browser
 
-Sometimes you may want to use a different or newer browser than the one embedded in the image.
+Sometimes you want the container to use a specific browser build rather than the Chromium that comes with the image — usually because your organization approves browser versions centrally.
 
-You can do this in two main ways:
+This takes three things, and leaving out any one of them breaks the run:
 
-1. Mount a Puppeteer cache directory from the host
-2. Point `PUPPETEER_EXECUTABLE_PATH` to a browser in a mounted directory
+1. A folder on the host holding a **Linux** browser build, mounted at `/home/nodejs/.cache/puppeteer` in the container.
+2. `PUPPETEER_EXECUTABLE_PATH` set to an empty string, so the embedded browser stops taking priority.
+3. `--browser-version` set to **the same build** that is in the folder.
 
-**Windows / PowerShell example (mount cached browser from host):**
+#### Fill the folder from inside a container
 
-```powershell
-# Host cache directory (created earlier with browser install commands)
-$cachePath = "$env:USERPROFILE\.cache\puppeteer"
+The browser has to be a Linux build, because the container is Linux. The reliable way to get one is to let the container download it — then it cannot be the wrong kind. This step needs internet access, and is done once:
+
+::: code-group
+
+```bash [macOS/Linux]
+mkdir -p "$HOME/bsi/browser-cache"
+
+docker run --rm \
+  -v "$HOME/bsi/browser-cache:/home/nodejs/.cache/puppeteer" \
+  ptarmiganlabs/butler-sheet-icons:latest \
+  browser install --browser chrome --browser-version 151.0.7922.77
+```
+
+```powershell [Windows PowerShell]
+$cachePath = 'C:\bsi-browser-cache'
+New-Item -ItemType Directory -Path $cachePath -Force | Out-Null
+
+docker run --rm `
+  -v "${cachePath}:/home/nodejs/.cache/puppeteer" `
+  ptarmiganlabs/butler-sheet-icons:latest `
+  browser install --browser chrome --browser-version 151.0.7922.77
+```
+
+:::
+
+::: danger Do not mount your own desktop's browser folder
+On Windows, `%USERPROFILE%\.cache\puppeteer` holds browsers downloaded **for Windows**. Mounting it into the container does not produce a clear error — Butler Sheet Icons accepts the entry and then tries to run a `.exe` inside a Linux container. The same applies to a macOS cache.
+
+Use the command above instead, which downloads a Linux build into a folder you nominate.
+:::
+
+#### Use it
+
+::: code-group
+
+```bash [macOS/Linux]
+docker run --rm \
+  -v "$HOME/bsi/browser-cache:/home/nodejs/.cache/puppeteer" \
+  -v "$HOME/bsi/img:/nodeapp/img" \
+  -e PUPPETEER_EXECUTABLE_PATH="" \
+  ptarmiganlabs/butler-sheet-icons:latest \
+  qscloud create-sheet-thumbnails \
+  --browser-version 151.0.7922.77 \
+  --tenanturl "$BSI_CLOUD_TENANT_URL" \
+  --apikey "$BSI_CLOUD_API_KEY" \
+  --appid "$BSI_CLOUD_APP_ID" \
+  --imagedir ./img
+```
+
+```powershell [Windows PowerShell]
+$cachePath = 'C:\bsi-browser-cache'
 $imgPath = 'C:\bsi-img'
 New-Item -ItemType Directory -Path $imgPath -Force | Out-Null
 
-# Use cached browser, ignore embedded one
-$env:PUPPETEER_EXECUTABLE_PATH = ''
-
 docker run --rm `
-  -v "$cachePath:/home/nodejs/.cache/puppeteer" `
-  -v "$imgPath:/nodeapp/img" `
+  -v "${cachePath}:/home/nodejs/.cache/puppeteer" `
+  -v "${imgPath}:/nodeapp/img" `
   -e PUPPETEER_EXECUTABLE_PATH="" `
   ptarmiganlabs/butler-sheet-icons:latest `
   qscloud create-sheet-thumbnails `
+  --browser-version 151.0.7922.77 `
   --tenanturl $env:BSI_CLOUD_TENANT_URL `
   --apikey $env:BSI_CLOUD_API_KEY `
   --appid $env:BSI_CLOUD_APP_ID `
   --imagedir ./img
 ```
 
-In this setup BSI ignores the embedded browser and uses the cached one from the host.
+:::
+
+A run that picked up the mounted browser says so:
+
+```
+info: Found 1 cached browser(s)
+info: Using cached browser: chrome 151.0.7922.77
+info: Browser ready from cache: chrome 151.0.7922.77
+```
+
+::: warning "Found 1 cached browser(s)" followed by "No local browser found"
+These two lines together mean the folder was read, but the browser in it is not the build that was asked for — so it was skipped. Both lines are accurate; it is the pair that is confusing.
+
+The fix is to make `--browser-version` name the build that is actually in the folder. Run `browser list-installed` with the folder mounted to see what that is:
+
+```bash
+docker run --rm \
+  -v "$HOME/bsi/browser-cache:/home/nodejs/.cache/puppeteer" \
+  ptarmiganlabs/butler-sheet-icons:latest \
+  browser list-installed
+```
+
+:::
+
+#### The simpler alternative
+
+If a specific build is not actually a requirement, do nothing: the browser inside the image is already there, already Linux, and needs no internet access. See [Air-gapped environments](/guide/advanced/docker#air-gapped-environments).
 
 ## Thumbnail generation examples
 
