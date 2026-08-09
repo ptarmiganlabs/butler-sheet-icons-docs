@@ -4,13 +4,20 @@
 
 This repository contains the VitePress documentation site for [Butler Sheet Icons](https://github.com/ptarmiganlabs/butler-sheet-icons), a tool for automatically creating Qlik Sense sheet thumbnail images.
 
+> **New documentation mostly originates in the BSI repo**, staged as drafts in its
+> `docs/to-doc-site/` folder. See [`CLAUDE.md`](../CLAUDE.md) in the repository root for where those
+> drafts live and how they are processed — including the rule that **each file must be approved
+> individually before anything is written**. `docs/to-doc-site/README.md` in the BSI repo is the
+> authoritative workflow.
+
 ## Project Structure & Technology Stack
 
 ### Framework
 
 - **VitePress**: Static site generator for documentation
-- **Node.js 18+**: Runtime requirement
+- **Node.js 24**: Runtime requirement (see `.nvmrc`)
 - **npm**: Package manager
+- **Cloudflare Pages**: Hosting and deployment
 
 ### Directory Structure
 
@@ -41,15 +48,9 @@ npm install                # Install dependencies
 npm run docs:dev          # Start development server (http://localhost:5173)
 npm run docs:build        # Build for production
 npm run docs:preview      # Preview production build locally
-npm run deploy            # Build and deploy to GitHub Pages
 ```
 
-### Deployment Commands
-
-```bash
-npm run deploy:build      # Build the site only
-npm run deploy:publish    # Deploy to gh-pages branch only
-```
+There is no deploy script. Deployment is automatic — see "Deployment & Hosting" below.
 
 ## Content Guidelines
 
@@ -58,7 +59,7 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 - Use clear, concise language appropriate for technical documentation
 - Write in active voice when possible
 - Include practical examples for all concepts
-- Cross-reference related sections using relative links
+- Cross-reference related sections using absolute, extensionless links
 - Use consistent terminology throughout
 
 ### Markdown Conventions
@@ -67,12 +68,12 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 - Include code blocks with appropriate language tags
 - Use callout blocks for important information (`::: tip`, `::: warning`, `::: danger`)
 - Always include alt text for images
-- Use relative paths for internal links
+- Use absolute, extensionless paths for internal links (e.g. `/guide/quick-start`)
 
 ### Image Handling
 
-- Store all images in `docs/public/img/` directory
-- Reference images using `/img/filename.ext` (VitePress automatically resolves from public/)
+- Store all images in `docs/public/images/` directory
+- Reference images using `/images/filename.ext` (VitePress automatically resolves from public/)
 - Include descriptive alt text for accessibility
 - Optimize images for web (appropriate file sizes)
 - Use PNG for screenshots, SVG for diagrams when possible
@@ -103,19 +104,35 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 
 ## Deployment & Hosting
 
-### GitHub Pages Configuration
+### Cloudflare Pages Configuration
 
-- **Custom Domain**: `butler-sheet-icons.ptarmiganlabs.com`
-- **Branch**: `gh-pages` (automatically updated by deploy script)
-- **CNAME**: Configured for custom domain
+- **Host**: Cloudflare Pages, project `butler-sheet-icons-docs`
+- **Custom Domain**: `butler-sheet-icons.ptarmiganlabs.com` (attached in the Cloudflare dashboard, not via a `CNAME` file)
+- **Production branch**: `main`
+- **Preview URLs**: `https://<branch>.butler-sheet-icons-docs.pages.dev`
 - **SSL**: Enforced HTTPS
+
+This site is **not** deployed via GitHub Pages. There is no `gh-pages` branch in use, no deploy script, and no deploying GitHub Actions workflow. `.github/workflows/build.yml` only validates the build.
 
 ### Deployment Process
 
-1. Content changes are made to `main` branch
-2. Run `npm run deploy` to build and publish
-3. GitHub Pages serves from `gh-pages` branch
-4. DNS points `butler-sheet-icons.ptarmiganlabs.com` to GitHub Pages
+1. Commit lands on a branch.
+2. Cloudflare Pages detects it, runs `npm run docs:build`, and publishes `docs/.vitepress/dist`.
+3. `main` publishes to the production domain; every other branch publishes to a preview URL.
+4. Cloudflare reports the result as a "Cloudflare Pages" check run and comments preview URLs on pull requests.
+
+### Branch Model
+
+**All work goes to `next`.** Branch off `next`, PR into `next`. There is no per-change branch decision.
+
+- `next` — where all documentation work goes. Preview URL only.
+- `main` — production, what the public site serves. Reached only by merging `next` at BSI release time.
+
+The site is single-version — one copy of the docs, no per-release archive — so anything on `main` is presented as documentation for the current BSI release whatever it actually describes, and Cloudflare publishes it within minutes. Routing everything through `next` keeps unreleased documentation off the public site. Writing to `main` directly is a deliberate production hotfix, not a normal option.
+
+At release time, Butler Sheet Icons is released first, then `next` merges into `main`.
+
+The version string in the site nav is cosmetic: `scripts/fetch-bsi-version.mjs` fetches the latest BSI release tag at build time and it becomes a nav dropdown label. It gates no content. Set `BSI_DOCS_VERSION` to override it.
 
 ## Code Quality & Testing
 
@@ -129,7 +146,7 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 
 ### Link Validation
 
-- All internal links should use relative paths
+- All internal links should be absolute and extensionless (e.g. `/guide/quick-start`)
 - External links should be verified as working
 - Check for broken image references
 - Ensure cross-references are accurate
@@ -178,7 +195,7 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 
 ### Image Updates
 
-1. Optimize images before adding to `docs/public/img/`
+1. Optimize images before adding to `docs/public/images/`
 2. Use descriptive filenames (e.g., `qscloud-login-page.png`)
 3. Update alt text to be descriptive and accessible
 4. Remove unused images to keep repository clean
@@ -194,8 +211,8 @@ npm run deploy:publish    # Deploy to gh-pages branch only
 ### Internal Linking
 
 ```markdown
-[Quick Start Guide](../guide/quick-start.md)
-[Browser Commands](../reference/commands.md#browser-commands)
+[Quick Start Guide](/guide/quick-start)
+[Browser Commands](/reference/commands#browser-commands)
 ```
 
 ### Code Block Examples
@@ -255,13 +272,13 @@ Use this for critical warnings about destructive operations
 ### Content Issues
 
 - Missing images: Check path references and file locations
-- Broken links: Verify relative paths and file existence
+- Broken links: Verify the absolute path matches a file under `docs/` and has no `.md` extension
 - Navigation problems: Update `.vitepress/config.js` sidebar
 
 ### Deployment Issues
 
-- GitHub Pages: Check branch settings and custom domain configuration
-- DNS: Verify CNAME record points to correct GitHub Pages URL
-- SSL: Ensure HTTPS enforcement is enabled
+- Change not live: Check the "Cloudflare Pages" check run on the commit, and confirm the commit is on `main` rather than `next`
+- Nav shows `v0.0.0`: The version lookup hit the GitHub API rate limit; `GITHUB_TOKEN` needs to be set in the Cloudflare project
+- Custom domain and DNS are managed in the Cloudflare dashboard, not in this repository
 
 Remember: This documentation serves users implementing Butler Sheet Icons in production environments. Accuracy, clarity, and completeness are essential for their success.

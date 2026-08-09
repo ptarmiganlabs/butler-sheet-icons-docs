@@ -2,6 +2,11 @@
  * Fetch latest Butler Sheet Icons release tag and write to docs/.vitepress/version.js
  * This runs before docs:dev and docs:build. If the request fails, we keep the last
  * generated file (if any) and continue, so docs still build.
+ *
+ * Set BSI_DOCS_VERSION to override the lookup entirely. The `next` branch documents
+ * a BSI release that is not out yet, so its Cloudflare preview would otherwise be
+ * labelled with the *previous* version. Set BSI_DOCS_VERSION on the preview
+ * environment to the upcoming version instead. See README_DEPLOY.md.
  */
 
 import fs from "node:fs/promises";
@@ -28,6 +33,14 @@ function isValidTag(tag) {
 }
 
 async function main() {
+  // An explicit override wins over the API lookup, and never falls back.
+  const override = process.env.BSI_DOCS_VERSION?.trim();
+  if (override) {
+    await writeVersionFile(override);
+    console.log(`[bsi-docs] Using BSI_DOCS_VERSION override: ${override}`);
+    return;
+  }
+
   try {
     const headers = { "User-Agent": "bsi-docs-build-script" };
     // Use token if provided to avoid rate limiting

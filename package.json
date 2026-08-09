@@ -7,9 +7,7 @@
     "pre:version": "node ./scripts/fetch-bsi-version.mjs",
     "docs:dev": "npm run pre:version && vitepress dev ./docs",
     "docs:build": "npm run pre:version && vitepress build ./docs",
-    "docs:preview": "npm run pre:version && vitepress preview ./docs",
-    "deploy": "npm run docs:build && gh-pages -d docs/.vitepress/dist",
-    "deploy:ci": "npm run docs:build"
+    "docs:preview": "npm run pre:version && vitepress preview ./docs"
   },
   "keywords": [
     "qlik-sense",
@@ -24,7 +22,6 @@
     "node": ">=24 <25"
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0",
     "mermaid": "^11.15.0",
     "ufo": "^1.6.4",
     "vitepress": "^1.6.4",
