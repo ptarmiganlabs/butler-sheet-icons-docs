@@ -72,7 +72,7 @@ once checks pass.
 
 ### At release time
 
-Order matters, because the version label in the site nav follows the **latest GitHub
+Order matters, because the version label on production follows the **latest GitHub
 release** of Butler Sheet Icons (see "Version label" below):
 
 1. Release Butler Sheet Icons first, so `releases/latest` points at the new version.
@@ -80,8 +80,9 @@ release** of Butler Sheet Icons (see "Version label" below):
    requires a pull request for `main` — direct pushes and force pushes are rejected —
    though no approvals are required, so you can merge your own.
 3. Cloudflare publishes; the nav label picks up the new version on that build.
-4. Update `BSI_DOCS_VERSION` on the Cloudflare **preview** environment to the next
-   upcoming version, or clear it. It does not update itself.
+
+There is no manual version step. The `next` preview reads its label from
+release-please, and production reads the latest release, so both correct themselves.
 
 Merging before the BSI release ships puts new content on the site under the *old*
 version number for however long the gap lasts.
@@ -110,21 +111,35 @@ a GitHub check rather than only as a failed Cloudflare deployment.
 
 The version shown in the site's top nav is **cosmetic**. It gates no content.
 
-`scripts/fetch-bsi-version.mjs` runs before every dev/build, asks the GitHub API for the
-latest `ptarmiganlabs/butler-sheet-icons` release, normalises the tag
-(`butler-sheet-icons-v3.11.0` → `v3.11.0`), and writes `docs/.vitepress/version.js`.
-That file is git-ignored and regenerated on each build. `docs/.vitepress/config.js`
-imports it and uses the string as a nav dropdown label.
+`scripts/fetch-bsi-version.mjs` runs before every dev/build and writes
+`docs/.vitepress/version.js`. That file is git-ignored and regenerated on each build.
+`docs/.vitepress/config.js` imports it and uses the string as a nav dropdown label.
 
-Two environment variables affect this:
+Which version it picks depends on what is being built, because `main` and `next`
+document different releases:
+
+| Build | Source | Why |
+| --- | --- | --- |
+| Production (`main`) | Latest GitHub release, tag normalised (`butler-sheet-icons-v4.0.0` → `v4.0.0`) | Production documents the release that has shipped |
+| Preview (any other branch) | The version in `.release-please-manifest.json` on release-please's release branch | `next` documents a release that is not out yet, so the latest release would label it with the *previous* version |
+| Local (`npm run docs:dev`) | Latest GitHub release | `CF_PAGES_BRANCH` is unset outside Cloudflare |
+
+**Do not try to set the upcoming version by hand.** It is not knowable in advance and
+not stable once guessed: release-please recomputes the bump as commits land and retitles
+the same pull request. A release tracking 3.12.0 became 4.0.0 that way when two breaking
+changes arrived, after several pages had already been written against 3.12.0. Reading it
+per build is what makes the label self-correcting.
+
+Every lookup degrades rather than failing the build: pending version → latest release →
+the previously generated `version.js` → `v0.0.0`.
+
+Environment variables that affect this:
 
 | Variable | Where | Effect |
 | --- | --- | --- |
-| `GITHUB_TOKEN` (or `GH_TOKEN`) | Cloudflare project, CI, local | Authenticates the API call. **Recommended in Cloudflare.** Build IPs are shared, so the 60 req/hour anonymous limit is reachable; because `version.js` is git-ignored, a fresh build container has no previous file to fall back on and the nav silently renders `v0.0.0`. |
-| `BSI_DOCS_VERSION` | Cloudflare **preview** environment | Overrides the lookup entirely. Set it to the upcoming version (e.g. `v3.12.0`) so the `next` preview is labelled with the version it actually documents rather than the last released one. Leave it unset on production. |
-
-Cloudflare supports separate production and preview environment variables, which is what
-makes the `BSI_DOCS_VERSION` split work.
+| `GITHUB_TOKEN` (or `GH_TOKEN`) | Cloudflare project, CI, local | Authenticates the API calls. **Recommended in Cloudflare.** Build IPs are shared, so the 60 req/hour anonymous limit is reachable; because `version.js` is git-ignored, a fresh build container has no previous file to fall back on and the nav silently renders `v0.0.0`. |
+| `CF_PAGES_BRANCH` | Set by Cloudflare Pages | Read, not set by us. Decides production vs preview behaviour above. |
+| `BSI_DOCS_VERSION` | Anywhere | **Escape hatch, normally unset.** Overrides everything and never falls back. Only useful to pin a label the automation cannot work out. A stale value here silently defeats the automation. |
 
 ## Settings that live in Cloudflare, not in this repo
 
@@ -133,7 +148,7 @@ under Workers & Pages → `butler-sheet-icons-docs`:
 
 - **Production branch** — must be `main`.
 - **Preview deployments** — must include `next` (the default is all non-production branches). If set to "None", `next` gets no preview URL and the branch model has no staging site.
-- **Environment variables** — `GITHUB_TOKEN` on production and preview; `BSI_DOCS_VERSION` on preview only.
+- **Environment variables** — `GITHUB_TOKEN` on production and preview. `BSI_DOCS_VERSION` should be **unset** on both; it is an escape hatch, and a leftover value silently overrides the automatic version label.
 - **Custom domain** — `butler-sheet-icons.ptarmiganlabs.com` is attached here. It is *not* controlled by a `CNAME` file in the repo; that is a GitHub Pages mechanism and was removed.
 - **Access policy on preview URLs** — preview deployments are publicly reachable by default. They are unlinked and not indexed, but guessable. If unreleased documentation must not be readable by anyone who finds the URL, put Cloudflare Access in front of preview deployments.
 
@@ -160,7 +175,7 @@ Export `GITHUB_TOKEN` locally to avoid anonymous API rate limits on the version 
 | Symptom | Cause / action |
 | --- | --- |
 | Nav shows `v0.0.0` | Version lookup failed and no cached file existed. Set `GITHUB_TOKEN` in the Cloudflare project. |
-| Nav shows the wrong version on a `next` preview | Expected without `BSI_DOCS_VERSION`; the lookup returns the latest *released* version. Set the override on the preview environment. |
+| Nav shows the wrong version on a `next` preview | Check the build log for the `[bsi-docs]` lines. They name the branch, whether it was treated as a preview, and which release PR was read. A stale `BSI_DOCS_VERSION` overriding everything is the most likely cause. |
 | Change not live on production | Check the "Cloudflare Pages" check run on the commit. Confirm the commit is on `main`, not `next`. |
 | Build fails on a dead link | VitePress names the offending file and link. Internal links are absolute and extensionless: `/guide/concepts/browser-management`. |
 | Anchor link goes nowhere | Anchors are not build-validated. Several pages use a non-breaking hyphen `‑` (U+2011) in headings, which survives into the generated id. Normalise headings to ASCII hyphens. |
