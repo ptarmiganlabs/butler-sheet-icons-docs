@@ -85,7 +85,9 @@ If the environment has no internet access and no browser can be found via steps 
 
 ## Which browser commands need internet access?
 
-Creating thumbnails does not need internet access for the browser itself, as long as step 1 or step 2 above finds one. The `browser` management commands are different — only some of them reach out to the internet:
+Creating thumbnails does not need internet access for the browser itself, as long as step 1 or step 2 above finds one — **but the value of `--browser-version` decides whether the run needs a lookup before it gets that far.** See [What `--browser-version` costs on an offline machine](#what-browser-version-costs-on-an-offline-machine) below.
+
+The `browser` management commands are different — only some of them reach out to the internet:
 
 | Command                              | Needs internet? |
 | ------------------------------------ | --------------- |
@@ -115,6 +117,40 @@ Setting `PUPPETEER_EXECUTABLE_PATH` to a browser installed by other means works 
 
 ::: warning Requires BSI 4.0.0 or later
 Earlier versions reported a failed `browser list-available` on an offline machine as a raw stack trace (`TypeError: Cannot read properties of undefined (reading 'status')`) with line numbers from inside the BSI binary — nothing an administrator could act on. From 4.0.0 the messages above are shown instead.
+:::
+
+## What `--browser-version` costs on an offline machine
+
+A thumbnail run has to turn `--browser-version` into a specific build before it can look in the cache. Some values need the browser vendor's version service to do that, and some do not — which is the difference between a run that works offline and one that depends on connectivity every time.
+
+| Value | Needs a lookup? |
+| --- | --- |
+| `recommended` (the default) | **No.** The build id is a constant inside Butler Sheet Icons. |
+| `stable`, `latest`, or a channel such as `beta` | **Yes**, on every run. These mean "whatever the vendor currently publishes", which can only be answered by asking. |
+| An exact full build id, e.g. `151.0.7922.77` | **No.** Already specific. |
+| A milestone or build prefix, e.g. `151` or `151.0.7922` | **Yes.** Butler Sheet Icons has to ask which build that resolves to. |
+
+**This is the strongest practical argument for `recommended` on an air-gapped or proxied machine.** It is the only value that is both current for your Butler Sheet Icons version and free of a per-run lookup.
+
+### When the lookup fails
+
+What happens next depends on how specific you were.
+
+**A floating keyword degrades to the cache.** For `stable`, `latest` and the release channels, a failed lookup is treated as an environment problem rather than a mistake. Butler Sheet Icons warns twice and carries on with the newest cached build of the right browser:
+
+```
+warn: Could not resolve --browser-version "stable": <reason>
+warn: Falling back to the newest browser already in the local cache.
+```
+
+If nothing is cached either, there is nothing to fall back to and the original lookup error is reported instead.
+
+**A pin does not degrade.** If you named a milestone or a build prefix and the lookup fails, the run stops. Asking for `151` is a promise about which build runs, and quietly substituting a different cached build would be the very thing that made runs fail unpredictably before 4.0.0 — a build nobody chose, selected silently.
+
+**Bad input never degrades.** A malformed version or an unsupported browser is your input being wrong, so it is reported as an error whether or not something is cached.
+
+::: tip Getting a genuinely offline run
+Use `recommended` (or simply omit `--browser-version`) and pre-populate the cache with `browser install` while the machine still has connectivity. That combination needs the network exactly once, on the machine that prepares the cache. See [Strategy 3](#strategy-3-use-a-pre-cached-browser-semi-offline) and [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
 :::
 
 ## Key environment variables
