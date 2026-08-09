@@ -841,6 +841,49 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 
 ## Sheet-Specific Issues
 
+### Sheets you did not select were skipped or blurred
+
+**Symptoms:**
+
+- Sheets you never listed in `--exclude-sheet-number` kept their old icons
+- Sheets you never listed in `--blur-sheet-number` came out blurred
+- The run reported success — there was no error or warning
+
+**Cause:**
+
+Butler Sheet Icons before 3.12.0 read these two options incorrectly, in two ways at once:
+
+- Only the last number you listed was used. `--exclude-sheet-number 3 7` behaved as though you had written `--exclude-sheet-number 7`.
+- That number was then matched as a text fragment rather than as a whole sheet number, so `--exclude-sheet-number 12` also excluded sheets 1 and 2.
+
+The more digits in the number, the more sheets were wrongly affected. A single one-digit number was always handled correctly. No other sheet filter was affected — `--exclude-sheet-status`, `--exclude-sheet-tag`, `--exclude-sheet-title`, `--blur-sheet-status` and `--blur-sheet-title` always worked as documented.
+
+**How to confirm from an old log:**
+
+At the default log level (`info`) Butler Sheet Icons logs one line per sheet it skipped or blurred, so a log from an earlier run tells you which sheets were affected:
+
+```
+Excluded sheet: 1: 'Sales overview', ...
+Using blurred thumbnail for sheet 1: ...
+```
+
+These lines say **that** a sheet was skipped or blurred, not **why** — status, tag and title filters produce the same lines. To see the reason, re-run with `--loglevel verbose`, which adds a line naming the filter that matched:
+
+```
+Excluded sheet (via sheet number): 1: 'Sales overview', ...
+Blurred sheet thumbnail (via sheet number): 1: 'Sales overview', ...
+```
+
+**Solutions:**
+
+1. **Upgrade to BSI 3.12.0 or later.** Both options now keep every number you list and match each as a whole sheet number.
+
+2. **Re-check your options before re-running.** If you worked around the old behaviour — listing sheet numbers one run at a time, or picking numbers that avoided the overlap — those workarounds are no longer needed and will now produce the wrong result.
+
+3. **Re-run thumbnail generation.** Nothing corrects itself: sheets that were wrongly excluded still have their old icons, and sheets that were wrongly blurred still have blurred ones, until Butler Sheet Icons runs again.
+
+See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers) for how the options behave now.
+
 ### Sheets Not Loading
 
 **Symptoms:**
