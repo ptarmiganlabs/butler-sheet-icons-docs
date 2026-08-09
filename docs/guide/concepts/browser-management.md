@@ -125,15 +125,108 @@ butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version
 
 If you instead want to force BSI to use a _system_ browser (for example a centrally managed Chrome or Edge installation), set `PUPPETEER_EXECUTABLE_PATH` before running BSI. This is described in detail on the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page.
 
-## Browser Versions and Compatibility
+## Choosing a browser build
 
-### Chrome Versions
+`--browser-version` decides which browser build Butler Sheet Icons uses. It accepts a keyword, a release channel, or an exact build id.
 
-Chrome versions use build numbers (e.g., `121.0.6167.85`). Butler Sheet Icons supports:
+### The two keywords
 
-- **Latest stable**: Always recommended for most users
-- **Specific versions**: Useful for environments requiring consistency
-- **Multiple channels**: Stable, beta, dev, canary (though stable is recommended)
+| Value | Meaning | How the build is decided |
+| --- | --- | --- |
+| `recommended` | The build this version of Butler Sheet Icons was tested with. **This is the default.** | Fixed inside Butler Sheet Icons |
+| `stable` | The newest stable release of the browser. | Looked up online, every time the command runs |
+
+Both work for Chrome and Firefox, so you do not need to know what each vendor calls its channels.
+
+**`recommended` is the right choice for almost everyone.** It cannot get ahead of what Butler Sheet Icons is able to drive, and it changes only when you upgrade Butler Sheet Icons itself. That gives you two things:
+
+- **Every server on the same Butler Sheet Icons version uses the same browser build.** A fleet of scheduled jobs cannot drift apart on its own.
+- **No lookup at run time.** The build id is baked in, so once it is cached there is nothing to ask the vendor. With `stable`, every run first asks which build is currently newest.
+
+Choose `stable` only if you specifically need the newest stable release — for example because a security policy requires it. Be aware that it follows whatever the vendor has promoted, which can be a build newer than Butler Sheet Icons has been tested against.
+
+Release **channels** are also accepted, and like `stable` they are resolved at run time: `beta`, `dev` and `canary` for Chrome; `beta`, `nightly`, `devedition` and `esr` for Firefox.
+
+::: tip A browser is never bundled with Butler Sheet Icons
+Whichever value you use, the browser is downloaded once and then kept in the local cache, so the first run on a new server always needs internet access. The keywords differ only in *how the build id is decided* — which is what matters on a server that is offline afterwards. See [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
+:::
+
+### Naming an exact build
+
+You can pin an exact build. The format is checked before anything else happens, so a typo stops the run immediately with a message naming the accepted forms — it is never silently swapped for another build from the cache.
+
+For **Chrome**, three forms are accepted:
+
+| Form | Example | Selects |
+| --- | --- | --- |
+| Milestone | `151` | The newest build of milestone 151 |
+| Build prefix | `151.0.7922` | The newest patch of that build |
+| Full build id | `151.0.7922.77` | Exactly that build |
+
+For **Firefox**, the build id must carry its channel prefix, for example `stable_153.0.3`. A bare version such as `152.0.1` is rejected: without the prefix it would be read as a nightly build, which is almost never what you want.
+
+To see what can be installed:
+
+::: code-group
+
+```powershell [PowerShell]
+butler-sheet-icons.exe browser list-available --browser chrome
+```
+
+```bash [Bash]
+./butler-sheet-icons browser list-available --browser chrome
+```
+
+:::
+
+### If you currently use `latest`
+
+::: warning `latest` changed meaning in BSI 4.0.0
+`latest` still works — no scripts or scheduled tasks need editing — but it is now treated as `stable`, and the run logs two lines the first time it is used:
+
+```
+warn: --browser-version "latest" now means "stable" - the newest stable release of the browser.
+warn: It previously meant the newest published build, which could be one the browser automation library cannot drive. Use "recommended" for the build Butler Sheet Icons is tested against, or "stable" to keep tracking the newest stable release.
+```
+
+The old meaning — the newest *published* build — is what caused runs to fail against a browser Butler Sheet Icons could not drive, so it is no longer available. For the safest behaviour, drop the option and let the default apply, or set it to `recommended` explicitly. See [Every app fails with `Target closed` or `Protocol error`](/guide/troubleshooting#every-app-fails-with-target-closed-or-protocol-error).
+:::
+
+### What to expect on the first run after upgrading
+
+Butler Sheet Icons matches a cached browser by exact build. On the first run after upgrading, most servers download the recommended build, because what they have cached is whatever `latest` happened to fetch previously. This is a one-time download per server, and it is what puts every server on the same known-good build.
+
+To do it ahead of time rather than during a scheduled run:
+
+::: code-group
+
+```powershell [PowerShell]
+butler-sheet-icons.exe browser install --browser chrome
+```
+
+```bash [Bash]
+./butler-sheet-icons browser install --browser chrome
+```
+
+:::
+
+You can then remove the old build. List what is installed, then name the exact build to remove:
+
+::: code-group
+
+```powershell [PowerShell]
+butler-sheet-icons.exe browser list-installed
+butler-sheet-icons.exe browser uninstall --browser chrome --browser-version <build id from the list>
+```
+
+```bash [Bash]
+./butler-sheet-icons browser list-installed
+./butler-sheet-icons browser uninstall --browser chrome --browser-version <build id from the list>
+```
+
+:::
+
+`browser uninstall` accepts an exact build id, or `recommended`. It deliberately does **not** accept `stable`, `latest` or a channel: those name whatever the vendor currently publishes, not a build on your machine, so they cannot safely identify something to delete. Uninstalling never needs internet access.
 
 ### Firefox Versions
 

@@ -837,6 +837,50 @@ export https_proxy=https://username:password@proxy.company.com:8080
 export http_proxy=http://user:pass@proxy.company.com:8080
 ```
 
+## Browser Build Issues
+
+### Every app fails with `Target closed` or `Protocol error`
+
+**Symptoms:**
+
+- Every app in the run fails, not just one
+- Errors mention `TargetCloseError`, `Protocol error`, `Target closed` or `Session closed`
+- The same job works on one server and fails on another with identical configuration
+
+```
+error: CLOUD APP (stack): TargetCloseError: Protocol error (Browser.getVersion): Target closed
+error: Failed to process 2 of 2 app(s)
+```
+
+**Cause:**
+
+The Chrome build being used cannot be driven by Butler Sheet Icons. Before BSI 4.0.0 the default was `latest`, meaning the newest *published* Chrome build — and Chrome ships new builds continuously, so that was sometimes a build the browser automation library could not control. Two servers could behave differently purely because each had a different build sitting in its cache.
+
+**Solutions:**
+
+1. **Use the recommended build**, which is the default from BSI 4.0.0 onward. Either remove `--browser-version` entirely or set it explicitly:
+
+   ```bash
+   --browser-version recommended
+   ```
+
+   From 4.0.0, Butler Sheet Icons also detects this itself and says so directly, naming the build instead of leaving you with a protocol error:
+
+   ```
+   error: QSEOW: Browser build 151.0.7922.109 started but stopped responding immediately. This build cannot be driven by Butler Sheet Icons.
+   error: Use a different browser build: "--browser-version recommended" selects the build Butler Sheet Icons is tested with. The same value can be set via the command's BSI_*_BROWSER_VERSION environment variable.
+   ```
+
+2. **Check for a `BSI_*_BROWSER_VERSION` environment variable** overriding your command line. A scheduled job or unit file may still set `latest`.
+
+3. **Install the recommended build ahead of time** so it is not downloaded during a scheduled run:
+
+   ```bash
+   butler-sheet-icons browser install --browser chrome
+   ```
+
+See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build) for what each keyword selects.
+
 ## Sheet-Specific Issues
 
 ### Sheets you did not select were skipped or blurred
