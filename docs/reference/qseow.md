@@ -76,7 +76,7 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 | `--blur-sheet-title`  | `BSI_QSEOW_CST_BLUR_SHEET_TITLE`  | Blur by title          |         | `--blur-sheet-title "Financial Data"` |
 | `--blur-sheet-status` | `BSI_QSEOW_CST_BLUR_SHEET_STATUS` | Blur by status         | `[]`    | `--blur-sheet-status published`       |
 | `--blur-sheet-tag`    | `BSI_QSEOW_CST_BLUR_SHEET_TAG`    | Blur by tag            |         | `--blur-sheet-tag "sensitive"`        |
-| `--blur-factor`       | `BSI_QSEOW_CST_BLUR_FACTOR`       | Blur intensity (0-100) | `5`     | `--blur-factor 10`                    |
+| `--blur-factor`       | `BSI_QSEOW_CST_BLUR_FACTOR`       | Blur intensity (1-100) | `5`     | `--blur-factor 10`                    |
 
 ::: tip One sheet number per environment variable
 `BSI_QSEOW_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSEOW_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
