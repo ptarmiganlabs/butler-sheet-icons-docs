@@ -56,7 +56,7 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 | `--blur-sheet-number` | `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` | Blur by position        |         | `--blur-sheet-number 2 4`             |
 | `--blur-sheet-title`  | `BSI_QSCLOUD_CST_BLUR_SHEET_TITLE`  | Blur by title           |         | `--blur-sheet-title "Financial Data"` |
 | `--blur-sheet-status` | `BSI_QSCLOUD_CST_BLUR_SHEET_STATUS` | Blur by status          | `[]`    | `--blur-sheet-status published`       |
-| `--blur-factor`       | `BSI_QSCLOUD_CST_BLUR_FACTOR`       | Blur intensity (0-1000) | `5`     | `--blur-factor 10`                    |
+| `--blur-factor`       | `BSI_QSCLOUD_CST_BLUR_FACTOR`       | Blur intensity (1-100)  | `5`     | `--blur-factor 10`                    |
 
 ::: tip One sheet number per environment variable
 `BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
