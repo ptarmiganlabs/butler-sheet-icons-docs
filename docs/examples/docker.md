@@ -2,7 +2,7 @@
 
 Butler Sheet Icons is available as a Docker image, making it perfect for containerized environments, CI/CD pipelines, and server deployments.
 
-The official image includes an embedded Chromium browser and is designed to work well in air-gapped environments. For a detailed explanation of how browsers are detected and how to override the embedded browser, see [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
+The official image includes an embedded Chromium browser, so it needs no internet access at all. For a runbook covering how to get the image onto a server with no internet access and how to verify it before going near production, see [Air-gapped environments](/guide/advanced/docker#air-gapped-environments). For a detailed explanation of how browsers are detected and how to override the embedded browser, see [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
 
 ## Docker Image Information
 
