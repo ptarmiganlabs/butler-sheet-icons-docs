@@ -102,7 +102,7 @@ error: Butler Sheet Icons needs internet access for this command. If this machin
        available locally.
 ```
 
-Use `browser list-installed` instead to see what is already available locally.
+Use `browser list-installed` instead to see what is already available locally. For Firefox the command makes no network call at all — it reports that only the latest version is supported and returns.
 :::
 
 ### install
