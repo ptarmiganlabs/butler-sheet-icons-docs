@@ -837,6 +837,35 @@ export https_proxy=https://username:password@proxy.company.com:8080
 export http_proxy=http://user:pass@proxy.company.com:8080
 ```
 
+### Tag or content library name fails or matches nothing
+
+**Symptoms:**
+
+- A QSEoW run fails immediately with a `400` or `403` from Qlik Sense
+- Or it completes normally but excludes nothing, even though the tags are set in the QMC
+
+**Cause:**
+
+Before BSI 4.0.0, names supplied to `--qliksensetag`, `--exclude-sheet-tag` and `--contentlibrary` were sent to the Qlik Sense Repository Service unprotected, so punctuation in a name was read as instructions rather than as part of the name. Each character failed in its own way:
+
+| Character in the name | What you saw |
+| --- | --- |
+| `&` | `400::Missing parameter value(s)` |
+| `'` | `400::Cannot parse the expression:` followed by the query |
+| `#` | `403::XSRF prevention check failed. Possible XSRF discovered.` |
+| `?` or `/` | `Request path contains unescaped characters` |
+| `%` | `URI malformed` |
+
+Names containing `+`, `=` or `,` were unaffected, as were names made only of letters, digits, spaces, hyphens and underscores.
+
+Separately — and silently — giving **two or more** `--exclude-sheet-tag` values joined them into one name, so nothing matched and every sheet was updated. See [Sheet Exclusion](/guide/concepts/sheet-exclusion#exclusion-options).
+
+**Solutions:**
+
+1. **Upgrade to BSI 4.0.0 or later.** Names are now protected before being sent, and several exclude tags match any of them.
+2. **Review apps where you used two or more exclude tags.** Sheets you meant to exclude have been getting new icons on every run. Re-run once exclusions work, or restore those icons by hand.
+3. **Undo any renaming workaround.** If you renamed `R&D` to `RandD`, you can rename it back — update the matching option or environment variable at the same time.
+
 ## Browser Build Issues
 
 ### Every app fails with `Target closed` or `Protocol error`
@@ -976,6 +1005,77 @@ See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-seve
    # Ensure browser is up to date
    butler-sheet-icons browser install --browser chrome
    ```
+
+## Docker Issues
+
+### Permission denied writing thumbnails from the Docker image
+
+**Symptoms:**
+
+- Running the Docker image on a **Linux** host, every app in the run fails
+- The log contains `EACCES`
+- The same command works on a macOS or Windows laptop
+
+```
+error: EACCES: permission denied, mkdir './img/cloud/6ab8a5b7-1f0e-4e9c-8b53-9f42b6c1a0d2'
+error: CLOUD PROCESS APP: Failed to process app 6ab8a5b7-1f0e-4e9c-8b53-9f42b6c1a0d2: Error creating cloud image directory
+```
+
+On QSEoW the wording differs slightly — `QSEOW CREATE THUMBNAILS 1` in place of `CLOUD PROCESS APP`, and `qseow` in place of `cloud` in the path — but `EACCES` appears either way. Search your logs for `EACCES`.
+
+A QSEoW **certificate** failure has the same underlying cause. If you mounted a folder holding `client.pem` and `client_key.pem` and saw this even though the files were plainly there, this is why — certificate files are normally readable only by their owner:
+
+```
+error: QSEOW CREATE THUMBNAILS 2: Missing certificate file(s)
+```
+
+**Cause:**
+
+Before BSI 4.0.0, the container ran as a built-in unprivileged account that did not own the folder you mounted. Docker Desktop on macOS and Windows ignores ownership on mounted folders, so this only ever showed up on Linux — which is where scheduled runs live.
+
+**Solutions:**
+
+1. **Upgrade to BSI 4.0.0 or later and re-run.** No change to your command is needed. The container adopts the mounted folder's owner and logs one line when it does:
+
+   ```
+   butler-sheet-icons: running as uid 1000:1000, adopted from /nodeapp/img, so files written there belong to you
+   ```
+
+2. **Do not mount a `root`-owned folder.** The container deliberately will not run as root. Mount one you own instead.
+
+3. **If you pass `--user` explicitly**, that is respected as given — make sure the account you name can write to the folder.
+
+4. **Check for a `:ro` mount.** A read-only mount cannot receive thumbnails.
+
+See [Docker Usage](/guide/advanced/docker#writing-thumbnails-to-a-mounted-folder-on-linux) for the full explanation.
+
+## Reading the Logs
+
+### Log messages changed in BSI 4.0.0
+
+Several log lines named the wrong operation, or were punctuated inconsistently between platforms. Nothing about how Butler Sheet Icons behaves changed — only what it writes. **This matters if you have log monitoring that matches on the old text.**
+
+| Command | Old text | New text |
+| --- | --- | --- |
+| `qscloud remove-sheet-icons` | `Closed session after updating sheet thumbnail images in QS Cloud app …` | `Closed session after removing sheet icons in QS Cloud app …` |
+| `qscloud remove-sheet-icons` | `CLOUD PROCESS APP 2: Failed to process app …` | `CLOUD REMOVE SHEET ICONS: Failed to process app …` |
+
+Neither "updating" nor "generating" describes removing an icon, and the `2` was a leftover that did not name the command actually running.
+
+A failure to start the built-in browser used to be punctuated differently per platform — QS Cloud used a colon after the prefix, QSEoW did not. Both now use the colon:
+
+```
+CLOUD APP: Could not launch virtual browser: …
+QSEOW: Could not launch virtual browser: …
+```
+
+**One line is new at the default log level.** Running `qscloud remove-sheet-icons`, this was written at `verbose` and so was hidden at the default `info`:
+
+```
+Created session to <server or tenant>, engine version is <version>
+```
+
+It is now written at `info`, matching every other command that works on an app you named. Expect one extra line per app; use `--loglevel warn` to suppress it along with the other progress messages. Commands that re-open an app already announced by the step above them still log at `verbose`, so no app is announced twice in one run.
 
 ## Platform-Specific Issues
 
