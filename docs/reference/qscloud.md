@@ -36,8 +36,12 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 | `--imagedir`             | `BSI_QSCLOUD_CST_IMAGE_DIR`          | Screenshot directory                                | `./img`  | `--imagedir ./screenshots`        |
 | `--includesheetpart`     | `BSI_QSCLOUD_CST_INCLUDE_SHEET_PART` | Screenshot area (1 = content, 2 = +title, 4 = full) | `1`      | `--includesheetpart 2`            |
 | `--browser`              | `BSI_QSCLOUD_CST_BROWSER`            | Browser type (`chrome` only)                        | `chrome` | `--browser chrome`                |
-| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser version                                     | `recommended` | `--browser-version 121.0.6167.85` |
+| `--browser-version`      | `BSI_QSCLOUD_CST_BROWSER_VERSION`    | Browser build to use                                | `recommended` | `--browser-version stable`        |
 | `--skip-login`           | `BSI_QSCLOUD_CST_SKIP_LOGIN`         | Skip login page                                     | `false`  | `--skip-login`                    |
+
+::: tip Which browser build?
+`--browser-version` accepts `recommended` (the build Butler Sheet Icons is tested with, and the default), `stable`, a release channel, or an exact build id. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
+:::
 
 ### Sheet Filtering
 
