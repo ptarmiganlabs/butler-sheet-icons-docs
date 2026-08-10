@@ -93,3 +93,24 @@ butler-sheet-icons qseow create-sheet-thumbnails `
 - QS Cloud commands: [/reference/qscloud](/reference/qscloud)
 - Browser management (for debugging and sizing): [/guide/concepts/browser-management](/guide/concepts/browser-management)
 - How it works (architecture and flow): [/guide/concepts/how-it-works](/guide/concepts/how-it-works)
+
+## Valid values are checked before the run starts
+
+::: warning Requires BSI 4.0.0 or later
+In earlier versions an invalid value was accepted and the run began. The error appeared much later — after certificates were checked, connections opened and the browser started.
+:::
+
+`--includesheetpart` is now validated by the command line itself, so a wrong value costs a second rather than a failed run:
+
+```
+error: option '--includesheetpart <value>' argument '9' is invalid. Allowed choices are 1, 2, 3, 4.
+```
+
+The valid values also appear in `--help`, so they can be found without leaving the terminal. They differ between the two back ends, which is deliberate rather than an oversight:
+
+| Command | Valid values |
+|---|---|
+| `qseow create-sheet-thumbnails` | `1`, `2`, `3`, `4` |
+| `qscloud create-sheet-thumbnails` | `1`, `2`, `4` — `3` (selection bar) has no Qlik Sense Cloud equivalent |
+
+The same check applies to values supplied through `BSI_QSEOW_CST_INCLUDE_SHEET_PART` and `BSI_QSCLOUD_CST_INCLUDE_SHEET_PART`, with a message naming the variable the value came from.

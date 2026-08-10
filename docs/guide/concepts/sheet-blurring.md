@@ -146,6 +146,27 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 - BSI captures screenshots and stores thumbnails per app and platform (Cloud/QSEoW).
 - Blurred images are saved with a `-blurred` suffix next to the regular thumbnails.
 
+
+## Blurring by tag
+
+::: warning Requires BSI 4.0.0 or later
+`--blur-sheet-tag` was accepted on the command line long before it did anything. On client-managed Qlik Sense nothing ever asked Qlik Sense which sheets carried the tag, so no sheet was ever blurred because of it.
+:::
+
+On client-managed Qlik Sense (QSEoW), `--blur-sheet-tag` now works: sheets carrying the named tag get a blurred thumbnail, exactly as with `--blur-sheet-number`, `--blur-sheet-title` or `--blur-sheet-status`.
+
+If you are upgrading from 4.0.0, note that each run used to log this line:
+
+```
+--blur-sheet-tag is not yet implemented for QSEoW and will be ignored.
+```
+
+**That warning is gone.** If you built a monitoring rule or a log filter matching it, the rule will stop firing — remove it.
+
+::: tip Tagging is a Qlik Sense feature
+Tags are applied to sheets in Qlik Sense itself, not in Butler Sheet Icons. Any sheet carrying the tag you name is blurred, which makes this the easiest filter to maintain when the set of sensitive sheets changes often — no command line has to be edited.
+:::
+
 ## Related
 
 - Sheet exclusion: See [Sheet Exclusion](/guide/concepts/sheet-exclusion) for analogous exclude filters and status nuances.
