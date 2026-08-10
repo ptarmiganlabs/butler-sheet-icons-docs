@@ -186,6 +186,43 @@ Yes. Run Butler Sheet Icons with `--loglevel debug` (or set the `BSI_LOG_LEVEL` 
 **What if the crash happens before Butler Sheet Icons can even read the environment variables?**
 The redaction and timeout logic in the crash dump writer is designed to handle this. The first time an unhandled error fires, the safety net writes the dump using whatever environment is already set; if the dump directory cannot be created, the write is skipped silently and the process exits.
 
+
+## How many dumps a single run can write
+
+::: warning Requires BSI 4.0.0 or later
+Earlier versions could write one crash dump per unhandled error. A single run that produced a burst of them filled the dump directory with hundreds of near-identical files, and the run did not reliably end.
+:::
+
+A run now writes **one** crash dump for the first failure, and stops there. When a run does produce repeated failures, a limit caps how many files can ever be written:
+
+| Variable | Default | Description |
+|---|---|---|
+| `BSI_CRASH_DUMP_MAX_PER_PROCESS` | `10` | Maximum crash dumps a single run may write. Set to `0` for no limit. |
+
+When the limit is reached, one line says so and no further files are written:
+
+```
+CRASH DUMP: Limit of 10 dumps per process reached, no further dumps will be written. Set BSI_CRASH_DUMP_MAX_PER_PROCESS to raise or remove the limit.
+```
+
+### Cleaning up dumps written by an older version
+
+If a machine has a directory full of near-identical dumps from before the upgrade, they are safe to delete once you have kept any you want to investigate.
+
+::: code-group
+
+```powershell [PowerShell]
+Get-ChildItem $env:TEMP\butler-sheet-icons-crash-* | Remove-Item
+```
+
+```bash [Bash]
+rm /tmp/butler-sheet-icons-crash-*
+```
+
+:::
+
+Adjust the path if `BSI_CRASH_DUMP_DIR` points somewhere else.
+
 ## Related
 
 - [Secret redaction in logs](/reference/log-redaction) — what is redacted from log output, and how that differs from the redaction applied to crash dumps.

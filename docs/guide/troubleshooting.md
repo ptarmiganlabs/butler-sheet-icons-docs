@@ -31,6 +31,36 @@ butler-sheet-icons qscloud create-sheet-icons --headless false
 butler-sheet-icons browser list-installed
 ```
 
+
+## Fixed in 4.0.0: options and messages that told you the wrong thing
+
+::: warning Requires BSI 4.0.0 or later
+If you are running an earlier version, the behaviour described below still applies to you and the workarounds may still be needed.
+:::
+
+Five fixes in 4.0.0 share a theme: Butler Sheet Icons accepted something, or reported something, that did not match what it actually did. If you built a workaround around any of them, it can now be removed.
+
+### Two options that never took effect
+
+| Option | What happened before |
+|---|---|
+| `--skip-login` (QS Cloud) | Silently ignored. Login was always attempted, and the log line announcing the skip could never appear. |
+| `--port` (QSEoW) | Not available, so a Qlik Sense server on a non-default port could not be reached without a proxy. |
+
+Both now behave as documented. If you set `--skip-login` and worked around it being ignored, that workaround is no longer needed.
+
+### Three errors that named the wrong cause
+
+These did not change what fails — they changed what you are told, which is the difference between a five-minute fix and an afternoon.
+
+| Symptom | Before | Now |
+|---|---|---|
+| A certificate file exists but cannot be read — wrong permissions, or a directory where a file was expected | Reported as a **missing** certificate, sending you to look for a file that was there all along | Reports that the file could not be read, and why |
+| The Qlik Sense server answers, but with something unexpected — a proxy login page, an error body | Reported as a **missing content library**, sending you to check a content library that was fine | Reports that the server's answer could not be understood |
+| A per-app lookup fails for one app | Surfaced as an internal error, with no indication which app | Names the app and continues with the rest |
+
+If you have monitoring rules or log filters matching the old wording, they will stop firing. That is the point — but they need removing.
+
 ## Run Failures and Exit Codes
 
 ::: warning Requires BSI 4.0.0 or later
