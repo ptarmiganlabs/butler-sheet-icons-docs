@@ -123,6 +123,66 @@ butler-sheet-icons qscloud create-sheet-thumbnails
 - Command-line parameters override environment variables if both are provided.
 - On shared systems, avoid system-wide secrets in env vars; consider a proper secrets manager in production.
 
+## Output and interaction
+
+These do not configure a command — they control how Butler Sheet Icons presents itself.
+
+| Variable | Effect |
+|---|---|
+| `NO_COLOR` (any value) | Never colour the log output, even in a terminal |
+| `FORCE_COLOR=1` | Always colour it, even when redirecting to a file |
+| `FORCE_COLOR=0` | Never colour it — the same as `NO_COLOR` |
+| `BSI_NO_INTERACTIVE=1` | Refuse to prompt, even in a terminal. See [Interactive Mode](/guide/interactive-mode) |
+| `BSI_ASCII_ONLY=1` | Use plain ASCII instead of Unicode symbols in interactive mode |
+
+### Colour codes in captured logs
+
+::: warning Requires BSI 4.1.0 or later
+In earlier versions, colour instructions were written whether or not the output was going to a screen.
+:::
+
+Butler Sheet Icons colours its log output so that `info`, `warn` and `error` lines are easy to tell apart.
+Until 4.1.0 it did that **always** — so if you redirected output to a file, piped it into another tool, or
+let a scheduler capture it, the colour instructions were captured too:
+
+```
+2026-06-24T10:30:45.123Z ←[32minfo←[39m: App version: 4.0.0
+```
+
+instead of:
+
+```
+2026-06-24T10:30:45.123Z info: App version: 4.0.0
+```
+
+From 4.1.0 the check is automatic: colour goes to a terminal, and nothing else. Interactive sessions are
+unchanged; redirected output, pipes, `docker logs` and scheduler transcripts are now clean.
+
+This is not only cosmetic. Colour codes in a captured log break things that read it afterwards: a search
+for `info:` does not match `←[32minfo←[39m:`, and log shippers that parse a level field — Splunk, Elastic,
+Grafana Loki — see unexpected characters in it.
+
+If you were stripping these characters yourself with a `sed` filter, a PowerShell replace, or a
+log-shipper rule, that workaround is no longer needed. Leaving it in place does no harm.
+
+Use `FORCE_COLOR=1` if you deliberately want a coloured transcript — for example when capturing output
+with a tool that renders colour back to you later.
+
+::: code-group
+
+```powershell [PowerShell]
+$env:FORCE_COLOR = "1"
+butler-sheet-icons.exe browser list-installed > coloured.log
+```
+
+```bash [Bash]
+FORCE_COLOR=1 butler-sheet-icons browser list-installed > coloured.log
+```
+
+:::
+
+A terminal reporting itself as `TERM=dumb` is also treated as unable to show colour.
+
 ## Related: Proxy environment variables
 
 When behind a proxy, set standard proxy variables (Linux/macOS example):

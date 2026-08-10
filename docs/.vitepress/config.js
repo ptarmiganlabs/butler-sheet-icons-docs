@@ -89,6 +89,7 @@ export default withMermaid({
             { text: "Introduction", link: "/guide/introduction" },
             { text: "Quick Start", link: "/guide/quick-start" },
             { text: "Installation", link: "/guide/installation" },
+            { text: "Interactive Mode", link: "/guide/interactive-mode" },
           ],
         },
         {

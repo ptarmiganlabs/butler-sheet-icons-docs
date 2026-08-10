@@ -166,6 +166,10 @@ If you try to install an older Chrome version that's no longer available, you'll
 
 Removes a specific browser version from the BSI cache. This doesn't affect other browsers on your system, only those in the BSI cache.
 
+::: tip Pick from a list instead of typing a version
+`butler-sheet-icons interactive` offers the browsers actually in the cache, so you don't have to look up the exact build id first. See [Interactive Mode](/guide/interactive-mode).
+:::
+
 **Usage:**
 
 ```bash
@@ -204,6 +208,38 @@ PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
 2024-02-16T14:26:44.597Z info: Installed browsers:
 2024-02-16T14:26:44.613Z info:     firefox, build id=124.0a1, platform=win64, path=C:\Users\goran\.cache\puppeteer\firefox\win64-124.0a1
 ```
+
+#### Browsers built for another platform
+
+::: warning Requires BSI 4.1.0 or later
+In earlier versions this command could report that it had removed a browser while the browser was still on disk. It printed a success message, exited with code 0, and left the files in place.
+:::
+
+The BSI cache labels each browser with the platform it was built for — `win64`, `mac_arm`, `linux`, and so on. A cache can hold builds for another platform in several ordinary ways:
+
+- The cache directory was copied from one machine to another, for example when preparing an offline server.
+- The cache is on a shared or network drive used by more than one machine.
+- The cache is mounted into a Docker container from a host running a different operating system.
+
+Such builds **can** be removed — a browser you cannot run still takes up disk space. From 4.1.0 the removal actually happens, and the result is verified before success is reported.
+
+When removal fails, the command says so and exits with a non-zero code, so a scheduled job can detect it:
+
+```
+error: Browser "chrome", version "151.0.7922.47" (built for win64) could not be removed. It is still in the cache at C:\Users\goran\.cache\puppeteer\chrome\win64-151.0.7922.47.
+```
+
+When the same version is cached for more than one platform, the build that can run on the current machine is removed first, and the ambiguity is reported:
+
+```
+warn: Build 151.0.7922.47 is cached for 2 platforms (win64, mac_arm). Removing the "win64" build; re-run to remove the next one.
+```
+
+Run the command again to remove the second one.
+
+::: tip Worth checking once
+If you have previously cleaned up browsers on a machine, run `browser list-installed` to check whether builds you believed were deleted are still there. If they are, `browser uninstall` will now remove them properly.
+:::
 
 ### uninstall-all
 
