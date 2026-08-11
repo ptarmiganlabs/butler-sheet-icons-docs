@@ -11,6 +11,8 @@ The official image includes an embedded Chromium browser, so it needs no interne
 - Platforms: AMD64, ARM64
 - Registry: Docker Hub
 
+For what the image contains besides Butler Sheet Icons, and where to find the licences of that software, see [What is inside the image](/guide/advanced/docker#what-is-inside-the-image).
+
 ## Basic Usage
 
 ### Help and Version Information
