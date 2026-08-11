@@ -12,7 +12,7 @@ By default Butler Sheet Icons uses its own cache of browsers, completely separat
 
 In addition to the cached browsers managed by BSI, you can also point BSI at a specific system browser executable via the `PUPPETEER_EXECUTABLE_PATH` environment variable. That is covered in more detail on the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page.
 
-## Supported Browsers
+## Supported Browsers {#supported-browsers}
 
 Butler Sheet Icons manages two browsers, but they are not interchangeable:
 
@@ -99,7 +99,7 @@ butler-sheet-icons browser install --browser firefox
 
 :::
 
-## Browser Selection
+## Browser Selection {#browser-selection}
 
 When running sheet icon creation commands, you can specify which browser to use from the BSI cache:
 
@@ -125,7 +125,7 @@ butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version
 
 If you instead want to force BSI to use a _system_ browser (for example a centrally managed Chrome or Edge installation), set `PUPPETEER_EXECUTABLE_PATH` before running BSI. This is described in detail on the [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) page.
 
-## Choosing a browser build
+## Choosing a browser build {#choosing-a-browser-build}
 
 `--browser-version` decides which browser build Butler Sheet Icons uses. It accepts a keyword, a release channel, or an exact build id.
 
@@ -234,7 +234,7 @@ butler-sheet-icons.exe browser uninstall --browser chrome --browser-version <bui
 
 Firefox is managed only by the `browser` commands — it cannot render thumbnails, so its version affects nothing about a thumbnail run. Firefox build ids are channel-prefixed, for example `stable_153.0.3`.
 
-## Headless vs. Visible Browser
+## Headless vs. Visible Browser {#headless-vs-visible-browser}
 
 Butler Sheet Icons can run in two modes:
 
@@ -286,7 +286,7 @@ butler-sheet-icons qscloud create-sheet-icons --headless false ...
 - Visual confirmation of what's happening
 - Easier troubleshooting
 
-## Proxy Server Support
+## Proxy Server Support {#proxy-server-support}
 
 If you're behind a corporate proxy, configure the following environment variables:
 

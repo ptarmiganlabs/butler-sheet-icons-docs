@@ -59,6 +59,7 @@ release it describes.
 - Add alt text to all images for accessibility
 - Use absolute, extensionless links for internal navigation (e.g. `/guide/quick-start`)
 - Test all links before submitting
+- Use [VitePress markdown features](../VITEPRESS_MARKDOWN.md) to improve code examples: line highlighting, code diffs, line numbers, custom anchors, and table of contents
 
 ## 🏗️ Content Structure
 
