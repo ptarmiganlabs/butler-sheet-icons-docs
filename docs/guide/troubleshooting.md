@@ -32,13 +32,13 @@ butler-sheet-icons browser list-installed
 ```
 
 
-## Fixed in 4.0.0: options and messages that told you the wrong thing
+## Fixed in 4.1.0: options and messages that told you the wrong thing
 
-::: warning Requires BSI 4.0.0 or later
+::: warning Requires BSI 4.1.0 or later
 If you are running an earlier version, the behaviour described below still applies to you and the workarounds may still be needed.
 :::
 
-Five fixes in 4.0.0 share a theme: Butler Sheet Icons accepted something, or reported something, that did not match what it actually did. If you built a workaround around any of them, it can now be removed.
+Five fixes in 4.1.0 share a theme: Butler Sheet Icons accepted something, or reported something, that did not match what it actually did. If you built a workaround around any of them, it can now be removed.
 
 ### Two options that never took effect
 
