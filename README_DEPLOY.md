@@ -130,14 +130,27 @@ the same pull request. A release tracking 3.12.0 became 4.0.0 that way when two 
 changes arrived, after several pages had already been written against 3.12.0. Reading it
 per build is what makes the label self-correcting.
 
-Every lookup degrades rather than failing the build: pending version → latest release →
-the previously generated `version.js` → `v0.0.0`.
+The chain is: pending version (preview only) → latest release from the API → latest
+release from `github.com` → the previously generated `version.js` → `v0.0.0`.
+
+The `github.com` step needs no authentication: `/releases/latest` on the website is a 302
+to `/releases/tag/<tag>`, so the tag arrives in the `Location` header at no API quota
+cost. It is what keeps the label correct when `GITHUB_TOKEN` is missing, invalid or rate
+limited, which is the failure this site actually hits.
+
+> [!IMPORTANT]
+> **On production the chain does not end at `v0.0.0` — it fails the build.** Publishing
+> `v0.0.0` is wrong, publicly visible and completely silent: the build succeeds, Cloudflare
+> deploys, and nothing surfaces the problem until somebody looks at the nav. A failed build
+> is louder and cheaper to notice. Set `BSI_DOCS_VERSION` to publish anyway if GitHub is
+> unreachable during a release. Preview and local builds still degrade to `v0.0.0`, so
+> working offline and on a plane still builds.
 
 Environment variables that affect this:
 
 | Variable | Where | Effect |
 | --- | --- | --- |
-| `GITHUB_TOKEN` (or `GH_TOKEN`) | Cloudflare project, CI, local | Authenticates the API calls. **Recommended in Cloudflare.** Build IPs are shared, so the 60 req/hour anonymous limit is reachable; because `version.js` is git-ignored, a fresh build container has no previous file to fall back on and the nav silently renders `v0.0.0`. |
+| `GITHUB_TOKEN` (or `GH_TOKEN`) | Cloudflare project, CI, local | Authenticates the API calls. **Optional** — the `github.com` fallback covers its absence. Worth setting anyway: build IPs are shared, so the 60 req/hour anonymous limit is reachable and the fallback then carries every build. Only needs read access to a public repo, so an unscoped token is enough. A `403` in the build log means it is missing or rate limited; a `401` means the value is wrong. |
 | `CF_PAGES_BRANCH` | Set by Cloudflare Pages | Read, not set by us. Decides production vs preview behaviour above. |
 | `BSI_DOCS_VERSION` | Anywhere | **Escape hatch, normally unset.** Overrides everything and never falls back. Only useful to pin a label the automation cannot work out. A stale value here silently defeats the automation. |
 
@@ -174,7 +187,8 @@ Export `GITHUB_TOKEN` locally to avoid anonymous API rate limits on the version 
 
 | Symptom | Cause / action |
 | --- | --- |
-| Nav shows `v0.0.0` | Version lookup failed and no cached file existed. Set `GITHUB_TOKEN` in the Cloudflare project. |
+| Nav shows `v0.0.0` | Only possible on a preview or local build — production fails instead. Every lookup failed, including the unauthenticated `github.com` one, so the machine most likely had no outbound network. |
+| Production build fails on the version lookup | Both GitHub lookups failed. Read the `[bsi-docs]` warnings above the error: `403` means `GITHUB_TOKEN` is missing or rate limited, `401` means it is wrong. To publish while GitHub is unreachable, set `BSI_DOCS_VERSION` — and remove it afterwards. |
 | Nav shows the wrong version on a `next` preview | Check the build log for the `[bsi-docs]` lines. They name the branch, whether it was treated as a preview, and which release PR was read. A stale `BSI_DOCS_VERSION` overriding everything is the most likely cause. |
 | Change not live on production | Check the "Cloudflare Pages" check run on the commit. Confirm the commit is on `main`, not `next`. |
 | Build fails on a dead link | VitePress names the offending file and link. Internal links are absolute and extensionless: `/guide/concepts/browser-management`. |
