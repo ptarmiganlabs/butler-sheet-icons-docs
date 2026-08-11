@@ -278,7 +278,7 @@ project/
 
 Create `docker-compose.yml`:
 
-```yaml
+```yaml:line-numbers
 services:
   butler-sheet-icons:
     image: ptarmiganlabs/butler-sheet-icons:latest
@@ -329,7 +329,7 @@ docker-compose up
 
 ### QSEoW Example
 
-```yaml
+```yaml:line-numbers
 services:
   butler-sheet-icons:
     image: ptarmiganlabs/butler-sheet-icons:latest
@@ -362,7 +362,7 @@ services:
 
 ### GitHub Actions Example
 
-```yaml
+```yaml:line-numbers
 name: Update Sheet Thumbnails
 
 on:
@@ -395,7 +395,7 @@ jobs:
             --imagedir ./img \
             --loglevel info
 
-      - name: Archive thumbnails
+      - name: Archive thumbnail
         uses: actions/upload-artifact@v3
         with:
           name: sheet-thumbnails

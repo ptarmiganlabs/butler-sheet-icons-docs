@@ -283,7 +283,7 @@ docker run --rm \
 
 **3. Ask for the same build you installed.** Butler Sheet Icons looks for the exact build id that `--browser-version` resolves to, so the two have to agree:
 
-```bash
+```bash:line-numbers
 docker run --rm \
   -v "$HOME/bsi/browser-cache:/home/nodejs/.cache/puppeteer" \
   -v "$HOME/bsi/img:/nodeapp/img" \
@@ -357,7 +357,7 @@ Mount the folder, or leave the embedded browser alone.
 
 ::: code-group
 
-```bash [macOS/Linux]
+```bash:line-numbers [macOS/Linux]
 # Remove all
 ./butler-sheet-icons browser uninstall-all
 
@@ -369,7 +369,7 @@ Mount the folder, or leave the embedded browser alone.
 ./butler-sheet-icons browser list-installed
 ```
 
-```powershell [Windows PowerShell]
+```powershell:line-numbers [Windows PowerShell]
 # Remove all
 ./butler-sheet-icons.exe browser uninstall-all
 
@@ -387,7 +387,7 @@ Mount the folder, or leave the embedded browser alone.
 
 ::: code-group
 
-```bash [macOS/Linux]
+```bash:line-numbers [macOS/Linux]
 ./butler-sheet-icons qscloud create-sheet-icons \
   --tenanturl mytenant.eu.qlikcloud.com \
   --apikey $BSI_API_KEY \
@@ -399,7 +399,7 @@ Mount the folder, or leave the embedded browser alone.
   --loglevel verbose
 ```
 
-```powershell [Windows PowerShell]
+```powershell:line-numbers [Windows PowerShell]
 ./butler-sheet-icons.exe qscloud create-sheet-icons `
   --tenanturl mytenant.eu.qlikcloud.com `
   --apikey $env:BSI_API_KEY `

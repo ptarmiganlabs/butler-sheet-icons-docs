@@ -309,7 +309,7 @@ For how to transfer the image across an air gap, what network access the contain
 
 **Windows / PowerShell example (using the embedded browser):**
 
-```powershell
+```powershell:line-numbers
 # Images are stored under C:\bsi-img on the host
 $imgPath = 'C:\bsi-img'
 New-Item -ItemType Directory -Path $imgPath -Force | Out-Null
@@ -371,7 +371,7 @@ Use the command above instead, which downloads a Linux build into a folder you n
 
 ::: code-group
 
-```bash [macOS/Linux]
+```bash:line-numbers
 docker run --rm \
   -v "$HOME/bsi/browser-cache:/home/nodejs/.cache/puppeteer" \
   -v "$HOME/bsi/img:/nodeapp/img" \
@@ -385,7 +385,7 @@ docker run --rm \
   --imagedir ./img
 ```
 
-```powershell [Windows PowerShell]
+```powershell:line-numbers
 $cachePath = 'C:\bsi-browser-cache'
 $imgPath = 'C:\bsi-img'
 New-Item -ItemType Directory -Path $imgPath -Force | Out-Null
@@ -437,7 +437,7 @@ The examples below show how browser detection and environment variables fit into
 
 ### QS Cloud thumbnails – Windows (system browser)
 
-```powershell
+```powershell:line-numbers
 $env:PUPPETEER_EXECUTABLE_PATH = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
 $env:BSI_CLOUD_TENANT_URL = 'https://your-tenant.region.qlikcloud.com'
 $env:BSI_CLOUD_API_KEY = 'your-api-key'
@@ -452,7 +452,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 
 ### QS Cloud thumbnails – macOS / Linux (system browser)
 
-```bash
+```bash:line-numbers
 export PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"   # Or a Chrome path on macOS
 export BSI_CLOUD_TENANT_URL="https://your-tenant.region.qlikcloud.com"
 export BSI_CLOUD_API_KEY="your-api-key"
@@ -467,7 +467,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails \
 
 ### QSEoW thumbnails – Windows (download browser automatically)
 
-```powershell
+```powershell:line-numbers
 $env:BSI_QSEOW_HOST = 'sense.company.com'
 $env:BSI_QSEOW_APP_ID = 'your-app-id'
 
@@ -480,7 +480,7 @@ butler-sheet-icons qseow create-sheet-thumbnails `
 
 ### QSEoW thumbnails – macOS / Linux (system browser)
 
-```bash
+```bash:line-numbers
 export PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 export BSI_QSEOW_HOST="sense.company.com"
 export BSI_QSEOW_APP_ID="your-app-id"
