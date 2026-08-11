@@ -68,6 +68,8 @@ reviewable without diffing the branch.
 - **A new page needs a sidebar entry** in `docs/.vitepress/config.js`. Without one it is reachable
   only by search.
 - Write for **Qlik Sense administrators**, not Node.js developers.
+- **VitePress markdown features** (line highlighting, code diffs, line numbers, custom anchors,
+  table of contents, etc.): See [VITEPRESS_MARKDOWN.md](./VITEPRESS_MARKDOWN.md)
 
 ## Testing the site locally
 

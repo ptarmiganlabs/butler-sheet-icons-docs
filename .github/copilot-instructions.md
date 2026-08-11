@@ -272,6 +272,8 @@ Use this for critical warnings about destructive operations
 :::
 ```
 
+For advanced markdown features (line highlighting, code diffs, line numbers, custom anchors, table of contents), see [VITEPRESS_MARKDOWN.md](../VITEPRESS_MARKDOWN.md).
+
 ## Security Considerations
 
 ### Sensitive Information

@@ -142,7 +142,6 @@ Here's a complete configuration example using environment variables:
 ### Environment Variables
 
 ```bash
-# Required
 export BSI_QSCLOUD_CST_TENANTURL="mytenant.eu.qlikcloud.com"
 export BSI_QSCLOUD_CST_APIKEY="eyJhbGciOiJFUzM4NCIsImtpZCI6..."
 export BSI_QSCLOUD_CST_LOGON_USER_ID="user@company.com"

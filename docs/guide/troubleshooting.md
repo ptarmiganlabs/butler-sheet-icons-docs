@@ -61,7 +61,7 @@ These did not change what fails — they changed what you are told, which is the
 
 If you have monitoring rules or log filters matching the old wording, they will stop firing. That is the point — but they need removing.
 
-## Run Failures and Exit Codes
+## Run Failures and Exit Codes {#run-failures-and-exit-codes}
 
 ::: warning Requires BSI 4.0.0 or later
 Earlier versions always exited with `0`. If your automation never reported a failure before upgrading, that is why — see [Exit codes and job status](/guide/advanced/ci-cd#exit-codes-and-job-status).
@@ -115,11 +115,22 @@ The per-sheet line names the sheet by title and ID, which is what you need to fi
 
 The Qlik Sense Cloud connection test reached something, but the response did not describe a user.
 
-```
+```text
 Connection test to tenant mytenant.eu.qlikcloud.com returned a response with no user in it. Check that --tenanturl points at a Qlik Sense Cloud tenant and that --apikey is a valid, unexpired API key for it.
 ```
 
-In earlier versions this printed `Connection to tenant … successful.` followed by four lines reading `undefined`, and the run then failed later for reasons that looked unrelated.
+In earlier versions, the output was misleading:
+
+```diff
+- info: Connection to tenant mytenant.eu.qlikcloud.com successful.
+- info:     Tenant ID : undefined
+- info:     User name : undefined
+- info:     User email: undefined
+- info:     User ID   : undefined
++ Connection test to tenant mytenant.eu.qlikcloud.com returned a response with no user in it. Check that --tenanturl points at a Qlik Sense Cloud tenant and that --apikey is a valid, unexpired API key for it.
+```
+
+The run then failed later for reasons that looked unrelated.
 
 **What to do:** verify `--tenanturl` points at a Qlik Sense Cloud tenant and that `--apikey` is valid and unexpired. See [QS Cloud Authentication Problems](#qs-cloud-authentication-problems).
 
@@ -189,7 +200,7 @@ An app is saved once, after all of its sheets have been dealt with. If the run f
 
 ## Authentication Issues
 
-### QS Cloud Authentication Problems
+### QS Cloud Authentication Problems {#qs-cloud-authentication-problems}
 
 **Symptoms:**
 
@@ -313,7 +324,7 @@ An app is saved once, after all of its sheets have been dealt with. If the run f
    --contentlibrary "My Custom Library"
    ```
 
-### App Access Issues
+### App Access Issues {#app-access-issues}
 
 **Symptoms:**
 
@@ -898,7 +909,7 @@ Separately — and silently — giving **two or more** `--exclude-sheet-tag` val
 
 ## Browser Build Issues
 
-### Every app fails with `Target closed` or `Protocol error`
+### Every app fails with `Target closed` or `Protocol error` {#every-app-fails-with-target-closed-or-protocol-error}
 
 **Symptoms:**
 
@@ -1038,7 +1049,7 @@ See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-seve
 
 ## Docker Issues
 
-### Permission denied writing thumbnails from the Docker image
+### Permission denied writing thumbnails from the Docker image {#permission-denied-writing-thumbnails-from-the-docker-image}
 
 **Symptoms:**
 
@@ -1085,24 +1096,29 @@ See [Docker Usage](/guide/advanced/docker#writing-thumbnails-to-a-mounted-folder
 
 Several log lines named the wrong operation, or were punctuated inconsistently between platforms. Nothing about how Butler Sheet Icons behaves changed — only what it writes. **This matters if you have log monitoring that matches on the old text.**
 
-| Command | Old text | New text |
-| --- | --- | --- |
-| `qscloud remove-sheet-icons` | `Closed session after updating sheet thumbnail images in QS Cloud app …` | `Closed session after removing sheet icons in QS Cloud app …` |
-| `qscloud remove-sheet-icons` | `CLOUD PROCESS APP 2: Failed to process app …` | `CLOUD REMOVE SHEET ICONS: Failed to process app …` |
+```diff
+- Closed session after updating sheet thumbnail images in QS Cloud app …
++ Closed session after removing sheet icons in QS Cloud app …
+
+- CLOUD PROCESS APP 2: Failed to process app …
++ CLOUD REMOVE SHEET ICONS: Failed to process app …
+```
 
 Neither "updating" nor "generating" describes removing an icon, and the `2` was a leftover that did not name the command actually running.
 
 A failure to start the built-in browser used to be punctuated differently per platform — QS Cloud used a colon after the prefix, QSEoW did not. Both now use the colon:
 
-```
-CLOUD APP: Could not launch virtual browser: …
-QSEOW: Could not launch virtual browser: …
+```diff
+- CLOUD APP Could not launch virtual browser: …
+- QSEOW Could not launch virtual browser: …
++ CLOUD APP: Could not launch virtual browser: …
++ QSEOW: Could not launch virtual browser: …
 ```
 
 **One line is new at the default log level.** Running `qscloud remove-sheet-icons`, this was written at `verbose` and so was hidden at the default `info`:
 
-```
-Created session to <server or tenant>, engine version is <version>
+```diff
++ Created session to <server or tenant>, engine version is <version>
 ```
 
 It is now written at `info`, matching every other command that works on an app you named. Expect one extra line per app; use `--loglevel warn` to suppress it along with the other progress messages. Commands that re-open an app already announced by the step above them still log at `verbose`, so no app is announced twice in one run.
