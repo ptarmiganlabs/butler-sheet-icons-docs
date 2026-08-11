@@ -30,6 +30,9 @@ const REPO = "butler-sheet-icons";
 const API_ROOT = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const LATEST_RELEASE_URL = `${API_ROOT}/releases/latest`;
 
+/** Website equivalent of LATEST_RELEASE_URL. Redirects to the tag, and costs no API quota. */
+const RELEASES_LATEST_WEB_URL = `https://github.com/${OWNER}/${REPO}/releases/latest`;
+
 /**
  * Branch release-please keeps its pending release on. The name is derived from its
  * config — `release-please--branches--<target>--components--<component>` — and is
@@ -110,6 +113,11 @@ function isPreviewBuild() {
   return branch !== "" && branch !== PRODUCTION_BRANCH;
 }
 
+/** True only on the Cloudflare build that publishes the public site. */
+function isProductionBuild() {
+  return currentBranch() === PRODUCTION_BRANCH;
+}
+
 /**
  * Asks release-please what the next version will be.
  *
@@ -159,7 +167,52 @@ async function fetchLatestReleaseVersion() {
   return normalizeTag(rawTag);
 }
 
-/** Keeps a previously generated file if there is one, otherwise writes a safe default. */
+/**
+ * Same answer as fetchLatestReleaseVersion, read from github.com instead of the API.
+ *
+ * `/releases/latest` on the website is a 302 to `/releases/tag/<tag>`, so the tag comes
+ * back in the Location header. This costs no API quota, which is the whole point: the
+ * API's anonymous limit is 60 req/hour against shared Cloudflare build IPs, and a
+ * missing or invalid GITHUB_TOKEN is otherwise indistinguishable from success — both
+ * end at the v0.0.0 fallback. This path keeps production correct without a token.
+ *
+ * Only useful for a public repository, which this one is.
+ */
+async function fetchLatestReleaseVersionViaRedirect() {
+  const res = await fetch(RELEASES_LATEST_WEB_URL, {
+    redirect: "manual",
+    headers: { "User-Agent": "bsi-docs-build-script" },
+  });
+
+  const location = res.headers.get("location");
+  if (!location) {
+    throw new Error(`No redirect from ${RELEASES_LATEST_WEB_URL} (${res.status})`);
+  }
+
+  // A repo with no releases redirects to /releases, which carries no tag.
+  const marker = "/releases/tag/";
+  const index = location.indexOf(marker);
+  if (index === -1) {
+    throw new Error(`Redirect carried no release tag: ${location}`);
+  }
+
+  const rawTag = decodeURIComponent(location.slice(index + marker.length));
+  if (!isValidTag(rawTag)) {
+    throw new Error(`Redirect carried an unusable tag: ${location}`);
+  }
+
+  return normalizeTag(rawTag);
+}
+
+/**
+ * Keeps a previously generated file if there is one, otherwise writes a safe default.
+ *
+ * On production there is no safe default. `v0.0.0` in the nav is wrong, publicly visible,
+ * and silent — the site builds and deploys perfectly well while showing it, so nothing
+ * surfaces the failure until someone happens to look at the nav. Failing the build is
+ * louder and cheaper to notice. Set BSI_DOCS_VERSION to publish anyway if GitHub is down
+ * during a release.
+ */
 async function writeFallbackVersion() {
   try {
     const existing = await fs.readFile(outFile, "utf8");
@@ -168,6 +221,15 @@ async function writeFallbackVersion() {
       return;
     }
   } catch {}
+
+  if (isProductionBuild()) {
+    throw new Error(
+      "Could not determine the version to show, and this is a production build. " +
+        "Refusing to publish v0.0.0 to the public site. Check the warnings above: a 401 " +
+        "means GITHUB_TOKEN is invalid, a 403 means it is missing or rate limited. " +
+        "Set BSI_DOCS_VERSION to a known version to publish anyway."
+    );
+  }
 
   const fallback = "v0.0.0";
   await writeVersionFile(fallback);
@@ -212,12 +274,30 @@ async function main() {
     const tag = await fetchLatestReleaseVersion();
     await writeVersionFile(tag);
     console.log(`[bsi-docs] Latest ${REPO} version: ${tag}`);
+    return;
   } catch (err) {
     console.warn(
-      `[bsi-docs] Warning: Could not fetch latest release tag: ${err.message}`
+      `[bsi-docs] Warning: Could not fetch latest release tag from the API: ${err.message}`
     );
-    await writeFallbackVersion();
   }
+
+  // The API call above is the one that needs a token. This one does not, so it is what
+  // keeps the label right when the token is missing, invalid, or rate limited.
+  try {
+    const tag = await fetchLatestReleaseVersionViaRedirect();
+    await writeVersionFile(tag);
+    console.log(`[bsi-docs] Latest ${REPO} version, via github.com: ${tag}`);
+    return;
+  } catch (err) {
+    console.warn(
+      `[bsi-docs] Warning: Could not read the release redirect either: ${err.message}`
+    );
+  }
+
+  await writeFallbackVersion();
 }
 
-main();
+main().catch((err) => {
+  console.error(`[bsi-docs] ${err.message}`);
+  process.exit(1);
+});
