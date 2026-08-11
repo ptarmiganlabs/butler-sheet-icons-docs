@@ -76,7 +76,7 @@ Getting at that page is more awkward than it looks, because a `chrome://` page c
 
 ::: details Command to save the credits page
 
-```bash
+```bash:line-numbers
 docker run --rm --network none --entrypoint node \
     ptarmiganlabs/butler-sheet-icons:latest --input-type=module -e "
 import puppeteer from 'puppeteer-core';
@@ -356,7 +356,7 @@ The two numbers are not supposed to match, and a mismatch is not something to fi
 
 On the air-gapped host, with the image already loaded:
 
-```bash
+```bash:line-numbers
 mkdir -p "$HOME/bsi/img"
 # $HOME/bsi/cert holds client.pem and client_key.pem, exported from the QMC
 
