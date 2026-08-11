@@ -31,8 +31,8 @@ When you run Butler Sheet Icons **outside** Docker — as a pre-built binary —
 
 ### Where to find the licence information
 
-::: warning Requires BSI 4.0.1 or later
-The `/nodeapp/licenses/` directory described below does not exist in earlier images, and earlier images also stripped most licence files out of `node_modules` to save space. On a 4.0.0 image the `find` command below returns 23 results; from 4.0.1 it returns 162.
+::: warning Requires BSI 4.1.0 or later
+The `/nodeapp/licenses/` directory described below does not exist in earlier images, and earlier images also stripped most licence files out of `node_modules` to save space. On a 4.0.0 image the `find` command below returns 23 results; from 4.1.0 it returns 162.
 
 The Chromium credits page and the Alpine package database are present in older images too.
 :::

@@ -189,7 +189,7 @@ The redaction and timeout logic in the crash dump writer is designed to handle t
 
 ## How many dumps a single run can write
 
-::: warning Requires BSI 4.0.0 or later
+::: warning Requires BSI 4.1.0 or later
 Earlier versions could write one crash dump per unhandled error. A single run that produced a burst of them filled the dump directory with hundreds of near-identical files, and the run did not reliably end.
 :::
 

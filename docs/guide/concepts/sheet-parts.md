@@ -96,7 +96,7 @@ butler-sheet-icons qseow create-sheet-thumbnails `
 
 ## Valid values are checked before the run starts
 
-::: warning Requires BSI 4.0.0 or later
+::: warning Requires BSI 4.1.0 or later
 In earlier versions an invalid value was accepted and the run began. The error appeared much later — after certificates were checked, connections opened and the browser started.
 :::
 

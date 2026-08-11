@@ -149,7 +149,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 
 ## Blurring by tag
 
-::: warning Requires BSI 4.0.0 or later
+::: warning Requires BSI 4.1.0 or later
 `--blur-sheet-tag` was accepted on the command line long before it did anything. On client-managed Qlik Sense nothing ever asked Qlik Sense which sheets carried the tag, so no sheet was ever blurred because of it.
 :::
 
