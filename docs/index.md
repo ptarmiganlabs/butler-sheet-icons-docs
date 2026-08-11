@@ -40,7 +40,7 @@ features:
 
 ## What is Butler Sheet Icons?
 
-Butler Sheet Icons is a cross-platform, command-line tool that creates sheet thumbnail images based on the actual layout of sheets in Qlik Sense applications. It works with both Qlik Sense Cloud and Qlik Sense Enterprise on Windows (QSEoW).
+Butler Sheet Icons is a cross-platform, command-line tool that creates sheet thumbnail images based on the actual layout of sheets in Qlik Sense applications. It works with both Qlik Sense Cloud and Qlik Sense Enterprise on Windows (QSEoW). It is free and open source software, released under the MIT license.
 
 ## Key Benefits
 
