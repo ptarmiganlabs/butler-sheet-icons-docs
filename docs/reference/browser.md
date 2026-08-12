@@ -43,10 +43,14 @@ butler-sheet-icons browser list-installed [options]
 
 **Options:**
 
-| Option                            | Environment Variable       | Description                                              | Default | Example            |
-| --------------------------------- | -------------------------- | -------------------------------------------------------- | ------- | ------------------ |
-| `--loglevel, --log-level <level>` | `BSI_BROWSER_LI_LOG_LEVEL` | Set log level (error, warn, info, verbose, debug, silly) | `info`  | `--loglevel debug` |
-| `-h, --help`                      | `-`                        | Display help for command                                 | `-`     | `-h`               |
+<!-- generated:cli-options browser list-installed -->
+
+| Option                            | Environment Variable       | Description                                                   | Default | Example            |
+| --------------------------------- | -------------------------- | ------------------------------------------------------------- | ------- | ------------------ |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_LI_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly) | `info`  | `--loglevel error` |
+| `-h, --help`                      | -                          | display help for command                                      | -       | `-h`               |
+
+<!-- /generated:cli-options -->
 
 **Example Output (Windows):**
 
@@ -69,12 +73,16 @@ butler-sheet-icons browser list-available [options]
 
 **Options:**
 
-| Option                            | Environment Variable       | Description                                              | Default  | Example              |
-| --------------------------------- | -------------------------- | -------------------------------------------------------- | -------- | -------------------- |
-| `--loglevel, --log-level <level>` | `BSI_BROWSER_LA_LOG_LEVEL` | Set log level (error, warn, info, verbose, debug, silly) | `info`   | `--loglevel verbose` |
-| `--browser <browser>`             | `BSI_BROWSER_LA_BROWSER`   | Browser to check availability for (chrome, firefox)      | `chrome` | `--browser firefox`  |
-| `--channel <channel>`             | `BSI_BROWSER_LA_CHANNEL`   | Chrome release channel (stable, beta, dev, canary)       | `stable` | `--channel beta`     |
-| `-h, --help`                      | `-`                        | Display help for command                                 | `-`      | `--help`             |
+<!-- generated:cli-options browser list-available -->
+
+| Option                            | Environment Variable       | Description                                                                                                                                                      | Default  | Example             |
+| --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------- |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_LA_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                    | `info`   | `--loglevel error`  |
+| `--browser <browser>`             | `BSI_BROWSER_LA_BROWSER`   | Browser to list available versions for (e.g. "chrome" or "firefox"). Use "butler-sheet-icons browser install" to install one of them. (choices: chrome, firefox) | `chrome` | `--browser firefox` |
+| `--channel <channel>`             | `BSI_BROWSER_LA_CHANNEL`   | Which of the browser's release channel versions should be listed? This option is only used for Chrome. (choices: stable, beta, dev, canary)                      | `stable` | `--channel beta`    |
+| `-h, --help`                      | -                          | display help for command                                                                                                                                         | -        | `-h`                |
+
+<!-- /generated:cli-options -->
 
 **Example Output (macOS):**
 
@@ -117,12 +125,17 @@ butler-sheet-icons browser install [options]
 
 **Options:**
 
-| Option                            | Environment Variable            | Description                                              | Default  | Example                           |
-| --------------------------------- | ------------------------------- | -------------------------------------------------------- | -------- | --------------------------------- |
-| `--loglevel, --log-level <level>` | `BSI_BROWSER_I_LOG_LEVEL`       | Set log level (error, warn, info, verbose, debug, silly) | `info`   | `--loglevel debug`                |
-| `--browser <browser>`             | `BSI_BROWSER_I_BROWSER`         | Browser to install (chrome, firefox)                     | `chrome` | `--browser firefox`               |
-| `--browser-version <version>`     | `BSI_BROWSER_I_BROWSER_VERSION` | Keyword (`recommended`, `stable`), channel, or build ID   | `recommended` | `--browser-version 121.0.6167.85` |
-| `-h, --help`                      | `-`                             | Display help for command                                 | `-`      | `--help`                          |
+<!-- generated:cli-options browser install -->
+
+| Option                            | Environment Variable            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default       | Example             |
+| --------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------- |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_I_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                                                                                                                                                                                                                                    | `info`        | `--loglevel error`  |
+| `--browser <browser>`             | `BSI_BROWSER_I_BROWSER`         | Browser to install (e.g. "chrome" or "firefox"). Use "butler-sheet-icons browser list-installed" to see which browsers are currently installed. (choices: chrome, firefox)                                                                                                                                                                                                                                                                                       | `chrome`      | `--browser firefox` |
+| `--browser-version <version>`     | `BSI_BROWSER_I_BROWSER_VERSION` | Browser build to install. Either a keyword - "recommended" for the build Butler Sheet Icons is tested with, "stable" for the newest stable release, or a release channel such as "beta" - or an exact version. For Chrome that is a milestone ("151"), a build prefix ("151.0.7922") or a full build id ("151.0.7922.77"); for Firefox a channel-prefixed build id ("stable_153.0.3"). Use "butler-sheet-icons browser list-available" to see what is available. | `recommended` | -                   |
+| `-i, --interactive`               | -                               | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                                                                                                                                                                                                                   | -             | -                   |
+| `-h, --help`                      | -                               | display help for command                                                                                                                                                                                                                                                                                                                                                                                                                                         | -             | `-h`                |
+
+<!-- /generated:cli-options -->
 
 **Examples:**
 
@@ -178,12 +191,17 @@ butler-sheet-icons browser uninstall [options]
 
 **Options:**
 
-| Option                            | Environment Variable             | Description                                              | Default  | Example                           |
-| --------------------------------- | -------------------------------- | -------------------------------------------------------- | -------- | --------------------------------- |
-| `--loglevel, --log-level <level>` | `BSI_BROWSER_UI_LOG_LEVEL`       | Set log level (error, warn, info, verbose, debug, silly) | `info`   | `--loglevel warn`                 |
-| `--browser <browser>`             | `BSI_BROWSER_UI_BROWSER`         | Browser to uninstall (chrome, firefox)                   | `chrome` | `--browser firefox`               |
-| `--browser-version <version>`     | `BSI_BROWSER_UI_BROWSER_VERSION` | Exact build id, or `recommended`. Not `stable`/`latest`. | `-`      | `--browser-version 121.0.6167.85` |
-| `-h, --help`                      | `-`                              | Display help for command                                 | `-`      | `--help`                          |
+<!-- generated:cli-options browser uninstall -->
+
+| Option                            | Environment Variable             | Description                                                                                                                                                                                                                                                              | Default      | Example             |
+| --------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------- |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_UI_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                                            | `info`       | `--loglevel error`  |
+| `--browser <browser>`             | `BSI_BROWSER_UI_BROWSER`         | Browser to uninstall (e.g. "chrome" or "firefox"). Use "butler-sheet-icons browser list-installed" to see which browsers are currently installed. (choices: chrome, firefox)                                                                                             | **Required** | `--browser firefox` |
+| `--browser-version <version>`     | `BSI_BROWSER_UI_BROWSER_VERSION` | Browser build to uninstall: an exact build id (for Chrome e.g. "151.0.7922.77", for Firefox e.g. "stable_153.0.3"), or "recommended" for the build Butler Sheet Icons is tested with. Use "butler-sheet-icons browser list-installed" to see which builds are installed. | **Required** | -                   |
+| `-i, --interactive`               | -                                | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                           | -            | -                   |
+| `-h, --help`                      | -                                | display help for command                                                                                                                                                                                                                                                 | -            | `-h`                |
+
+<!-- /generated:cli-options -->
 
 **Example (Windows):**
 
@@ -253,10 +271,14 @@ butler-sheet-icons browser uninstall-all [options]
 
 **Options:**
 
-| Option                            | Environment Variable       | Description                                              | Default | Example           |
-| --------------------------------- | -------------------------- | -------------------------------------------------------- | ------- | ----------------- |
-| `--loglevel, --log-level <level>` | `BS_BROWSER_UIA_LOG_LEVEL` | Set log level (error, warn, info, verbose, debug, silly) | `info`  | `--loglevel info` |
-| `-h, --help`                      | `-`                        | Display help for command                                 | `-`     | `--help`          |
+<!-- generated:cli-options browser uninstall-all -->
+
+| Option                            | Environment Variable       | Description                                                   | Default | Example            |
+| --------------------------------- | -------------------------- | ------------------------------------------------------------- | ------- | ------------------ |
+| `--log-level, --loglevel <level>` | `BS_BROWSER_UIA_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly) | `info`  | `--loglevel error` |
+| `-h, --help`                      | -                          | display help for command                                      | -       | `-h`               |
+
+<!-- /generated:cli-options -->
 
 **Example (macOS):**
 
