@@ -148,9 +148,32 @@ Both are keywords rather than build numbers, so you do not need to know what Goo
 - **Every server on the same Butler Sheet Icons version uses the same browser build.** A fleet of scheduled jobs cannot drift apart on its own.
 - **No lookup at run time.** The build id is baked in, so once it is cached there is nothing to ask the vendor. With `stable`, every run first asks which build is currently newest.
 
-Choose `stable` only if you specifically need the newest stable release — for example because a security policy requires it. Be aware that it follows whatever the vendor has promoted, which can be a build newer than Butler Sheet Icons has been tested against.
+Choose `stable` only if you specifically need the newest stable release — for example because a security policy requires it. Be aware that it follows whatever the vendor has promoted, which can be a build newer than Butler Sheet Icons has been tested against, and eventually one it **cannot drive at all**. See [Every app fails with `Target closed` or `Protocol error`](/guide/troubleshooting#every-app-fails-with-target-closed-or-protocol-error) for what that looks like and why it can appear overnight.
 
 It also means a lookup on every run: on an offline or proxied machine that costs you connectivity you may not have. See [What `--browser-version` costs on an offline machine](/guide/concepts/browser-detection-and-environment-variables#what-browser-version-costs-on-an-offline-machine).
+
+### What `recommended` points at {#what-recommended-points-at}
+
+One exact Chrome build, decided by the browser automation library Butler Sheet Icons ships. It moves when that library is upgraded, which happens as part of upgrading Butler Sheet Icons — never on its own.
+
+Every run says which build it resolved to:
+
+```
+info: Browser version "recommended" resolved to chrome build 151.0.7922.71 (the build this version of Butler Sheet Icons is tested with)
+```
+
+**BSI 5.0.0 resolves `recommended` to Chrome `151.0.7922.71`.** In 4.1.0 it was `151.0.7922.47`.
+
+The practical consequence is that the first run after upgrading downloads the new build, and the previous one stays in the cache until you remove it:
+
+```bash
+butler-sheet-icons browser list-installed
+butler-sheet-icons browser uninstall --browser-version 151.0.7922.47
+```
+
+::: tip Read the build from the log, not from here
+This page states the build for the release named above. Your run tells you its own answer on the line quoted here, which is the one to trust — particularly if you are on a different version.
+:::
 
 Chrome's release **channels** are also accepted, and like `stable` they are resolved at run time: `beta`, `dev` and `canary`.
 
