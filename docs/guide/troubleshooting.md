@@ -326,8 +326,8 @@ in which a browser states what it is and which operating system it runs on. The 
 ```mermaid
 flowchart TD
     Start([Browser requests a sheet]) --> UA{"User-Agent matches the proxy's<br/>Windows authentication pattern?"}
-    UA -->|"No — Macintosh, X11"| Forms["/internal_forms_authentication/<br/>the login page"]
-    UA -->|"Yes — Windows NT"| NTLM["/internal_windows_authentication<br/>NTLM"]
+    UA -->|"No — macOS, Linux"| Forms["/internal_forms_authentication/<br/>the login page"]
+    UA -->|"Yes — Windows"| NTLM["/internal_windows_authentication<br/>NTLM"]
     Forms --> OK([BSI types the credentials and works])
     NTLM --> Fail([ERR_INVALID_AUTH_CREDENTIALS])
 ```
