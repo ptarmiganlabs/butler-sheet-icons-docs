@@ -56,7 +56,7 @@ If no system browser is configured, BSI looks in the Puppeteer cache directory (
 
 A cached browser is used when it matches **both** of these:
 
-- **Browser type** — the browser asked for with `--browser`. The thumbnail commands accept `chrome` only; the `browser` commands also accept `firefox`.
+- **Browser type** — the browser asked for with `--browser`. Every command accepts `chrome` only, and it is the default, so this matters only if you name it explicitly.
 - **Version** — if you specify an exact `--browser-version`, only a cached browser with exactly that build ID is used. If a different version is cached, BSI treats it as no match and downloads the version you asked for. If `--browser-version` is `latest` (the default), any cached build of the requested browser type is accepted.
 
 When a cached browser matches, it is used as-is and nothing is downloaded. This is what makes repeat runs fast: the browser is downloaded once and reused on every later run, with no network access needed for the browser itself.
@@ -93,7 +93,7 @@ The `browser` management commands are different — only some of them reach out 
 | ------------------------------------ | --------------- |
 | `browser list-installed`             | **No.** Reads the local Puppeteer cache only. |
 | `browser uninstall` / `uninstall-all` | **No.** Removes browsers from the local cache. |
-| `browser list-available`             | **Yes**, for Chrome. It asks Google's Chrome version history service which versions exist. (For Firefox the command only reports that `latest` is the sole supported version, and makes no network call.) |
+| `browser list-available`             | **Yes.** It asks Google's Chrome version history service which versions exist. |
 | `browser install`                    | **Yes**, always. BSI verifies that the requested build can actually be downloaded before installing it, so the command needs internet access even when that version is already in the cache. |
 
 On a machine with no internet access — an air-gapped server, or one behind a proxy that blocks outbound HTTPS — `browser list-available` reports:

@@ -14,28 +14,31 @@ In addition to the cached browsers managed by BSI, you can also point BSI at a s
 
 ## Supported Browsers {#supported-browsers}
 
-Butler Sheet Icons manages two browsers, but they are not interchangeable:
+**Chrome is the only browser Butler Sheet Icons uses.** It is the only value `--browser` accepts, on every command that has the option, and full version control is available — including specific build numbers.
 
-- **Chrome**: the only browser that can render sheet thumbnails. Full version control available, including specific build numbers.
-- **Firefox**: can be installed, listed and removed with the `browser` commands, but **cannot be used to create thumbnails**.
+The reason is the rendering path. Thumbnails are produced by driving the browser over the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/), with a list of startup switches only Chromium-based browsers understand. No other browser can be driven that way.
 
-::: warning Firefox is not available for thumbnails — BSI 4.0.0 or later
-`--browser firefox` is rejected by `qseow create-sheet-thumbnails` and `qscloud create-sheet-thumbnails`:
+::: warning Firefox is no longer accepted — BSI 5.0.0 or later
+Earlier versions let you install, list and remove a Firefox that no command could ever launch. `--browser firefox` is now rejected everywhere, by `browser install`, `browser uninstall` and `browser list-available` as well as by the thumbnail commands:
 
 ```
 error: option '--browser <browser>' argument 'firefox' is invalid. Allowed choices are chrome.
 ```
 
-The same applies when the value comes from an environment variable:
+Values coming from an environment variable are checked against the same list, so the run fails at start-up rather than part-way through:
 
 ```
-error: option '--browser <browser>' value 'firefox' from env 'BSI_QSEOW_CST_BROWSER' is invalid. Allowed choices are chrome.
+error: option '--browser <browser>' value 'firefox' from env 'BSI_BROWSER_LA_BROWSER' is invalid. Allowed choices are chrome.
 ```
 
-Firefox never actually worked for thumbnail creation — the rendering path drives the browser over the Chrome DevTools Protocol with a Chromium-only argument list — but earlier versions accepted the option and then failed later, in a way that was hard to interpret. It is now rejected up front.
+The variables affected are `BSI_BROWSER_I_BROWSER` (`browser install`), `BSI_BROWSER_UI_BROWSER` (`browser uninstall`), `BSI_BROWSER_LA_BROWSER` (`browser list-available`) and the `..._BROWSER` variables of the two thumbnail commands.
 
-`browser install`, `browser uninstall`, `browser uninstall-all` and `browser list-available` still accept `--browser firefox`.
+Firefox's release channels `nightly`, `devedition` and `esr` are no longer valid `--browser-version` values either, and neither are its channel-prefixed build ids such as `stable_153.0.3`.
+
+**If you have `--browser firefox` in a script**, remove the option. Chrome is the default, so nothing needs to replace it. A Firefox left in the browser cache by an earlier release is removed by [`browser uninstall-all`](/reference/browser#uninstall-all).
 :::
+
+`browser list-installed` and `browser uninstall-all` have no `--browser` option and are unaffected.
 
 ## Browser Cache Location
 
@@ -76,25 +79,19 @@ You can pre-install browsers into the BSI cache using the browser management com
 ::: code-group
 
 ```bash [Bash]
-# Install latest Chrome
+# Install the recommended Chrome build
 butler-sheet-icons browser install
 
-# Install specific Chrome version
-butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
-
-# Install Firefox
-butler-sheet-icons browser install --browser firefox
+# Install a specific Chrome build
+butler-sheet-icons browser install --browser-version 121.0.6167.85
 ```
 
 ```powershell [PowerShell]
-# Install latest Chrome
+# Install the recommended Chrome build
 butler-sheet-icons browser install
 
-# Install specific Chrome version
-butler-sheet-icons browser install --browser chrome --browser-version 121.0.6167.85
-
-# Install Firefox
-butler-sheet-icons browser install --browser firefox
+# Install a specific Chrome build
+butler-sheet-icons browser install --browser-version 121.0.6167.85
 ```
 
 :::
@@ -136,7 +133,7 @@ If you instead want to force BSI to use a _system_ browser (for example a centra
 | `recommended` | The build this version of Butler Sheet Icons was tested with. **This is the default.** | Fixed inside Butler Sheet Icons |
 | `stable` | The newest stable release of the browser. | Looked up online, every time the command runs |
 
-Both work for Chrome and Firefox, so you do not need to know what each vendor calls its channels.
+Both are keywords rather than build numbers, so you do not need to know what Google currently calls its builds.
 
 **`recommended` is the right choice for almost everyone.** It cannot get ahead of what Butler Sheet Icons is able to drive, and it changes only when you upgrade Butler Sheet Icons itself. That gives you two things:
 
@@ -147,7 +144,7 @@ Choose `stable` only if you specifically need the newest stable release — for 
 
 It also means a lookup on every run: on an offline or proxied machine that costs you connectivity you may not have. See [What `--browser-version` costs on an offline machine](/guide/concepts/browser-detection-and-environment-variables#what-browser-version-costs-on-an-offline-machine).
 
-Release **channels** are also accepted, and like `stable` they are resolved at run time: `beta`, `dev` and `canary` for Chrome; `beta`, `nightly`, `devedition` and `esr` for Firefox.
+Chrome's release **channels** are also accepted, and like `stable` they are resolved at run time: `beta`, `dev` and `canary`.
 
 ::: tip A browser is never bundled with Butler Sheet Icons
 Whichever value you use, the browser is downloaded once and then kept in the local cache, so the first run on a new server always needs internet access. The keywords differ only in *how the build id is decided* — which is what matters on a server that is offline afterwards. See [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables).
@@ -157,15 +154,13 @@ Whichever value you use, the browser is downloaded once and then kept in the loc
 
 You can pin an exact build. The format is checked before anything else happens, so a typo stops the run immediately with a message naming the accepted forms — it is never silently swapped for another build from the cache.
 
-For **Chrome**, three forms are accepted:
+Three forms are accepted:
 
 | Form | Example | Selects |
 | --- | --- | --- |
 | Milestone | `151` | The newest build of milestone 151 |
 | Build prefix | `151.0.7922` | The newest patch of that build |
 | Full build id | `151.0.7922.77` | Exactly that build |
-
-For **Firefox**, the build id must carry its channel prefix, for example `stable_153.0.3`. A bare version such as `152.0.1` is rejected: without the prefix it would be read as a nightly build, which is almost never what you want.
 
 To see what can be installed:
 
@@ -229,10 +224,6 @@ butler-sheet-icons.exe browser uninstall --browser chrome --browser-version <bui
 :::
 
 `browser uninstall` accepts an exact build id, or `recommended`. It deliberately does **not** accept `stable`, `latest` or a channel: those name whatever the vendor currently publishes, not a build on your machine, so they cannot safely identify something to delete. Uninstalling never needs internet access.
-
-### Firefox Versions
-
-Firefox is managed only by the `browser` commands — it cannot render thumbnails, so its version affects nothing about a thumbnail run. Firefox build ids are channel-prefixed, for example `stable_153.0.3`.
 
 ## Headless vs. Visible Browser {#headless-vs-visible-browser}
 

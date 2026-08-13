@@ -6,7 +6,7 @@ For details on how BSI decides which browser to use at runtime, and how environm
 
 ## Overview
 
-BSI uses its own browser cache system and does not rely on browsers installed elsewhere on your system. This ensures consistency and allows for precise version control. The `browser` command manages both Chrome and Firefox across Windows, macOS, and Linux. Note that only Chrome can render sheet thumbnails — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
+BSI uses its own browser cache system and does not rely on browsers installed elsewhere on your system. This ensures consistency and allows for precise version control. The `browser` command manages Chrome across Windows, macOS, and Linux. Chrome is the only browser Butler Sheet Icons uses — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ## Basic Usage
 
@@ -45,10 +45,11 @@ butler-sheet-icons browser list-installed [options]
 
 <!-- generated:cli-options browser list-installed -->
 
-| Option                            | Environment Variable       | Description                                                   | Default | Example            |
-| --------------------------------- | -------------------------- | ------------------------------------------------------------- | ------- | ------------------ |
-| `--log-level, --loglevel <level>` | `BSI_BROWSER_LI_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly) | `info`  | `--loglevel error` |
-| `-h, --help`                      | -                          | display help for command                                      | -       | `-h`               |
+| Option                            | Environment Variable       | Description                                                                                                                                                                                                                                            | Default | Example            |
+| --------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | ------------------ |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_LI_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                          | `info`  | `--loglevel error` |
+| `--browser-cache-dir <directory>` | `BSI_BROWSER_CACHE_DIR`    | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise. | -       | -                  |
+| `-h, --help`                      | -                          | display help for command                                                                                                                                                                                                                               | -       | `-h`               |
 
 <!-- /generated:cli-options -->
 
@@ -75,12 +76,12 @@ butler-sheet-icons browser list-available [options]
 
 <!-- generated:cli-options browser list-available -->
 
-| Option                            | Environment Variable       | Description                                                                                                                                                      | Default  | Example             |
-| --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------- |
-| `--log-level, --loglevel <level>` | `BSI_BROWSER_LA_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                    | `info`   | `--loglevel error`  |
-| `--browser <browser>`             | `BSI_BROWSER_LA_BROWSER`   | Browser to list available versions for (e.g. "chrome" or "firefox"). Use "butler-sheet-icons browser install" to install one of them. (choices: chrome, firefox) | `chrome` | `--browser firefox` |
-| `--channel <channel>`             | `BSI_BROWSER_LA_CHANNEL`   | Which of the browser's release channel versions should be listed? This option is only used for Chrome. (choices: stable, beta, dev, canary)                      | `stable` | `--channel beta`    |
-| `-h, --help`                      | -                          | display help for command                                                                                                                                         | -        | `-h`                |
+| Option                            | Environment Variable       | Description                                                                                                                                                         | Default  | Example            |
+| --------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------ |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_LA_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                       | `info`   | `--loglevel error` |
+| `--browser <browser>`             | `BSI_BROWSER_LA_BROWSER`   | Browser to list available versions for. Only "chrome" is supported. Use "butler-sheet-icons browser install" to install one of the listed builds. (choices: chrome) | `chrome` | `--browser chrome` |
+| `--channel <channel>`             | `BSI_BROWSER_LA_CHANNEL`   | Which of the browser's release channel versions should be listed? (choices: stable, beta, dev, canary)                                                              | `stable` | `--channel beta`   |
+| `-h, --help`                      | -                          | display help for command                                                                                                                                            | -        | `-h`               |
 
 <!-- /generated:cli-options -->
 
@@ -110,7 +111,7 @@ error: Butler Sheet Icons needs internet access for this command. If this machin
        available locally.
 ```
 
-Use `browser list-installed` instead to see what is already available locally. For Firefox the command makes no network call at all — it reports that only the latest version is supported and returns.
+Use `browser list-installed` instead to see what is already available locally — it reads the cache and never goes online.
 :::
 
 ### install
@@ -127,13 +128,14 @@ butler-sheet-icons browser install [options]
 
 <!-- generated:cli-options browser install -->
 
-| Option                            | Environment Variable            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default       | Example             |
-| --------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------- |
-| `--log-level, --loglevel <level>` | `BSI_BROWSER_I_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                                                                                                                                                                                                                                    | `info`        | `--loglevel error`  |
-| `--browser <browser>`             | `BSI_BROWSER_I_BROWSER`         | Browser to install (e.g. "chrome" or "firefox"). Use "butler-sheet-icons browser list-installed" to see which browsers are currently installed. (choices: chrome, firefox)                                                                                                                                                                                                                                                                                       | `chrome`      | `--browser firefox` |
-| `--browser-version <version>`     | `BSI_BROWSER_I_BROWSER_VERSION` | Browser build to install. Either a keyword - "recommended" for the build Butler Sheet Icons is tested with, "stable" for the newest stable release, or a release channel such as "beta" - or an exact version. For Chrome that is a milestone ("151"), a build prefix ("151.0.7922") or a full build id ("151.0.7922.77"); for Firefox a channel-prefixed build id ("stable_153.0.3"). Use "butler-sheet-icons browser list-available" to see what is available. | `recommended` | -                   |
-| `-i, --interactive`               | -                               | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                                                                                                                                                                                                                   | -             | -                   |
-| `-h, --help`                      | -                               | display help for command                                                                                                                                                                                                                                                                                                                                                                                                                                         | -             | `-h`                |
+| Option                            | Environment Variable            | Description                                                                                                                                                                                                                                                                                                                                                                       | Default       | Example            |
+| --------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_I_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                                                                                                                                                     | `info`        | `--loglevel error` |
+| `--browser <browser>`             | `BSI_BROWSER_I_BROWSER`         | Browser to install. Only "chrome" is supported. Use "butler-sheet-icons browser list-installed" to see which browsers are currently installed. (choices: chrome)                                                                                                                                                                                                                  | `chrome`      | `--browser chrome` |
+| `--browser-version <version>`     | `BSI_BROWSER_I_BROWSER_VERSION` | Browser build to install. Either a keyword - "recommended" for the build Butler Sheet Icons is tested with, "stable" for the newest stable release, or a release channel such as "beta" - or an exact version: a milestone ("151"), a build prefix ("151.0.7922") or a full build id ("151.0.7922.77"). Use "butler-sheet-icons browser list-available" to see what is available. | `recommended` | -                  |
+| `--browser-cache-dir <directory>` | `BSI_BROWSER_CACHE_DIR`         | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise.                                                                                                                            | -             | -                  |
+| `-i, --interactive`               | -                               | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                                                                                                                                    | -             | -                  |
+| `-h, --help`                      | -                               | display help for command                                                                                                                                                                                                                                                                                                                                                          | -             | `-h`               |
 
 <!-- /generated:cli-options -->
 
@@ -149,23 +151,20 @@ PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser install
 2024-02-16T14:13:44.062Z info: Browser "chrome" version "121.0.6167.85" installed
 ```
 
-Install latest Firefox (macOS):
+Install a specific Chrome build (macOS):
 
 ```bash
-➜  butler-sheet-icons ./butler-sheet-icons browser install --browser firefox --browser-version latest
-2024-02-16T14:17:47.673Z info: App version: 3.2.3
-2024-02-16T14:17:47.976Z info: Resolved browser build id: "124.0a1" for browser "firefox" version "latest"
+➜  butler-sheet-icons ./butler-sheet-icons browser install --browser-version 151.0.7922.77
+2024-02-16T14:17:47.976Z info: Resolved browser build id: "151.0.7922.77" for browser "chrome" version "151.0.7922.77"
 2024-02-16T14:17:48.343Z info: Installing browser...
-2024-02-16T14:19:06.845Z info: Browser "firefox" version "124.0a1" installed
+2024-02-16T14:19:06.845Z info: Browser "chrome" version "151.0.7922.77" installed
 ```
 
 #### Browser Version Notes
 
-**Chrome:** a milestone (`151`), a build prefix (`151.0.7922`) or a full build id (`151.0.7922.77`). Some older builds may no longer be downloadable — use `list-available` to see what is currently offered.
+An exact build is a milestone (`151`), a build prefix (`151.0.7922`) or a full build id (`151.0.7922.77`). Some older builds may no longer be downloadable — use `list-available` to see what is currently offered.
 
-**Firefox:** a channel-prefixed build id such as `stable_153.0.3`. A bare version number is rejected, because it would be interpreted as a nightly build.
-
-Both also accept the keywords `recommended` and `stable`, and a release channel. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
+The keywords `recommended` and `stable` are also accepted, as are Chrome's release channels `beta`, `dev` and `canary`. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
 
 ::: warning Older Chrome Versions
 If you try to install an older Chrome version that's no longer available, you'll get a 404 error. The Chrome team periodically removes older versions from their download servers. Use a newer version instead.
@@ -193,13 +192,14 @@ butler-sheet-icons browser uninstall [options]
 
 <!-- generated:cli-options browser uninstall -->
 
-| Option                            | Environment Variable             | Description                                                                                                                                                                                                                                                              | Default      | Example             |
-| --------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------- |
-| `--log-level, --loglevel <level>` | `BSI_BROWSER_UI_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                                            | `info`       | `--loglevel error`  |
-| `--browser <browser>`             | `BSI_BROWSER_UI_BROWSER`         | Browser to uninstall (e.g. "chrome" or "firefox"). Use "butler-sheet-icons browser list-installed" to see which browsers are currently installed. (choices: chrome, firefox)                                                                                             | **Required** | `--browser firefox` |
-| `--browser-version <version>`     | `BSI_BROWSER_UI_BROWSER_VERSION` | Browser build to uninstall: an exact build id (for Chrome e.g. "151.0.7922.77", for Firefox e.g. "stable_153.0.3"), or "recommended" for the build Butler Sheet Icons is tested with. Use "butler-sheet-icons browser list-installed" to see which builds are installed. | **Required** | -                   |
-| `-i, --interactive`               | -                                | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                           | -            | -                   |
-| `-h, --help`                      | -                                | display help for command                                                                                                                                                                                                                                                 | -            | `-h`                |
+| Option                            | Environment Variable             | Description                                                                                                                                                                                                                                            | Default      | Example            |
+| --------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------ |
+| `--log-level, --loglevel <level>` | `BSI_BROWSER_UI_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                          | `info`       | `--loglevel error` |
+| `--browser <browser>`             | `BSI_BROWSER_UI_BROWSER`         | Browser to uninstall. Only "chrome" is supported. Use "butler-sheet-icons browser list-installed" to see which browsers are currently installed. (choices: chrome)                                                                                     | **Required** | `--browser chrome` |
+| `--browser-version <version>`     | `BSI_BROWSER_UI_BROWSER_VERSION` | Browser build to uninstall: an exact build id (e.g. "151.0.7922.77"), or "recommended" for the build Butler Sheet Icons is tested with. Use "butler-sheet-icons browser list-installed" to see which builds are installed.                             | **Required** | -                  |
+| `--browser-cache-dir <directory>` | `BSI_BROWSER_CACHE_DIR`          | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise. | -            | -                  |
+| `-i, --interactive`               | -                                | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                         | -            | -                  |
+| `-h, --help`                      | -                                | display help for command                                                                                                                                                                                                                               | -            | `-h`               |
 
 <!-- /generated:cli-options -->
 
@@ -208,23 +208,20 @@ butler-sheet-icons browser uninstall [options]
 ```powershell
 # First, see what's installed
 PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
-2024-02-16T14:24:20.096Z info: App version: 3.2.3
 2024-02-16T14:24:20.112Z info: Installed browsers:
 2024-02-16T14:24:20.112Z info:     chrome, build id=121.0.6167.85, platform=win64, path=C:\Users\goran\.cache\puppeteer\chrome\win64-121.0.6167.85
-2024-02-16T14:24:20.112Z info:     firefox, build id=124.0a1, platform=win64, path=C:\Users\goran\.cache\puppeteer\firefox\win64-124.0a1
+2024-02-16T14:24:20.112Z info:     chrome, build id=151.0.7922.77, platform=win64, path=C:\Users\goran\.cache\puppeteer\chrome\win64-151.0.7922.77
 
-# Uninstall specific Chrome version
+# Uninstall the older build
 PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser uninstall --browser-version 121.0.6167.85
-2024-02-16T14:26:39.018Z info: App version: 3.2.3
 2024-02-16T14:26:39.018Z info: Starting browser uninstallation
 2024-02-16T14:26:39.018Z info: Uninstalling browser: chrome, build id=121.0.6167.85, platform=win64, path=C:\Users\goran\.cache\puppeteer\chrome\win64-121.0.6167.85
 2024-02-16T14:26:39.096Z info: Browser "chrome", version "121.0.6167.85" uninstalled.
 
 # Verify uninstallation
 PS C:\tools\butler-sheet-icons> .\butler-sheet-icons.exe browser list-installed
-2024-02-16T14:26:44.597Z info: App version: 3.2.3
 2024-02-16T14:26:44.597Z info: Installed browsers:
-2024-02-16T14:26:44.613Z info:     firefox, build id=124.0a1, platform=win64, path=C:\Users\goran\.cache\puppeteer\firefox\win64-124.0a1
+2024-02-16T14:26:44.613Z info:     chrome, build id=151.0.7922.77, platform=win64, path=C:\Users\goran\.cache\puppeteer\chrome\win64-151.0.7922.77
 ```
 
 #### Browsers built for another platform
@@ -273,10 +270,11 @@ butler-sheet-icons browser uninstall-all [options]
 
 <!-- generated:cli-options browser uninstall-all -->
 
-| Option                            | Environment Variable       | Description                                                   | Default | Example            |
-| --------------------------------- | -------------------------- | ------------------------------------------------------------- | ------- | ------------------ |
-| `--log-level, --loglevel <level>` | `BS_BROWSER_UIA_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly) | `info`  | `--loglevel error` |
-| `-h, --help`                      | -                          | display help for command                                      | -       | `-h`               |
+| Option                            | Environment Variable       | Description                                                                                                                                                                                                                                            | Default | Example            |
+| --------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | ------------------ |
+| `--log-level, --loglevel <level>` | `BS_BROWSER_UIA_LOG_LEVEL` | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                          | `info`  | `--loglevel error` |
+| `--browser-cache-dir <directory>` | `BSI_BROWSER_CACHE_DIR`    | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise. | -       | -                  |
+| `-h, --help`                      | -                          | display help for command                                                                                                                                                                                                                               | -       | `-h`               |
 
 <!-- /generated:cli-options -->
 
@@ -285,25 +283,22 @@ butler-sheet-icons browser uninstall-all [options]
 ```bash
 # Check current installations
 ➜  butler-sheet-icons ./butler-sheet-icons browser list-installed
-2024-02-16T14:27:20.425Z info: App version: 3.2.3
 2024-02-16T14:27:20.427Z info: Installed browsers:
 2024-02-16T14:27:20.428Z info:     chrome, build id=121.0.6167.85, platform=mac, path=/Users/goran/.cache/puppeteer/chrome/mac-121.0.6167.85
-2024-02-16T14:27:20.428Z info:     firefox, build id=124.0a1, platform=mac, path=/Users/goran/.cache/puppeteer/firefox/mac-124.0a1
+2024-02-16T14:27:20.428Z info:     chrome, build id=151.0.7922.77, platform=mac, path=/Users/goran/.cache/puppeteer/chrome/mac-151.0.7922.77
 
 # Remove all browsers
 ➜  butler-sheet-icons ./butler-sheet-icons browser uninstall-all
-2024-02-16T14:29:24.989Z info: App version: 3.2.3
 2024-02-16T14:29:24.990Z info: Starting uninstallation of all browsers
 2024-02-16T14:29:24.991Z info: Uninstalling 2 browsers:
 2024-02-16T14:29:24.992Z info:     Starting uninstallation of "chrome", build id "121.0.6167.85", platform "mac", path "/Users/goran/.cache/puppeteer/chrome/mac-121.0.6167.85"
-2024-02-16T14:29:25.880Z info:     Starting uninstallation of "firefox", build id "124.0a1", platform "mac", path "/Users/goran/.cache/puppeteer/firefox/mac-124.0a1"
-2024-02-16T14:29:26.214Z info: Removing any remaining files and directories in the browser cache directory
-2024-02-16T14:29:26.214Z info: Browser "chrome" (121.0.6167.85) uninstalled.
-2024-02-16T14:29:26.214Z info: Browser "firefox" (124.0a1) uninstalled.
+2024-02-16T14:29:25.880Z info: Browser "chrome" (121.0.6167.85) uninstalled.
+2024-02-16T14:29:25.881Z info:     Starting uninstallation of "chrome", build id "151.0.7922.77", platform "mac", path "/Users/goran/.cache/puppeteer/chrome/mac-151.0.7922.77"
+2024-02-16T14:29:26.213Z info: Browser "chrome" (151.0.7922.77) uninstalled.
+2024-02-16T14:29:26.214Z info: Removing any files the uninstall left behind in the browser cache
 
 # Verify all browsers removed
 ➜  butler-sheet-icons ./butler-sheet-icons browser list-installed
-2024-02-16T14:29:29.943Z info: App version: 3.2.3
 2024-02-16T14:29:29.944Z info: No browsers installed
 ```
 
@@ -311,14 +306,14 @@ butler-sheet-icons browser uninstall-all [options]
 
 ### Development Environment Setup
 
-1. **Install latest stable browsers:**
+1. **Install a browser:**
 
    ```bash
-   # Install latest Chrome
+   # Install the recommended Chrome build
    butler-sheet-icons browser install
 
-   # Install latest Firefox
-   butler-sheet-icons browser install --browser firefox
+   # Or the newest stable Chrome
+   butler-sheet-icons browser install --browser-version stable
    ```
 
 2. **Verify installation:**
@@ -355,11 +350,10 @@ If you're experiencing browser-related problems:
    butler-sheet-icons browser uninstall-all
    ```
 
-3. **Reinstall browsers:**
+3. **Reinstall the browser:**
 
    ```bash
-   butler-sheet-icons browser install --browser chrome
-   butler-sheet-icons browser install --browser firefox
+   butler-sheet-icons browser install
    ```
 
 ## Integration with Sheet Commands

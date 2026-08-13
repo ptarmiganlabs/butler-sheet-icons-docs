@@ -31,7 +31,7 @@ Example output:
 2024-02-16T14:10:55.141Z info: App version: 3.2.3
 2024-02-16T14:10:55.141Z info: Installed browsers:
 2024-02-16T14:10:55.156Z info:     chrome, build id=121.0.6167.85, platform=mac, path=/Users/you/.cache/puppeteer/chrome/mac-121.0.6167.85
-2024-02-16T14:10:55.156Z info:     firefox, build id=124.0a1, platform=mac, path=/Users/you/.cache/puppeteer/firefox/mac-124.0a1
+2024-02-16T14:10:55.156Z info:     chrome, build id=151.0.7922.77, platform=mac, path=/Users/you/.cache/puppeteer/chrome/mac-151.0.7922.77
 ```
 
 ### Install default browser (latest Chrome)
@@ -56,20 +56,6 @@ Example output:
 2024-02-16T14:13:35.562Z info: Installing browser...
 2024-02-16T14:13:44.062Z info: Browser "chrome" version "121.0.6167.85" installed
 ```
-
-### Install Firefox (latest)
-
-::: code-group
-
-```bash [macOS/Linux]
-./butler-sheet-icons browser install --browser firefox
-```
-
-```powershell [Windows PowerShell]
-./butler-sheet-icons.exe browser install --browser firefox
-```
-
-:::
 
 ### List available Chrome builds (channels)
 
@@ -183,7 +169,7 @@ butler-sheet-icons qscloud create-sheet-icons \
 
 :::
 
-`chrome` is the only value the thumbnail commands accept. Firefox can be installed and removed with the `browser` commands, but cannot render thumbnails — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
+`chrome` is the only value `--browser` accepts, on this and every other command — see [Supported Browsers](/guide/concepts/browser-management#supported-browsers). It is also the default, so the option can be left out entirely.
 
 ### Use a specific browser version
 
@@ -333,22 +319,22 @@ Mount the folder, or leave the embedded browser alone.
 # Installed browsers
 ./butler-sheet-icons browser list-installed
 
-# Available Chrome builds
-./butler-sheet-icons browser list-available --browser chrome
+# Available Chrome builds on the stable channel
+./butler-sheet-icons browser list-available
 
-# Available Firefox builds
-./butler-sheet-icons browser list-available --browser firefox
+# Available Chrome builds on another channel
+./butler-sheet-icons browser list-available --channel beta
 ```
 
 ```powershell [Windows PowerShell]
 # Installed browsers
 ./butler-sheet-icons.exe browser list-installed
 
-# Available Chrome builds
-./butler-sheet-icons.exe browser list-available --browser chrome
+# Available Chrome builds on the stable channel
+./butler-sheet-icons.exe browser list-available
 
-# Available Firefox builds
-./butler-sheet-icons.exe browser list-available --browser firefox
+# Available Chrome builds on another channel
+./butler-sheet-icons.exe browser list-available --channel beta
 ```
 
 :::
@@ -361,9 +347,8 @@ Mount the folder, or leave the embedded browser alone.
 # Remove all
 ./butler-sheet-icons browser uninstall-all
 
-# Reinstall common browsers
-./butler-sheet-icons browser install --browser chrome
-./butler-sheet-icons browser install --browser firefox
+# Reinstall
+./butler-sheet-icons browser install
 
 # Verify
 ./butler-sheet-icons browser list-installed
@@ -373,9 +358,8 @@ Mount the folder, or leave the embedded browser alone.
 # Remove all
 ./butler-sheet-icons.exe browser uninstall-all
 
-# Reinstall common browsers
-./butler-sheet-icons.exe browser install --browser chrome
-./butler-sheet-icons.exe browser install --browser firefox
+# Reinstall
+./butler-sheet-icons.exe browser install
 
 # Verify
 ./butler-sheet-icons.exe browser list-installed
