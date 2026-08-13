@@ -94,6 +94,31 @@ Those are shown, and labelled:
 They remain selectable on purpose. A browser you cannot run is still taking up disk space, and removing
 it is a perfectly reasonable thing to want.
 
+### When there is nothing to uninstall
+
+On a machine with an empty browser cache, `browser uninstall -i` says so and stops without asking
+anything:
+
+```
+info: No browsers installed, so there is nothing to uninstall. Use "butler-sheet-icons browser install" to install one.
+```
+
+**The exit code is 0.** Nothing was asked for, so nothing failed — the same answer
+[`browser list-installed`](/reference/browser#list-installed) gives on that machine.
+
+The cache it looks in is the one the command itself would use, so this respects `--browser-cache-dir` and
+`BSI_BROWSER_CACHE_DIR`. A cache that exists but cannot be read is not treated as an empty one: you are
+still offered the chance to type a build id, which is how you recover.
+
+::: tip This is the interactive path only
+Running `browser uninstall` **without** `-i` is unchanged. Naming a build that is not in the cache still
+reports it and still exits **1**, which is what a scheduler or CI job sees:
+
+```
+info: Browser not found in cache: chrome build 151.0.7922.77. Use "butler-sheet-icons browser list-installed" to see what is installed.
+```
+:::
+
 ## Creating sheet thumbnails
 
 The two thumbnail commands are where this helps most. `qseow create-sheet-thumbnails` takes 36 options and `qscloud create-sheet-thumbnails` takes 25, so a first run has meant reading `--help`, assembling a long command line, and finding out only at the end that a certificate path or an API key was wrong.
