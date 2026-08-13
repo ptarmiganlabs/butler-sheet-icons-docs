@@ -6,14 +6,22 @@ Butler Sheet Icons is regularly tested against various versions of Qlik Sense to
 
 Butler Sheet Icons supports multiple QSEoW versions using the `--sense-version` parameter to handle version-specific differences in the web interface.
 
+::: tip Two different questions
+**Which values are accepted** is decided by the code, and the complete list is in the `--sense-version` row of the [QSEoW command reference](/reference/qseow#options) — that table is generated from the command definitions, so it cannot fall behind.
+
+**Which versions have been tested** is what the table below records. A value can be accepted without having a test date here.
+:::
+
 ### Currently Supported Versions
 
 | QSEoW Version    | BSI Version | Last Tested | Command Parameter              | Status            |
 | ---------------- | ----------- | ----------- | ------------------------------ | ----------------- |
+| 2026-May IR      | 5.0.0       | 2026-Aug-11 | `--sense-version 2026-May`     | ✅ Supported      |
 | 2025-Nov IR      | 3.9.0       | 2025-Nov-24 | `--sense-version 2025-Nov`     | ✅ Supported      |
 | 2025-May IR      | 3.9.0       | 2025-Nov-22 | `--sense-version 2025-May`     | ✅ Supported      |
 | 2024-Nov IR      | 3.8.0       | 2025-Jan-6  | `--sense-version 2024-Nov`     | ✅ Supported      |
 | 2024-May IR      | 3.8.0       | 2024-Dec-6  | `--sense-version 2024-May`     | ✅ Supported      |
+| 2024-Feb IR      | —           | —           | `--sense-version 2024-Feb`     | ✅ Accepted       |
 | 2023-Nov patch 3 | 3.6.4       | 2024-Nov-6  | `--sense-version 2023-Nov`     | ✅ Supported      |
 | 2023-Aug patch 3 | 3.6.0       | 2024-Jan-4  | `--sense-version 2023-Aug`     | ✅ Supported      |
 | 2023-May patch 6 | 3.5.0       | 2023-Oct-6  | `--sense-version 2023-May`     | ✅ Supported      |
@@ -24,19 +32,40 @@ Butler Sheet Icons supports multiple QSEoW versions using the `--sense-version` 
 
 ### Version Selection
 
-The `--sense-version` parameter is **mandatory** for QSEoW installations. Choose the parameter that matches your QSEoW version:
+`--sense-version` defaults to **`2026-May`**, so a run against a current server needs no version option at all. Set it explicitly when your server is older:
 
 ```bash
-# For May 2024 release
+# Against a 2025-Nov server
 butler-sheet-icons qseow create-sheet-thumbnails \
-  --sense-version 2024-May \
+  --sense-version 2025-Nov \
   # ... other options
 
-# For November 2023 release
+# Against a 2023-Nov server
 butler-sheet-icons qseow create-sheet-thumbnails \
   --sense-version 2023-Nov \
   # ... other options
 ```
+
+The same value can be given through `BSI_QSEOW_CST_SENSE_VERSION`, which is usually the better choice for a scheduled task.
+
+::: warning The default changed in BSI 5.0.0
+Earlier versions defaulted to an older release. If you relied on the default rather than setting `--sense-version` explicitly, check that it still matches your server — and set it explicitly if it does not, which is worth doing anyway on a server you do not upgrade often.
+:::
+
+### What the version is used for
+
+`--sense-version` tells Butler Sheet Icons which Qlik Sense hub layout to expect. In practice it now affects one thing: **finding the logout control in the hub user menu**, and only as a fallback.
+
+Logging out normally goes through the Qlik Proxy Service session, which does not depend on the hub's page structure at all — so a changed menu, or a user with different permissions, is far less likely to affect a run than it once was. The hub user menu is used only if the proxy request is not accepted, and even then the stable logout hook is tried before the version-specific selector.
+
+A failed logout does not discard thumbnails that were already created. The browser and engine sessions are still closed, processing continues, and the log says what happened:
+
+```
+error: QSEOW: Could not log out of Qlik Sense - both the proxy session API and the hub's user menu failed.
+error: QSEOW: Thumbnail generation completed, but logout was skipped. Processing will continue; if upload and sheet updates complete, only logout will have failed.
+```
+
+If you see that, the log also names the `--sense-version` you ran with and asks you to report it. Include the Qlik Sense release and service-release information — that is what identifies the layout Butler Sheet Icons needs to learn.
 
 ### Finding Your QSEoW Version
 

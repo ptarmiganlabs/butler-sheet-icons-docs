@@ -286,13 +286,11 @@ An app is saved once, after all of its sheets have been dealt with. If the run f
 
 ```bash
 # Check your QSEoW version in QMC → About
-# Use the correct version parameter
---sense-version 2024-May    # Use exact version
-
-# Available versions:
-# 2024-Nov, 2024-May, 2023-Nov, 2023-Aug, 2023-May,
-# 2023-Feb, 2022-Nov, pre-2022-Nov
+# Then set the matching value
+--sense-version 2025-Nov
 ```
+
+The accepted values are listed in the [`--sense-version` row of the QSEoW reference](/reference/qseow#options), which is generated from the command definitions and therefore always current. A wrong value is rejected at startup rather than causing a confusing failure later.
 
 ### Content Library Issues (QSEoW)
 

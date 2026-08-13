@@ -144,16 +144,16 @@ For development/testing environments:
 
 ## QSEoW Version Specification
 
-**Critical**: You must specify your QSEoW version for compatibility:
+`--sense-version` tells Butler Sheet Icons which Qlik Sense hub layout to expect. It defaults to the most recent supported release, so set it when your server is older:
 
 ```bash
---sense-version 2024-Nov          # Use the version used in your Qlik Sense environment
+--sense-version 2025-Nov          # Use the version used in your Qlik Sense environment
 ```
 
 For a list of supported QSEoW versions and the exact values to use with `--sense-version`, see [Supported Versions → QSEoW](/reference/supported-versions#qlik-sense-enterprise-on-windows-qseow).
 
 ::: warning Version Compatibility
-Using the wrong version parameter may cause login or navigation failures. Always specify the correct version for your QSEoW installation.
+Setting this explicitly is worth doing on a server you do not upgrade often, so a change to the default in a later Butler Sheet Icons release cannot move underneath you. See [What the version is used for](/reference/supported-versions#what-the-version-is-used-for) for what it actually affects.
 :::
 
 ::: tip Command alias
