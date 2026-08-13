@@ -16,7 +16,7 @@ Butler Sheet Icons supports multiple QSEoW versions using the `--sense-version` 
 
 | QSEoW Version    | BSI Version | Last Tested | Command Parameter              | Status            |
 | ---------------- | ----------- | ----------- | ------------------------------ | ----------------- |
-| 2026-May IR      | 5.0.0       | 2026-Aug-11 | `--sense-version 2026-May`     | ✅ Supported      |
+| 2026-May SR2     | 5.0.0       | 2026-Aug-11 | `--sense-version 2026-May`     | ✅ Supported      |
 | 2025-Nov IR      | 3.9.0       | 2025-Nov-24 | `--sense-version 2025-Nov`     | ✅ Supported      |
 | 2025-May IR      | 3.9.0       | 2025-Nov-22 | `--sense-version 2025-May`     | ✅ Supported      |
 | 2024-Nov IR      | 3.8.0       | 2025-Jan-6  | `--sense-version 2024-Nov`     | ✅ Supported      |
