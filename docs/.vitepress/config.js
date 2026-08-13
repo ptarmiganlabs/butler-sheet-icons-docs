@@ -135,6 +135,10 @@ export default withMermaid({
           items: [
             { text: "CI/CD Integration", link: "/guide/advanced/ci-cd" },
             { text: "Docker Usage", link: "/guide/advanced/docker" },
+            {
+              text: "Browser Cache Directory",
+              link: "/guide/advanced/browser-cache-directory",
+            },
             { text: "Proxy Configuration", link: "/guide/advanced/proxy" },
             { text: "Troubleshooting", link: "/guide/troubleshooting" },
             { text: "Crash Dump Files", link: "/guide/advanced/crash-dumps" },

@@ -42,13 +42,21 @@ Firefox's release channels `nightly`, `devedition` and `esr` are no longer valid
 
 ## Browser Cache Location
 
-Browsers are downloaded and stored in a cache directory:
+Browsers are downloaded and stored in a cache directory. Each browser version is stored in its own subdirectory for easy management.
 
-- **Windows**: `C:\Users\<username>\.cache\puppeteer\`
-- **macOS/Linux**: `~/.cache/puppeteer/`
+Where that directory is depends on how you run Butler Sheet Icons:
 
-Each browser version is stored in its own subdirectory for easy management.  
-There are Butler Sheet Icons browser management commands for installing, updating, and removing browsers.
+| How you run it | Default cache directory |
+| --- | --- |
+| Standalone build (`butler-sheet-icons.exe` or `butler-sheet-icons`) | `browser-cache`, next to the executable |
+| From Node.js | `.cache/puppeteer` in the current user's home directory |
+| Docker image | Not used — the image ships its own browser |
+
+::: warning Requires BSI 5.0.0 or later
+Before 5.0.0 the cache was always in the home directory, with no way to change it. On a Qlik Sense server that meant the browser you installed as yourself was invisible to the service account running the scheduled task.
+:::
+
+**You can choose the directory yourself** with `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` — which is the right thing to do on a server where a scheduled task and an administrator both need to reach the same browser. See [Browser Cache Directory](/guide/advanced/browser-cache-directory) for the full precedence order, what happens to a browser already in the old location, and how `PUPPETEER_CACHE_DIR` fits in.
 
 ## Initial Browser Setup
 
