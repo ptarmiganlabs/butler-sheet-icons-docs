@@ -117,6 +117,29 @@ butler-sheet-icons qscloud create-sheet-thumbnails
 
 :::
 
+## Variables holding more than one value
+
+Two kinds of option take a list, and they behave differently in an environment variable.
+
+**App IDs take a comma-separated list.** `BSI_QSEOW_CST_APP_ID` and `BSI_QSCLOUD_CST_APP_ID` each accept
+several, which is how you name a fixed set of apps without tagging them in Qlik Sense first:
+
+```bash
+export BSI_QSEOW_CST_APP_ID='a3e0f5d2-000a-464f-998d-33d333b175d7,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff'
+```
+
+::: warning Requires BSI 5.0.0 or later
+Earlier versions accepted exactly one app ID.
+:::
+
+**Sheet numbers take exactly one.** `BSI_QSEOW_CST_EXCLUDE_SHEET_NUMBER` and the blur equivalent hold a
+single number, and a value containing more than one is rejected at startup. To select several sheets,
+pass the option on the command line instead — see
+[Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-several-sheet-numbers).
+
+**A variable that is set but empty counts as unset.** A bare `BSI_QSEOW_CST_APP_ID=` line in a systemd
+unit file or a Docker environment file means no app was named, rather than one app with a blank ID.
+
 ## Behavior and security
 
 - With environment variables set, you can run BSI with minimal parameters.
