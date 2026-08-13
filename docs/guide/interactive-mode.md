@@ -93,6 +93,95 @@ Those are shown, and labelled:
 They remain selectable on purpose. A browser you cannot run is still taking up disk space, and removing
 it is a perfectly reasonable thing to want.
 
+## Creating sheet thumbnails
+
+The two thumbnail commands are where this helps most. `qseow create-sheet-thumbnails` takes 36 options and `qscloud create-sheet-thumbnails` takes 25, so a first run has meant reading `--help`, assembling a long command line, and finding out only at the end that a certificate path or an API key was wrong.
+
+::: code-group
+
+```powershell [PowerShell]
+butler-sheet-icons.exe qseow create-sheet-thumbnails -i
+butler-sheet-icons.exe qscloud create-sheet-thumbnails -i
+```
+
+```bash [Bash]
+./butler-sheet-icons qseow create-sheet-thumbnails -i
+./butler-sheet-icons qscloud create-sheet-thumbnails -i
+```
+
+:::
+
+### It asks about a third of the options
+
+Most options have defaults that work against a stock installation, so you are not asked about them unless you say you want to be. Two questions gate the rest:
+
+```
+? Exclude or blur any sheets? (y/N)
+? Configure advanced options (ports, certificates, schema version, browser)? (y/N)
+```
+
+Answer no to both — the common case — and the count drops sharply:
+
+| Command | Options it declares | Questions asked |
+| --- | --- | --- |
+| `qseow create-sheet-thumbnails` | 36 | 14 |
+| `qscloud create-sheet-thumbnails` | 25 | 10 |
+
+Answer yes and the relevant block is asked in full. Nothing is hidden permanently — the defaults are simply not worth your time when they are already right. On Qlik Sense Cloud the second question reads *"Configure advanced options (schema version, timeouts, browser)?"*, since there are no ports or certificates to set.
+
+### Mistakes are reported where you make them
+
+This is the main practical difference from the command line.
+
+On **Qlik Sense Cloud**, the tenant is contacted as soon as you give the API key, so a bad key or a mistyped tenant URL is caught immediately and you are asked again:
+
+```
+? Qlik Sense cloud tenant URL … acme.eu.qlikcloud.com
+? API key … ********
+✖ Request failed with status code 401
+? API key …
+```
+
+On **QSEoW**, the certificate files are checked the moment you name them:
+
+```
+? Qlik Sense certificate file … ./cert/client.pem
+? Qlik Sense certificate key file … ./cert/wrong.pem
+✖ Certificate file(s) not found. Check --certfile and --certkeyfile.
+? Qlik Sense certificate key file …
+```
+
+The content library is checked the same way, when you choose it.
+
+Run the same thing as a plain command line and a bad certificate path is reported only after all 36 options have been typed — and a missing content library only after every screenshot has already been taken.
+
+### You choose apps from a list
+
+Rather than typing an app ID from memory:
+
+```
+? Which apps should be updated?
+❯ Choose from all apps on the server
+  Choose a tag, then apps carrying it
+  Type an app id
+
+? Which apps?
+❯ ◯ Finance dashboard  (id: a1b2c3d4-1111-2222-3333-444455556666)
+  ◯ Sales overview  (id: 9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff)
+```
+
+On Qlik Sense Cloud the middle choice is a collection rather than a tag, and collections are shown with the number of items they hold, so an empty one is obvious before you pick it:
+
+```
+? Which collection?
+❯ Monthly reporting  (12 items)
+  Retired dashboards  (0 items)
+```
+
+**The app ID is always shown.** App names are not unique — two apps on the same server can share one — so the name alone would not tell you which is which. Showing the full ID also means you can copy it into [`--appid`](/reference/qseow#selecting-apps) later.
+
+Typing an ID directly is still offered, for when you already have it. And if the list cannot be fetched — a network problem, or an account without permission to read the app list — the wizard falls back to asking you to type the ID rather than stranding you.
+
 ## Starting from the command you were typing
 
 Going through the menu means starting over even when you already know which command you want and have
