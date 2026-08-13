@@ -171,6 +171,12 @@ butler-sheet-icons.exe browser list-installed --browser-cache-dir D:\qlik\butler
 
 :::
 
+## Excluding it from antivirus scanning
+
+Endpoint protection inspecting a freshly downloaded browser is the usual reason a run sits for minutes after `Launching browser...`, and excluding this directory from real-time scanning is the fix. See [The run hangs after "Launching browser..."](/guide/troubleshooting#the-run-hangs-after-launching-browser).
+
+This is also why it is worth pinning the directory to somewhere stable rather than letting it follow whichever account runs Butler Sheet Icons — an exclusion your security team adds for one path does not cover the others.
+
 ## Related
 
 - [Browser Management](/guide/concepts/browser-management) — which browser is used, and how a build is chosen

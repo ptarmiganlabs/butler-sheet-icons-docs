@@ -493,6 +493,76 @@ On an air-gapped server, or one behind a proxy that blocks outbound HTTPS, the t
 
 Creating thumbnails itself does not need internet access once a browser is available locally. For the full picture, see [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access).
 
+### The run hangs after "Launching browser..." {#the-run-hangs-after-launching-browser}
+
+**Symptoms:**
+
+- The last line in the log is `Browser setup complete. Launching browser...`, then nothing at all for minutes
+- A scheduled run appears to have frozen, but eventually completes normally
+- It happened once and would not reproduce the next day
+- Several servers were affected on the same night
+
+Starting the browser normally takes a second or two. When it takes minutes instead, the run is not damaged — the thumbnails are created normally once the browser finally starts. It is the waiting that is the problem.
+
+::: warning Requires BSI 5.0.0 or later
+From 5.0.0 the silence is followed by an explanation. Earlier versions gave no indication of what happened, which is what made this so hard to diagnose:
+
+```
+warning: QSEOW: Browser launch took 1500s, longer than the 30s launch timeout allows for.
+         The extra time went into starting the browser process, which no timeout covers.
+warning: QSEOW: On Windows this is typically antivirus or endpoint protection scanning a
+         browser executable it has not seen before. Excluding the Butler Sheet Icons browser
+         cache directory from real-time scanning avoids it.
+```
+
+Each is a single line in the log; they are wrapped here to fit. The prefix names the stage the run was in and differs between commands.
+:::
+
+**What is actually happening:**
+
+Butler Sheet Icons asks the operating system to start the browser, and the operating system does not come back. This is not the browser being slow — it is the request to start it being held.
+
+On Windows the usual reason is security software inspecting the browser program before it is allowed to run. Butler Sheet Icons downloads its own copy of Chrome, so the first run after a browser download presents the scanner with a program it has never seen before. Some products send such a file away to be analysed and hold it until an answer comes back. If that lookup is slow — or the machine's route to the vendor's service is blocked — the wait can be extremely long.
+
+Two things follow, and both are recognisable:
+
+- **It typically strikes once, then disappears.** Once the file has been examined and accepted, later runs start normally. A failure that will not reproduce the next morning is characteristic of this, and does not mean it was imagined.
+- **It can affect several machines at once**, if they share a security policy and all download the same new browser version around the same time.
+
+**Solutions:**
+
+1. **Exclude the browser cache directory from real-time scanning.** This is the directory Butler Sheet Icons downloads its browsers into, and where that is depends on how you run it:
+
+   | How you run it | Directory to exclude |
+   | --- | --- |
+   | Standalone build | `browser-cache`, next to `butler-sheet-icons.exe` |
+   | From Node.js | `.cache\puppeteer` in the home directory of the account running BSI |
+   | A directory you chose | Whatever `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` names |
+
+   Check the log if you are not sure — Butler Sheet Icons names the directory it used whenever it is not the last of these. See [Browser Cache Directory](/guide/advanced/browser-cache-directory).
+
+   Your security team will normally be the ones to make this change. It is a routine exclusion: the directory holds only browsers that Butler Sheet Icons downloaded itself from Google's official distribution point.
+
+2. **If an exclusion is not possible**, take the first-sight scan out of the scheduled run. After upgrading Butler Sheet Icons or changing the browser version, start a run by hand once and let it complete. The scan then happens while somebody is watching, rather than in the middle of the night.
+
+**If the browser never starts at all:**
+
+Where the wait ends in failure rather than success, the log says so directly:
+
+```
+error: QSEOW: The browser did not become ready within 30s. It was started but never reported
+       a debugging endpoint - usually a browser build that cannot run on this machine, or
+       security software holding it at startup.
+```
+
+Same family of problem, but the browser failed rather than merely being slow. If the exclusion above does not resolve it, the browser build in use may be one that cannot run on this machine — try the build Butler Sheet Icons is tested with:
+
+```bash
+--browser-version recommended
+```
+
+See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
+
 ### Browser Runtime Crashes
 
 **Symptoms:**
@@ -711,6 +781,7 @@ Creating thumbnails itself does not need internet access once a browser is avail
 - Windows Defender blocks browser download
 - Antivirus software quarantines browser files
 - Permission errors on system directories
+- A run that sits for minutes after `Launching browser...`
 
 **Solutions:**
 
@@ -721,6 +792,8 @@ Creating thumbnails itself does not need internet access once a browser is avail
 # Run PowerShell as Administrator if needed for first installation
 # Check if corporate policies block browser downloads
 ```
+
+Excluding the browser cache directory from real-time scanning is the durable fix, and it also resolves a run that appears to hang at start-up — see [The run hangs after "Launching browser..."](#the-run-hangs-after-launching-browser). Which directory to exclude depends on how you run Butler Sheet Icons; see [Browser Cache Directory](/guide/advanced/browser-cache-directory).
 
 #### macOS Issues
 
