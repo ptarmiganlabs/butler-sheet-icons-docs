@@ -1337,7 +1337,26 @@ error: Failed to process 2 of 2 app(s)
 
 **Cause:**
 
-The Chrome build being used cannot be driven by Butler Sheet Icons. Before BSI 4.0.0 the default was `latest`, meaning the newest *published* Chrome build — and Chrome ships new builds continuously, so that was sometimes a build the browser automation library could not control. Two servers could behave differently purely because each had a different build sitting in its cache.
+The Chrome build being used cannot be driven by Butler Sheet Icons. Thumbnails are captured through a browser automation library, and that library is only tested against the Chrome builds current when it was released. Chrome's stable channel moves faster than the library does, so a build far enough ahead cannot be driven: Chrome launches normally, and the first instruction sent to it fails.
+
+Nothing is wrong with Chrome, and nothing is wrong with your Qlik Sense environment.
+
+Before BSI 4.0.0 the default was `latest`, meaning the newest *published* build, so this could strike anyone — two servers could behave differently purely because each had a different build cached. From 4.0.0 the default is `recommended` and that class of failure went away.
+
+::: warning It can still happen if you deliberately track Chrome's stable channel
+`recommended` cannot get ahead of what Butler Sheet Icons can drive. Anything that floats can:
+
+| `--browser-version` (or `BSI_*_BROWSER_VERSION`) | Can drift ahead? |
+| --- | --- |
+| `recommended` — the default | No |
+| `stable`, or its old alias `latest` | **Yes**, once Chrome's stable channel moves far enough ahead |
+| A release channel: `beta`, `dev`, `canary` | **Yes** |
+| An explicit recent build id, e.g. `151.0.7922.138` | **Yes** |
+
+Because `stable` means "whatever Chrome publishes as stable today", this appears overnight on a machine whose configuration has not been touched for months. That is the nature of the setting, not a fault in your environment.
+
+If you never set `--browser-version` and never set a `BSI_*_BROWSER_VERSION` variable, this does not apply to you.
+:::
 
 **Solutions:**
 
@@ -1359,10 +1378,16 @@ The Chrome build being used cannot be driven by Butler Sheet Icons. Before BSI 4
 3. **Install the recommended build ahead of time** so it is not downloaded during a scheduled run:
 
    ```bash
-   butler-sheet-icons browser install --browser chrome
+   butler-sheet-icons browser install
    ```
 
-See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build) for what each keyword selects.
+4. **Upgrade Butler Sheet Icons**, if you have a reason to keep tracking `stable`. Each release ships a browser automation library that drives the Chrome builds current at the time, so upgrading is what restores `stable` — pinning `recommended` is what avoids needing to.
+
+::: tip Should you go back to `stable` afterwards?
+Only if you have a specific reason to track Chrome's stable channel. `stable` will drift ahead of the tested build again — that is what it is for — and the failure above is what that looks like when it goes too far. `recommended` is the setting that keeps working without attention, and it needs no internet lookup, which also makes it the right choice on air-gapped and tightly firewalled machines.
+:::
+
+See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build) for what each keyword selects, and [what `recommended` currently points at](/guide/concepts/browser-management#what-recommended-points-at).
 
 ## Sheet-Specific Issues
 
