@@ -12,7 +12,7 @@ If you discover a serious bug with BSI that may pose a security problem, please 
 
 ### Windows
 
-The Windows version of Butler Sheet Icons is signed with a code signing certificate issued by Certum, issued to "Open Source Developer, Göran Sander".
+The Windows version of Butler Sheet Icons is signed with a proper, commercial code signing certificate issued by Certum.
 
 ### macOS
 
