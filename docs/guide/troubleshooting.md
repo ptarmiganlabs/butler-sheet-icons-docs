@@ -82,6 +82,8 @@ Failed to process 1 of 3 app(s)
 
 **What to do:** find the per-app lines and treat each cause separately. They are ordinary failures — an unreachable engine, an app the account cannot write to, a published app — and are covered by the sections below.
 
+A per-app line reading `Lost the engine session while processing app … at sheet N` is a different case: the connection to Qlik Sense dropped mid-app. See [The connection to Qlik Sense drops in the middle of a run](#engine-session-dropped-mid-run).
+
 ### `No apps to process`
 
 The options you supplied matched no apps at all. This is reported as a failure, not a silent success: work was requested and none happened.
@@ -1110,6 +1112,83 @@ For more information about browser management, see the [Browser Management Guide
    # Test network connectivity
    telnet qlik-server.company.com 443
    ```
+
+### The connection to Qlik Sense drops in the middle of a run {#engine-session-dropped-mid-run}
+
+Butler Sheet Icons holds one connection to the Qlik Sense engine open for as long as it is working on an
+app. If that connection is lost part-way through — the app has ten sheets and the connection dies at
+sheet three — it cannot finish that app.
+
+**Symptoms:**
+
+```
+warning: CLOUD PROCESS APP: The engine session to Qlik Sense Cloud tenant your-tenant.eu.qlikcloud.com
+         was closed from the other end, code 1006. Whatever is still using this session will fail
+         from here on.
+error:   CLOUD APP: Lost the engine session while processing app 5838acc6-… at sheet 3, abandoning
+         the remaining sheets: Not connected (websocket closed with code 1006)
+```
+
+Each is a single line in the log; they are wrapped here to fit. The prefix names the stage the run was in
+and differs between commands.
+
+Three things are worth knowing about this output:
+
+- **The `warning` appears when the connection drops, which can be well before anything fails.** Taking a
+  screenshot of a sheet takes 25–40 seconds, and Butler Sheet Icons does not talk to the engine while it
+  waits for the browser. The connection can therefore be gone for some time before the next request
+  discovers it.
+- **The number after `code` is why the connection ended**, as reported by the network layer. **If you
+  report this problem, include that line** — it is the single most useful piece of information for
+  diagnosing it.
+- **Sheets after the failure point are not listed as failures.** They were never attempted.
+
+**What happens to the app:**
+
+- Sheets whose thumbnails were already produced **are** uploaded and applied.
+- The remaining sheets **keep the icons they already had**. Nothing is blanked or replaced with a broken
+  image.
+- The app is reported as failed and the run exits non-zero, so a scheduled task shows it as failed.
+
+Re-running Butler Sheet Icons for that app is safe, and is the right response.
+
+**What the close code tells you:**
+
+| Code | Meaning | What to do |
+| ---- | ------- | ---------- |
+| `1006` | The connection ended without a proper goodbye — typically a network device, firewall or proxy between Butler Sheet Icons and Qlik Sense dropping it | If it repeats, ask whoever manages that equipment whether long-lived WebSocket connections to Qlik Sense are being timed out for idleness |
+| Anything else, usually with a `reason` | The Qlik Sense end closed the connection deliberately | Investigate the reason text; include it in a support request |
+
+A run that loses its connection occasionally and succeeds on a re-run is a network hiccup, not a
+misconfiguration.
+
+::: tip This is already made less likely — BSI 5.0.0 or later
+Butler Sheet Icons sends a small keep-alive signal on the Qlik Sense connection every 20 seconds while it
+is otherwise idle.
+
+The reason is the gap above: a socket carrying no traffic for 30-odd seconds looks abandoned, and network
+equipment is free to drop it without telling either end. Keeping a little traffic on it makes that far
+less likely. This needs no configuration, applies to both Qlik Sense Cloud and QSEoW, and is not something
+you will see in the log. Connections to Qlik Sense Cloud benefit most, since they cross the public
+internet rather than your own network.
+
+It makes a drop **less likely**, not recoverable — nothing retries a session that has already gone.
+:::
+
+::: warning Do not shorten `--pagewait` to avoid this
+Shortening the wait used to reduce the idle time per sheet, but the keep-alive above now covers those gaps
+regardless of how long they are. Setting `--pagewait` below what your sheets need to finish rendering buys
+nothing here and produces thumbnails of half-drawn charts.
+:::
+
+::: tip A message that is not this — on BSI 4.1.0 and earlier
+Up to and including 4.1.0, a warning about the engine session being *"closed from the other end, code
+1000"* appeared on **successful** runs too. Butler Sheet Icons was reporting its own tidy-up as though the
+far end had hung up. Ignore it on those versions.
+
+From 5.0.0 a message of this kind means what it says, and the code it quotes is worth including in a bug
+report.
+:::
 
 ### Proxy Configuration
 
