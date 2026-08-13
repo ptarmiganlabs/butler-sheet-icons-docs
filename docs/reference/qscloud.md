@@ -10,6 +10,10 @@ Create thumbnail images for QS Cloud applications.
 butler-sheet-icons qscloud create-sheet-icons [options]
 ```
 
+::: tip Getting a first run working
+Add `-i` and Butler Sheet Icons asks for what it needs instead — 10 questions rather than 25 options, with the API key checked against your tenant as you give it, and the equivalent command line shown before anything runs. See [Interactive Mode](/guide/interactive-mode#creating-sheet-thumbnails).
+:::
+
 ### Options
 
 Four options have no default and must be supplied: `--tenanturl`, `--apikey`, `--logonuserid` and `--logonpwd`. Everything else has a working default.

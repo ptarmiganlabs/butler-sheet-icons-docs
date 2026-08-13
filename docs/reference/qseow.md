@@ -10,6 +10,10 @@ Create thumbnail images for QSEoW applications.
 butler-sheet-icons qseow create-sheet-thumbnails [options]
 ```
 
+::: tip Getting a first run working
+Add `-i` and Butler Sheet Icons asks for what it needs instead — 14 questions rather than 36 options, with the certificate paths and the content library checked as you give them, and the equivalent command line shown before anything runs. See [Interactive Mode](/guide/interactive-mode#creating-sheet-thumbnails).
+:::
+
 ### Options
 
 Six options have no default and must be supplied: `--host`, `--apiuserdir`, `--apiuserid`, `--logonuserdir`, `--logonuserid` and `--logonpwd`. Everything else has a working default.
