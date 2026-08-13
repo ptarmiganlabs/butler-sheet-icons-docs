@@ -52,7 +52,7 @@ If `PUPPETEER_EXECUTABLE_PATH` is set, BSI treats that as the preferred browser:
 
 ### 2. Cached browser (medium priority)
 
-If no system browser is configured, BSI looks in the Puppeteer cache directory (for example `C:\Users\<user>\.cache\puppeteer` on Windows, or `~/.cache/puppeteer` on macOS and Linux).
+If no system browser is configured, BSI looks in its browser cache directory. For a standalone build that is a `browser-cache` folder next to the executable; running from Node.js it is `.cache/puppeteer` in the current user's home directory. You can point it somewhere else with `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` — see [Browser Cache Directory](/guide/advanced/browser-cache-directory) for the full order of precedence.
 
 A cached browser is used when it matches **both** of these:
 

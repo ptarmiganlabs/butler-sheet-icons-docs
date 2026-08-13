@@ -98,6 +98,10 @@ To select several sheets, pass `--exclude-sheet-number` or `--blur-sheet-number`
 `--browser-version` accepts `recommended` (the build Butler Sheet Icons is tested with, and the default), `stable`, a release channel, or an exact build id. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build).
 :::
 
+::: tip Where the browser is kept — BSI 5.0.0 or later
+`--browser-cache-dir` / `BSI_BROWSER_CACHE_DIR` names the directory Butler Sheet Icons keeps downloaded browsers in. It has to be the same directory `browser install` writes to, so it is set once for the machine rather than per command. This is the fix when a scheduled task cannot find the browser you installed by hand. See [Browser Cache Directory](/guide/advanced/browser-cache-directory).
+:::
+
 ### Example: create thumbnails
 
 ```bash

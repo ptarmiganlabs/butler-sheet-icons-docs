@@ -682,14 +682,25 @@ Creating thumbnails itself does not need internet access once a browser is avail
 
 3. **Alternative Cache Location**:
 
-   ```bash
-   # Set custom cache directory using environment variable
-   # Windows:
-   $env:PUPPETEER_CACHE_DIR='C:\custom\cache\location'
+   Put the browser cache somewhere the account running Butler Sheet Icons can write to:
 
-   # macOS/Linux:
-   export PUPPETEER_CACHE_DIR='/custom/cache/location'
+   ::: code-group
+
+   ```powershell [PowerShell]
+   $env:BSI_BROWSER_CACHE_DIR = 'D:\qlik\butler-sheet-icons\browsers'
    ```
+
+   ```bash [Bash]
+   export BSI_BROWSER_CACHE_DIR='/opt/butler-sheet-icons/browsers'
+   ```
+
+   :::
+
+   ::: warning Requires BSI 5.0.0 or later
+   `BSI_BROWSER_CACHE_DIR` and `--browser-cache-dir` were added in 5.0.0. In earlier versions the cache location was fixed, and `PUPPETEER_CACHE_DIR` was ignored.
+   :::
+
+   This is also the fix when a scheduled task cannot find the browser you installed by hand — the two accounts have different home directories. See [Browser Cache Directory](/guide/advanced/browser-cache-directory).
 
 ### Platform-Specific Browser Issues
 
