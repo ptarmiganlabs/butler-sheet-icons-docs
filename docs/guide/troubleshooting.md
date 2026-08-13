@@ -643,7 +643,7 @@ Creating thumbnails itself does not need internet access once a browser is avail
    butler-sheet-icons qscloud create-sheet-icons --browser chrome --browser-version 120.0.6099.109 ...
    ```
 
-   Firefox is not an alternative here — it cannot render thumbnails. See [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
+   Another browser is not an alternative here — Chrome is the only browser Butler Sheet Icons can use. See [Supported Browsers](/guide/concepts/browser-management#supported-browsers).
 
 ### Browser Cache and Permissions
 
@@ -749,9 +749,6 @@ sudo apt-get install -y wget gnupg ca-certificates
 # For Chrome dependencies:
 sudo apt-get install -y libxss1 libappindicator1 libindicator7
 
-# For Firefox dependencies:
-sudo apt-get install -y libgtk-3-0 libdbus-glib-1-2
-
 # Check DISPLAY variable if running remotely
 echo $DISPLAY
 ```
@@ -764,17 +761,15 @@ Use these commands to diagnose browser-related issues:
 # Check current browser installation status
 butler-sheet-icons browser list-installed
 
-# Verify what browsers are available for download
-butler-sheet-icons browser list-available --browser chrome
-butler-sheet-icons browser list-available --browser firefox
+# Verify what Chrome builds are available for download
+butler-sheet-icons browser list-available
 
 # Test browser installation
-butler-sheet-icons browser install --browser chrome --loglevel debug
+butler-sheet-icons browser install --loglevel debug
 
-# Clean and reinstall all browsers
+# Clean and reinstall
 butler-sheet-icons browser uninstall-all
-butler-sheet-icons browser install --browser chrome
-butler-sheet-icons browser install --browser firefox
+butler-sheet-icons browser install
 
 # Test basic browser functionality with visible mode
 butler-sheet-icons qscloud create-sheet-icons \
