@@ -2,22 +2,28 @@
 
 Butler Sheet Icons can ask you what it needs instead of expecting you to assemble a command line.
 
+There are two ways in. Start from the menu:
+
 ```bash
 butler-sheet-icons interactive
 ```
 
-You get a menu, a few questions, and — before anything happens — the exact command line your answers
+Or add `-i` to the command you were already typing:
+
+```bash
+butler-sheet-icons browser uninstall -i
+```
+
+Either way you get a few questions and — before anything happens — the exact command line your answers
 correspond to.
 
-::: warning Requires BSI 4.1.0 or later
-Interactive mode is not available in earlier versions.
+::: warning Requires BSI 5.0.0 or later
+Interactive mode as described on this page needs 5.0.0. Version 4.1.0 had an earlier, smaller version of
+it: the `interactive` menu with the two browser wizards, and no `-i` flag.
 :::
 
 Nothing about the existing commands changes. Every option still works exactly as before, and automation
 is unaffected.
-
-This first release covers the two browser commands. The Qlik Sense thumbnail commands, which have the
-longest option lists and would benefit most, are planned for a later release.
 
 ## Why use it?
 
@@ -63,8 +69,10 @@ does what you asked.
 
 | Wizard | What it replaces |
 |---|---|
-| **Install a browser into the cache** | [`browser install`](/reference/browser) — pick from published versions by typing to filter, or take the recommended build |
-| **Uninstall a browser from the cache** | [`browser uninstall`](/reference/browser) — pick from what is actually installed |
+| **Install a browser into the cache** | [`browser install`](/reference/browser#install) — pick from published versions by typing to filter, or take the recommended build |
+| **Uninstall a browser from the cache** | [`browser uninstall`](/reference/browser#uninstall) — pick from what is actually installed |
+| **Create sheet thumbnails, QSEoW** | [`qseow create-sheet-thumbnails`](/reference/qseow) — 36 options, of which it asks about roughly a third |
+| **Create sheet thumbnails, Qlik Sense Cloud** | [`qscloud create-sheet-thumbnails`](/reference/qscloud) — 25 options, same idea |
 
 Choose **Exit** to leave without doing anything. `Ctrl+C` at any point does the same — nothing is changed
 unless you choose **Run it**.
@@ -84,6 +92,68 @@ Those are shown, and labelled:
 
 They remain selectable on purpose. A browser you cannot run is still taking up disk space, and removing
 it is a perfectly reasonable thing to want.
+
+## Starting from the command you were typing
+
+Going through the menu means starting over even when you already know which command you want and have
+half of it typed. `-i` on the command itself skips that:
+
+```bash
+butler-sheet-icons browser uninstall -i
+```
+
+### Anything you already supplied is kept
+
+This is the part worth knowing about. Options you have already given are treated as answers, not asked
+about again — so you can supply the parts you know and let Butler Sheet Icons ask for the rest:
+
+```bash
+butler-sheet-icons browser install --browser-cache-dir D:\qlik\browsers -i
+```
+
+```
+Ctrl+C cancels. Nothing is changed until you confirm at the end, where you can also start over.
+Already supplied, so not asked about again: --browser-cache-dir.
+
+  Type to filter, or take one of the first two entries.
+? Which build should be installed?
+❯ Recommended - the build this version of Butler Sheet Icons is tested with
+  Latest stable - whatever the vendor currently publishes
+```
+
+This is what makes `-i` useful for filling the gaps in a command you have partly written, not only for
+starting from nothing. It works for `BSI_*` environment variables too — a value set in your shell or in a
+`.env` file skips its question in exactly the same way.
+
+Values that merely fall back to a **default** are still asked about, with the default offered as the
+pre-filled answer. Only values you actually chose — on the command line or through the environment — are
+treated as settled.
+
+### One exception, and it says so
+
+`browser uninstall` asks a single question that stands in for both `--browser` and `--browser-version`,
+because it offers the builds that are actually in the cache. Supplying either of those does not skip that
+question — a build id you gave from memory may name something that is no longer installed, so the list
+wins. Butler Sheet Icons tells you when this is happening:
+
+```
+Supplied, but asked about again so the answer can be picked from what is actually there: --browser.
+```
+
+### Which commands accept it
+
+`-i` is on the commands that have a wizard behind them:
+
+| Command | `-i` |
+|---|---|
+| [`browser install`](/reference/browser#install) | Yes |
+| [`browser uninstall`](/reference/browser#uninstall) | Yes |
+| [`qseow create-sheet-thumbnails`](/reference/qseow) | Yes |
+| [`qscloud create-sheet-thumbnails`](/reference/qscloud) | Yes |
+| `browser list-installed`, `browser list-available`, `browser uninstall-all` | No — they take nothing worth asking about |
+
+Using `-i` on a command that does not accept it reports `unknown option '-i'` rather than doing something
+unexpected.
 
 ## What happens when there is no terminal?
 
@@ -169,6 +239,7 @@ it has changed.
 
 ## Related
 
-- [Browser Commands Reference](/reference/browser) — the full option list for the commands the wizards drive
+- [Browser Commands Reference](/reference/browser) — the full option list for the two browser wizards
+- [QSEoW Commands](/reference/qseow) and [QS Cloud Commands](/reference/qscloud) — the same for the thumbnail wizards
 - [Environment Variables](/guide/concepts/environment-variables) — including the colour and interactive controls
 - [Troubleshooting](/guide/troubleshooting)
