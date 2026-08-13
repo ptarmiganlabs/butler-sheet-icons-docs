@@ -223,6 +223,46 @@ rm /tmp/butler-sheet-icons-crash-*
 
 Adjust the path if `BSI_CRASH_DUMP_DIR` points somewhere else.
 
+## A closed output pipe is not a crash {#a-closed-output-pipe-is-not-a-crash}
+
+::: warning Requires BSI 5.0.0 or later
+Earlier versions wrote a crash dump when the command's output pipe closed.
+:::
+
+Looking at the first few lines of a long list is an everyday thing to do:
+
+```bash
+butler-sheet-icons browser list-available --channel stable | head -12
+```
+
+Until 5.0.0 that left a `.json` and a `.txt` crash report behind, in whatever directory you happened to be standing in, saying Butler Sheet Icons had crashed:
+
+```
+=== CRASH INFO ===
+Error Type: Error
+Source: uncaughtException
+Exit Code: 1
+
+=== ERROR MESSAGE ===
+write EPIPE
+```
+
+Nothing had gone wrong. `head` stops reading once it has the twelve lines you asked for, and the next line Butler Sheet Icons tried to print had nowhere to go. That is what `write EPIPE` means: *the thing reading my output has gone away*. The same happened with a pager you quit before the end, with `grep -m1`, and with any other command that stops reading early.
+
+A closed output pipe is now treated as an ordinary end to the run. **No crash dump is written, and nothing is printed about it** — the stream any message would go to is the one that just died. The command above leaves your working directory exactly as it found it, and the output itself is unchanged: you still get the same twelve lines.
+
+The run ends with exit code **141** rather than `0`; see [Exit code 141](/reference/commands#exit-code-141) for why, and who it affects.
+
+### Real failures are unaffected
+
+Worth being clear about, because the two can happen together:
+
+- A genuine error still writes one `.json` and one `.txt` crash report and exits with code **1**, with its `FATAL:` line in the log.
+- That remains true **even when the output pipe has already closed**. If a run crashes for a real reason while you happen to be piping it through `head`, you still get the crash report you need.
+- A failure to write output for any *other* reason — a full disk, a permission problem — is still a genuine error and still produces a crash report.
+
+The `BSI_CRASH_DUMP_*` variables are unchanged, and so is the one-dump-per-run behaviour above.
+
 ## Related
 
 - [Secret redaction in logs](/reference/log-redaction) — what is redacted from log output, and how that differs from the redaction applied to crash dumps.

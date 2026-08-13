@@ -61,6 +61,25 @@ Every command reports its outcome in the process exit code:
 | --------- | ----------------------------------------------------------------------------- |
 | `0`       | The command completed, and everything it was asked to do succeeded.           |
 | `1`       | The command failed, or finished with one or more apps it could not process.   |
+| `141`     | The command's output pipe closed before it finished writing — see below.      |
+
+### Exit code 141: the output pipe closed {#exit-code-141}
+
+::: warning Requires BSI 5.0.0 or later
+In earlier versions this situation produced a crash report and exit code `1`.
+:::
+
+A run whose output goes into a pipe that stops reading — `| head`, a pager you quit, `grep -m1` — ends with **141**. That is the usual convention on Linux and macOS for a program stopped by a closed pipe, `128 + 13`, where 13 is the `SIGPIPE` signal number. `ls | head` and most other tools report the same, and Butler Sheet Icons uses 141 on Windows too, for consistency.
+
+**It is deliberately not `0`.** Piping to `head` usually cuts a run short rather than letting it finish, and the exit code is meant to tell a scheduler whether the run did its job. Reporting success for work that was abandoned would be misleading.
+
+In practice this affects almost nobody:
+
+- **Running a command by hand** — you will never see it. The shell reports the exit code of the _last_ command in the pipeline, which is `head`, not Butler Sheet Icons.
+- **In a script using `set -o pipefail`** — the pipeline is reported as failed, exactly as it would be for `ls | head` in the same script. If you want the script to carry on, check for 141 specifically, or do not use `pipefail` on that line.
+- **In a scheduled task** — no change. A scheduled run writes to a log file or the console, not into a pipe that closes early.
+
+No crash dump is written for this, and nothing is printed about it — see [Crash Dump Files](/guide/advanced/crash-dumps#a-closed-output-pipe-is-not-a-crash).
 
 ### What counts as a failure
 

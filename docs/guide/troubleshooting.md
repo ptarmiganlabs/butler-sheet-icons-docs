@@ -168,6 +168,22 @@ Every image is attempted before the run stops, so one failure does not hide the 
 
 If earlier runs left apps showing broken sheet icons, re-running `create-sheet-thumbnails` against those apps repairs them, once the upload problem itself is resolved. To clear the icons instead of regenerating them, use `qscloud remove-sheet-icons` — note this exists only for Qlik Sense Cloud.
 
+### I piped the output to `head` and got a crash report {#crash-report-from-piping}
+
+```bash
+butler-sheet-icons browser list-available --channel stable | head -12
+```
+
+Until BSI 5.0.0 that left a `crash_dumps` folder behind, in whatever directory you were standing in, with a report saying `write EPIPE`.
+
+Nothing had gone wrong. `head` stops reading once it has the lines you asked for, and the next line Butler Sheet Icons tried to print had nowhere to go. The same happened with a pager you quit early, and with `grep -m1`.
+
+::: warning Requires BSI 5.0.0 or later
+A closed output pipe is now an ordinary end to the run: no crash report, nothing printed, and your working directory is left as it was. The run exits with **141** rather than `1` — see [Exit code 141](/reference/commands#exit-code-141).
+:::
+
+**On an earlier version**, the dumps are harmless and safe to delete. Real failures are unaffected either way — a genuine error still writes a crash report, even when the output pipe has already closed. See [Crash Dump Files](/guide/advanced/crash-dumps#a-closed-output-pipe-is-not-a-crash).
+
 ### `Qlik Sense Cloud returned an unusable response` {#cloud-unusable-response}
 
 Butler Sheet Icons asked your tenant for a list — your collections, the apps in a collection, or the apps on the tenant — and what came back was not a list.
