@@ -55,6 +55,7 @@ built:
 ? Ready?
 ❯ Run it
   Start over
+  Save the answers to .env
   Cancel
 ```
 
@@ -63,7 +64,7 @@ exactly the same result. This is the intended path from *"I clicked through it o
 night"*.
 
 Options you left at their default are left off the line, so what you see is the shortest command that
-does what you asked.
+does what you asked. See [Before anything runs](#before-anything-runs) for the full review step.
 
 ## What can I do with it?
 
@@ -243,6 +244,123 @@ Supplied, but asked about again so the answer can be picked from what is actuall
 
 Using `-i` on a command that does not accept it reports `unknown option '-i'` rather than doing something
 unexpected.
+
+## Before anything runs {#before-anything-runs}
+
+Every wizard ends the same way: a table of what it is about to do, the equivalent command line, and a
+question.
+
+```
+── Review ──────────────────────────────────────
+
+┌──────────────────┬──────────────────────────────────────┐
+│ tenanturl        │ acme.eu.qlikcloud.com                │
+│ apikey           │ <hidden>                             │
+│ includesheetpart │ 2                                    │
+│ appid            │ 3 selected:                          │
+│                  │ a1b2c3d4-1111-2222-3333-4444555566…  │
+└──────────────────┴──────────────────────────────────────┘
+
+  Equivalent command:
+  butler-sheet-icons qscloud create-sheet-thumbnails --tenanturl acme.eu…
+
+? Ready?
+❯ Run it
+  Start over
+  Save the answers to .env
+  Cancel
+```
+
+The table shows only what the run will actually use. Options left at their default are not listed — if a
+row is not there, the default applies.
+
+**Credentials are never shown**, in the table or in the command line. The list of what counts as a
+credential is the same one the logger redacts against, so a password cannot appear in one and be hidden in
+the other. See [Secret Redaction in Logs](/reference/log-redaction).
+
+On a console that cannot draw box-drawing characters — some Windows Server consoles — the table is drawn
+with `+`, `-` and `|` instead. Nothing is lost.
+
+### Saving your answers
+
+Choosing **Save the answers to .env** writes a `.env` file in the directory you are running from:
+
+```
+# Butler Sheet Icons
+# Settings for: butler-sheet-icons qscloud create-sheet-thumbnails
+
+BSI_QSCLOUD_CST_TENANTURL=acme.eu.qlikcloud.com
+BSI_QSCLOUD_CST_APIKEY=<set this yourself>
+BSI_QSCLOUD_CST_APP_ID=app-a,app-b
+```
+
+Butler Sheet Icons reads `.env` automatically on the next run from that directory, so the same command can
+then be repeated with no options at all — which is what makes this useful for a scheduled task.
+
+Saving does not end the wizard. You come back to the review, so you can save **and** run.
+
+#### It updates, it does not replace
+
+If a `.env` file is already there, only the settings belonging to the command you just ran are changed.
+Everything else — settings for other Butler Sheet Icons commands, comments, anything you put there
+yourself — is left exactly as it was, byte for byte.
+
+You are told what will change before it happens:
+
+```
+/home/goran/.env already exists. 6 setting(s) belonging to this command will be
+updated or added; everything else in the file is left untouched. A copy is kept
+in .env.bak either way.
+
+? Update .env? (Y/n)
+```
+
+A setting already in the file is updated in place; one that is not there is added at the end. A copy of
+the file as it was is kept in **`.env.bak`**, so even an unwanted update is recoverable.
+
+::: warning `.env.bak` holds one version only
+It is replaced on each save, so it always holds the state immediately before the most recent save — not a
+history. Two saves in a row and the original is gone.
+:::
+
+#### Credentials are a separate decision
+
+You are asked once more before any password or API key is written:
+
+```
+? Also write the credentials to the file? (y/N)
+```
+
+Answering **no**, the default, writes everything else and leaves a `<set this yourself>` placeholder where
+the credential goes. Answering **yes** writes them, and restricts the file so only your user account can
+read it.
+
+::: danger Think about this one
+A credential in a file is a credential that can be copied, backed up, or committed by accident. `.env` is
+listed in Butler Sheet Icons' own `.gitignore`, but that does not help if you keep your settings anywhere
+else.
+
+Supplying credentials as environment variables at run time, rather than storing them, is the safer habit —
+and on a Qlik Sense server it is usually what the scheduled task does anyway. See
+[Security](/reference/security).
+:::
+
+### After the run
+
+The wizard says plainly whether the run succeeded:
+
+```
+✔ Done
+```
+
+or, if something went wrong:
+
+```
+✖ The run reported a failure - the log above says which apps and why
+```
+
+Per-app detail stays in the log above, which already names each app it processed and each one that
+failed. See [Run failures and exit codes](/guide/troubleshooting#run-failures-and-exit-codes).
 
 ## What happens when there is no terminal?
 
