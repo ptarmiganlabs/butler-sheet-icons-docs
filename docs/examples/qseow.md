@@ -48,6 +48,87 @@ And here's the same operation on Windows:
 
 ![Windows Execution Example](/images/windows-execution.png "Butler Sheet Icons executing on Windows for QSEoW")
 
+## Several Named Apps in One Run
+
+::: warning Requires BSI 5.0.0 or later
+Earlier versions accepted exactly one `--appid`. Updating three named apps meant three runs, or tagging
+them in Qlik Sense first.
+:::
+
+`--appid` takes as many app IDs as you like, separated by spaces:
+
+::: code-group
+
+```bash [macOS/Linux]
+./butler-sheet-icons qseow create-sheet-thumbnails \
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff \
+  --host qlik-server.company.com \
+  ...
+```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff `
+  --host qlik-server.company.com `
+  ...
+```
+
+:::
+
+Commas work too, which is usually easier to read and easier to paste:
+
+```
+--appid a3e0f5d2-000a-464f-998d-33d333b175d7,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff
+```
+
+Both forms work in the environment variable as well:
+
+::: code-group
+
+```powershell [PowerShell]
+$env:BSI_QSEOW_CST_APP_ID = 'a3e0f5d2-000a-464f-998d-33d333b175d7,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff'
+```
+
+```bash [Bash]
+export BSI_QSEOW_CST_APP_ID='a3e0f5d2-000a-464f-998d-33d333b175d7,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff'
+```
+
+:::
+
+A single `--appid <id>` behaves exactly as it always has, so existing scripts, scheduled tasks and
+container runs need no changes.
+
+### Combining with a tag
+
+`--appid` and `--qliksensetag` are **added together**, not chosen between — see
+[Selecting apps](/reference/qseow#selecting-apps). This processes every app carrying the tag, **plus** the
+one named explicitly:
+
+```bash
+./butler-sheet-icons qseow create-sheet-thumbnails \
+  --qliksensetag "Butler Sheet Icons" \
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
+  ...
+```
+
+An app that is both named and tagged is still processed **once**.
+
+### Checking which apps were selected
+
+Run with `--loglevel debug` and Butler Sheet Icons lists them before any work starts:
+
+```
+debug: Will process these app IDs:
+debug: a3e0f5d2-000a-464f-998d-33d333b175d7
+debug: 9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff
+```
+
+::: tip An empty variable means no apps, not one blank app
+A variable that is set but empty — a bare `BSI_QSEOW_CST_APP_ID=` line in a systemd unit file or a Docker
+environment file — counts as no app being named. If nothing else selects any apps, the run reports
+`No apps to process` and exits 1 rather than failing on a blank ID.
+:::
+
 ## Tag-Based Bulk Update
 
 Update all apps with a specific tag, applying advanced filtering:
