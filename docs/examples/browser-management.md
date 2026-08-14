@@ -245,8 +245,12 @@ Chromium 150.0.7871.181 Alpine Linux
 Passing `--browser-version` to a thumbnail command in the container does not change which browser runs. Butler Sheet Icons uses the embedded one and tells you it has done so:
 
 ```
-warn: PUPPETEER_EXECUTABLE_PATH overrides --browser-version "121.0.6167.85": the browser at /usr/bin/chromium-browser will be used instead. Unset PUPPETEER_EXECUTABLE_PATH to use the requested build.
+warn: The browser executable from PUPPETEER_EXECUTABLE_PATH overrides --browser-version "121.0.6167.85": the browser at /usr/bin/chromium-browser will be used instead. Unset PUPPETEER_EXECUTABLE_PATH to use the requested build.
 ```
+
+::: warning Wording changed in BSI 5.0.0
+Before 5.0.0 this warning began `PUPPETEER_EXECUTABLE_PATH overrides ...`, without the leading `The browser executable from`. It had to name **which** setting won, because from 5.0.0 there are two that can: `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH`, and `PUPPETEER_EXECUTABLE_PATH`. Searching your logs for the old wording will not match a 5.0.0 run.
+:::
 
 Worse, on a machine without internet access, some values of `--browser-version` will make the run **fail** while still not changing the browser — because the version has to be resolved before the browser is chosen. Leave it at its default, `recommended`, when running in Docker. The reasoning is in [Browser versions on an air-gapped host](/guide/advanced/docker#browser-versions-on-an-air-gapped-host).
 
