@@ -733,15 +733,26 @@ butler-sheet-icons qseow create-sheet-thumbnails \
 
 ## Browser Cache Location
 
-BSI stores browsers in a cache directory under the home directory of the user running BSI:
+BSI keeps the browsers it downloads in a cache directory. Where that is depends on how you run it — the first of these that is set wins:
 
-- **Windows:** `%USERPROFILE%\.cache\puppeteer\`
-- **macOS:** `~/.cache/puppeteer/`
-- **Linux:** `~/.cache/puppeteer/`
+| Order | Location | Set by |
+| --- | --- | --- |
+| 1 | The directory you name | `--browser-cache-dir <directory>` or `BSI_BROWSER_CACHE_DIR` |
+| 2 | The directory `PUPPETEER_CACHE_DIR` names | `PUPPETEER_CACHE_DIR` |
+| 3 | `browser-cache` next to `butler-sheet-icons(.exe)` | Automatic, **standalone builds only** |
+| 4 | `.cache/puppeteer` in the current user's home directory | Automatic, everything else |
 
-These directories contain the actual browser binaries and are managed automatically by BSI.
+::: warning Requires BSI 5.0.0 or later
+In earlier versions the cache was always `.cache/puppeteer` in the home directory of whichever account ran BSI. There was no way to change it, and `PUPPETEER_CACHE_DIR` was ignored.
+:::
 
-Because the cache lives under the user's home directory, a browser installed by one user account is not visible to another. When BSI runs as a service account — for example from a scheduled task — install the browser as that same account, or point all accounts at one shared browser with `PUPPETEER_EXECUTABLE_PATH`.
+These directories hold the actual browser binaries and are managed automatically by BSI.
+
+The difference between the two automatic locations matters on a Qlik Sense server. Row 4 follows the **account**: a browser installed by one user is not visible to another, so a scheduled task running as LocalSystem looks in `C:\Windows\system32\config\systemprofile` rather than in your profile, finds nothing, and downloads its own copy — or fails, on a server with no internet access. Row 3 follows the **installation** instead, which is why the standalone builds use it: everyone who runs that copy of BSI gets the same browser.
+
+To make the location the same for every account, name it explicitly with `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` rather than relying on either default. [`browser check`](#check) reports the directory BSI resolved, which account it resolved it as, and which builds are in it.
+
+See [Browser Cache Directory](/guide/advanced/browser-cache-directory) for the full picture, including what happens when a browser is still in the pre-5.0.0 location.
 
 ## Related Documentation
 
