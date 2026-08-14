@@ -18,9 +18,12 @@ Visit the [GitHub releases page](https://github.com/ptarmiganlabs/butler-sheet-i
 
 #### Windows
 
-- The binary is digitally signed with a commercial certificate from Certum
-- Windows may show a security warning on first run - this is normal
+- The binary is digitally signed with a commercial certificate from Certum, **from BSI 5.0.0 onwards**. Versions 4.0.0 and 4.1.0 shipped unsigned, because the previous certificate had expired
+- Windows may show a security warning on first run - this is normal, and a signature does not immediately stop it
+- The publisher name shown is a person's, not "Ptarmigan Labs" — the certificate is issued to an individual open source developer
 - No additional dependencies required
+
+See [Windows code signing](/reference/security#windows-code-signing) for how to verify the signature, what it does and does not protect against, and how to build an AppLocker or WDAC publisher rule.
 
 #### macOS
 
