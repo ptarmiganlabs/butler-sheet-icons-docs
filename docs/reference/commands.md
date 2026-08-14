@@ -20,6 +20,7 @@ butler-sheet-icons <platform> <command> [options]
 | `qscloud` | `remove-sheet-icons`      | Remove thumbnails from QS Cloud apps | `remove-sheet-thumbnails` |
 | `qscloud` | `list-collections`        | List available collections           | —                         |
 | `qseow`   | `create-sheet-thumbnails` | Create thumbnails for QSEoW apps     | `create-sheet-icons`      |
+| `browser` | `check`                   | Check this machine can take screenshots | —                      |
 | `browser` | `install`                 | Install browser for BSI              | —                         |
 | `browser` | `list-installed`          | Show installed browsers              | —                         |
 | `browser` | `list-available`          | Show available browsers for download | —                         |
