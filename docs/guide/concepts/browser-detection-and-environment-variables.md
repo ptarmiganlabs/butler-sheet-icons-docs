@@ -104,7 +104,20 @@ The `browser` management commands are different — only some of them reach out 
 | `browser list-installed`             | **No.** Reads the local Puppeteer cache only. |
 | `browser uninstall` / `uninstall-all` | **No.** Removes browsers from the local cache. |
 | `browser list-available`             | **Yes.** It asks Google's Chrome version history service which versions exist. |
-| `browser install`                    | **Yes**, always. BSI verifies that the requested build can actually be downloaded before installing it, so the command needs internet access even when that version is already in the cache. |
+| `browser install`                    | **Only when it has work to do.** No internet is needed if the build you asked for is already in the cache *and* `--browser-version` names it without a lookup. Otherwise yes — to download the build, or to resolve the version name. See below. |
+
+::: warning Requires BSI 5.0.0 or later
+Before 5.0.0, `browser install` checked that the build could be **downloaded** before it looked at what was already on the machine, so it needed internet access even for a browser sitting on disk. It now looks in the cache first.
+
+This is what lets you confirm a staged browser **on the air-gapped machine itself** — previously the one check that could not be done there. See [`browser install`](/reference/browser#install).
+:::
+
+Whether `browser install` can run offline therefore comes down to two things:
+
+1. **The build must already be in the cache**, built for this machine, with the browser program present.
+2. **`--browser-version` must not need a lookup.** `recommended` (the default) and an exact full build id are answered from information BSI already has; `stable`, `latest`, a channel, a milestone or a build prefix all have to be asked about. The table in [What `--browser-version` costs on an offline machine](#what-browser-version-costs-on-an-offline-machine) says which is which, and it applies here exactly as it does to a thumbnail run.
+
+So `butler-sheet-icons browser install`, with no options at all, completes offline on a machine with the matching browser staged — the default `recommended` needs no lookup.
 
 On a machine with no internet access — an air-gapped server, or one behind a proxy that blocks outbound HTTPS — `browser list-available` reports:
 

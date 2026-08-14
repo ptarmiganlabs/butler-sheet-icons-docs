@@ -22,7 +22,7 @@ butler-sheet-icons browser [command] [options]
 | ---------------- | ------------------------------------------------------------------------ | --------------- |
 | `list-installed` | Show which browsers are currently installed and available for use by BSI | No              |
 | `list-available` | Show which browsers are available for download and installation          | Yes (Chrome)    |
-| `install`        | Install a browser into the BSI cache                                     | Yes             |
+| `install`        | Install a browser into the BSI cache                                     | Only if it has to download or look up a version — see [below](#install) |
 | `uninstall`      | Uninstall a specific browser from the BSI cache                          | No              |
 | `uninstall-all`  | Uninstall all browsers from the BSI cache                                | No              |
 | `help`           | Display help for browser commands                                        | No              |
@@ -170,9 +170,58 @@ The keywords `recommended` and `stable` are also accepted, as are Chrome's relea
 If you try to install an older Chrome version that's no longer available, you'll get a 404 error. The Chrome team periodically removes older versions from their download servers. Use a newer version instead.
 :::
 
-::: warning Needs internet access
-`browser install` always needs internet access — it verifies that the requested build can actually be downloaded before installing it, so the check runs even when that version is already in the cache. Run it once while the machine is connected; the browser is then stored in the cache and reused on later runs without connectivity. See [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access).
+#### Installing a browser that is already there {#install-already-present}
+
+::: warning Requires BSI 5.0.0 or later
+Before 5.0.0, `browser install` checked that the build could be **downloaded** before it looked at what was already on the machine. On a server with no internet access that check failed, and the command reported that a browser sitting right there on disk `cannot be downloaded`. The suggested next step, `browser list-available`, needs internet access too, so there was no way forward.
 :::
+
+BSI now looks in the cache first. If the build you asked for is already there, it says so and stops, using no network at all:
+
+```
+chrome 151.0.7922.47 is already installed at
+C:\butler-sheet-icons\browser-cache\chrome\win64-151.0.7922.47. Nothing to download.
+To replace it, remove it first with "butler-sheet-icons browser uninstall
+--browser-version 151.0.7922.47".
+```
+
+This is what lets you **confirm a staged browser on the air-gapped machine itself**. It also means `browser install` is now a **no-op when the requested build is already present** — it reports what is installed and exits successfully rather than installing over the top. To replace an installed browser, uninstall it first:
+
+```bash
+butler-sheet-icons browser uninstall --browser-version 151.0.7922.47
+```
+
+##### When it still needs internet access
+
+Two separate things can require the network, and both must be avoided for a fully offline install:
+
+| | Needs internet? |
+| --- | --- |
+| Resolving `--browser-version` | Depends on the value. `recommended` (the default) and an exact full build id such as `151.0.7922.77` need no lookup. `stable`, `latest`, a channel, a milestone (`151`) or a build prefix (`151.0.7922`) all do — see [What `--browser-version` costs on an offline machine](/guide/concepts/browser-detection-and-environment-variables#what-browser-version-costs-on-an-offline-machine). The lookup happens **before** the cache is consulted, so those values fail offline even when the browser is present. |
+| Fetching the build | Only when the build is not already in the cache for this machine. |
+
+So `butler-sheet-icons browser install`, with no options at all, completes offline on a machine with the matching browser staged.
+
+##### Three cases where it still downloads
+
+**A different build.** The cache holds a different version from the one requested. See [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected) — the message lists the build ids you have.
+
+**A build for a different operating system.** Installing is about placing *this* machine's build, so a foreign build never counts as already installed. Note this is **stricter than the check made when taking screenshots**, which accepts a 32-bit Windows build on 64-bit Windows, or an Intel macOS build on Apple Silicon. Installing requires an exact platform match.
+
+**A folder with no browser in it.** If the build's folder exists but the browser program inside it is missing — an incomplete copy, or an interrupted download — you will see:
+
+```
+A cached chrome 151.0.7922.47 directory exists at
+C:\butler-sheet-icons\browser-cache\chrome\win64-151.0.7922.47, but the browser executable
+is missing from it. Butler Sheet Icons will remove that directory and install the build
+again, which needs internet access.
+```
+
+BSI removes the incomplete folder itself and installs the build again, which works on a machine with internet access. Nothing is lost by the removal: a folder with no browser program in it cannot be used for anything.
+
+On an air-gapped machine the reinstall cannot succeed, so copy the browser across again — making sure your archiving tool includes hidden files, as several skip them by default and one of the files BSI needs is hidden.
+
+See also [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access).
 
 ### uninstall
 

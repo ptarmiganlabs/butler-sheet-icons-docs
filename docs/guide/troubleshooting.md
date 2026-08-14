@@ -699,16 +699,22 @@ Browser-related problems are among the most common issues when using Butler Shee
 
 **Cause:**
 
-Two of the `browser` commands need internet access, and the rest do not:
+Some of the `browser` commands need internet access, and the rest do not:
 
-| Command                               | Needs internet? |
-| ------------------------------------- | --------------- |
-| `browser list-installed`              | No              |
-| `browser uninstall` / `uninstall-all` | No              |
-| `browser list-available`              | Yes, for Chrome |
-| `browser install`                     | Yes, always     |
+| Command                               | Needs internet?                          |
+| ------------------------------------- | ---------------------------------------- |
+| `browser list-installed`              | No                                       |
+| `browser uninstall` / `uninstall-all` | No                                       |
+| `browser list-available`              | Yes, for Chrome                          |
+| `browser install`                     | Only if it has to download or look up a version |
 
-On an air-gapped server, or one behind a proxy that blocks outbound HTTPS, the two commands that need internet access will fail. This is expected behaviour, not a fault in BSI.
+On an air-gapped server, or one behind a proxy that blocks outbound HTTPS, the commands that need internet access will fail. This is expected behaviour, not a fault in BSI.
+
+::: warning `browser install` used to fail here even when the browser was present
+Before 5.0.0, `browser install` checked that the build could be **downloaded** before it looked at what was already on the machine — so on an offline server it reported that a browser sitting right there on disk `cannot be downloaded`, and pointed at `browser list-available`, which needs internet access too.
+
+From 5.0.0 the cache is checked first, so confirming a staged browser works on the air-gapped machine itself. Two conditions have to hold: the build must already be staged for this machine, and `--browser-version` must be one that needs no lookup — `recommended` (the default) or an exact full build id. See [Installing a browser that is already there](/reference/browser#install-already-present).
+:::
 
 **Solutions:**
 
@@ -721,9 +727,14 @@ On an air-gapped server, or one behind a proxy that blocks outbound HTTPS, the t
 2. **Prepare the machine while it still has connectivity**:
 
    ```bash
-   # Run once on a connected machine; the browser is cached and reused afterwards
-   butler-sheet-icons browser install --browser chrome --browser-version latest
+   # Run once on a connected machine; the browser is cached and reused afterwards.
+   # Leave --browser-version at its default: "recommended" is a fixed build that
+   # needs no lookup, so later runs work offline. "latest" resolves to whatever is
+   # newest that day, which is not what the offline machine will ask for.
+   butler-sheet-icons browser install --browser chrome
    ```
+
+   From 5.0.0 you can re-run the same command on the offline machine to confirm the browser is really there — it checks the cache before the network, and reports `is already installed at ...` without downloading anything.
 
 3. **Or point BSI at a browser installed by other means** — no download and no internet access needed:
 
