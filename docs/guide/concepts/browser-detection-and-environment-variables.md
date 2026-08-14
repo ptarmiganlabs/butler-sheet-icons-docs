@@ -54,20 +54,30 @@ If `PUPPETEER_EXECUTABLE_PATH` is set, BSI treats that as the preferred browser:
 
 If no system browser is configured, BSI looks in its browser cache directory. For a standalone build that is a `browser-cache` folder next to the executable; running from Node.js it is `.cache/puppeteer` in the current user's home directory. You can point it somewhere else with `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` — see [Browser Cache Directory](/guide/advanced/browser-cache-directory) for the full order of precedence.
 
-A cached browser is used when it matches **both** of these:
+A cached browser has to pass **four** checks before it is used. All four must hold:
 
 - **Browser type** — the browser asked for with `--browser`. Every command accepts `chrome` only, and it is the default, so this matters only if you name it explicitly.
-- **Version** — if you specify an exact `--browser-version`, only a cached browser with exactly that build ID is used. If a different version is cached, BSI treats it as no match and downloads the version you asked for. If `--browser-version` is `latest` (the default), any cached build of the requested browser type is accepted.
+- **Operating system** — the build must be one this machine can actually run. A browser cache only works on the operating system it was downloaded for.
+- **The browser program is present** — the build's folder must still contain the browser itself. A folder left behind by an interrupted download, or by a copy that dropped files, does not count.
+- **Version** — `--browser-version` is resolved to one specific build, and only a cached browser with exactly that build id is used. If a different build is cached, BSI treats it as no match and downloads the one you asked for.
 
-When a cached browser matches, it is used as-is and nothing is downloaded. This is what makes repeat runs fast: the browser is downloaded once and reused on every later run, with no network access needed for the browser itself.
+When a cached browser passes all four, it is used as-is and nothing is downloaded. This is what makes repeat runs fast: the browser is downloaded once and reused on every later run, with no network access needed for the browser itself.
 
 Use `butler-sheet-icons browser list-installed` to see which browsers are currently cached, and `browser install` to add one deliberately — for example when preparing a machine that will later run without internet access.
 
-::: tip "latest" means "anything cached", not "the newest available"
-With `--browser-version latest`, BSI does **not** check whether a newer browser has been released. Any cached build of the requested type is accepted, so a cached browser never updates itself. To move to a newer build, install it explicitly with `browser install --browser chrome --browser-version <build id>`, or clear the cache with `browser uninstall-all` and let the next run download a fresh one.
+::: warning Requires BSI 5.0.0 or later
+The operating system and browser-program checks were added in 5.0.0. Before that, a cache copied from a machine running a different operating system, or one whose browser files were incomplete, was accepted and used — and the run then failed later with an error that pointed at nothing in particular.
 
-If several builds of the same browser are cached, do not rely on which one gets picked. Pin `--browser-version` to an exact build ID whenever the exact version matters.
+If a cached browser is rejected, BSI now says which check it failed and where it looked. The three messages, and what to do about each, are in [Troubleshooting](/guide/troubleshooting#a-cached-browser-was-rejected).
 :::
+
+::: tip Version keywords are not wildcards
+`recommended` (the default), `stable` and `latest` each resolve to **one specific build** before the cache is searched. No keyword means "accept anything I have cached", so switching from one to another will not make BSI accept a build it has already rejected — it simply looks for a different specific build.
+
+To use a browser you already have, pin `--browser-version` to its exact build id. `browser list-installed` prints them. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build) for what each keyword means.
+:::
+
+A browser named with `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH` or with `PUPPETEER_EXECUTABLE_PATH` is not subject to any of this — that is step 1 above, and such a browser is used as-is, without these checks.
 
 ::: warning Requires BSI 4.0.0 or later
 In earlier versions a defect prevented BSI from ever finding a cached browser, so in practice it re-downloaded a browser on **every run** unless `PUPPETEER_EXECUTABLE_PATH` was set. From 4.0.0 the cache is used as described above. Nothing needs to be reconfigured — the improvement applies automatically, and repeat runs start faster and use far less bandwidth.
@@ -268,11 +278,20 @@ Typical flow:
 2. Copy the Puppeteer cache directory to the target machine
 3. Run BSI on the target machine without any browser env vars set
 
+::: warning The connected machine must run the same operating system
+A browser cache only works on the operating system it was downloaded for. Staging on an administrator's Mac for a Windows Server does not work, and from 5.0.0 BSI says so rather than failing later for no visible reason — see [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected).
+
+Stage the build the target machine will actually ask for, too. Both machines should use the same `--browser-version`, and leaving it at the default `recommended` on both is the simplest way to guarantee that.
+:::
+
 **Example outline (PowerShell + bash mix):**
 
 ```powershell
-# 1. On a connected machine, install a browser into the cache
-butler-sheet-icons browser install --browser chrome --browser-version latest
+# 1. On a connected machine, install a browser into the cache.
+#    "recommended" is the default and is a fixed build, so the target machine
+#    looks for exactly this one. Do not use "latest" here: it resolves to
+#    whatever is newest today, which is unlikely to be what the target asks for.
+butler-sheet-icons browser install --browser chrome --browser-version recommended
 ```
 
 ```bash
