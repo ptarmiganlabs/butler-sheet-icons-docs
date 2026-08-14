@@ -20,6 +20,7 @@ butler-sheet-icons browser [command] [options]
 
 | Command          | Description                                                              | Needs internet? |
 | ---------------- | ------------------------------------------------------------------------ | --------------- |
+| `check`          | Check whether this machine can take sheet screenshots at all             | No              |
 | `list-installed` | Show which browsers are currently installed and available for use by BSI | No              |
 | `list-available` | Show which browsers are available for download and installation          | Yes (Chrome)    |
 | `install`        | Install a browser into the BSI cache                                     | Only if it has to download or look up a version — see [below](#install) |
@@ -30,6 +31,303 @@ butler-sheet-icons browser [command] [options]
 On a machine without internet access, only the commands marked "No" above will work. See [Which browser commands need internet access?](/guide/concepts/browser-detection-and-environment-variables#which-browser-commands-need-internet-access) for what the offline failures look like and how to prepare an air-gapped machine.
 
 ## Commands Reference
+
+### check
+
+::: warning Requires BSI 5.0.0 or later
+`browser check` did not exist in earlier versions. The only way to find out whether a machine could drive a browser was to run a full thumbnail job against a live Qlik Sense environment and see what happened.
+:::
+
+Answers one question: **will a real thumbnail run work on this machine?**
+
+It answers it without contacting Qlik Sense, without changing anything, and without making a single network request. It is safe to run on a production Qlik Sense server at any time, and it is the first thing to run when a thumbnail run has failed for reasons that are not obvious.
+
+**Usage:**
+
+::: code-group
+
+```powershell [PowerShell]
+.\butler-sheet-icons.exe browser check
+```
+
+```bash [Bash]
+./butler-sheet-icons browser check
+```
+
+:::
+
+**Options:**
+
+<!-- generated:cli-options browser check -->
+
+| Option                             | Environment Variable            | Description                                                                                                                                                                                                                                                                                                                                                                         | Default       | Example            |
+| ---------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
+| `--log-level, --loglevel <level>`  | `BSI_BROWSER_C_LOG_LEVEL`       | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                                                                                                                                                                       | `info`        | `--loglevel error` |
+| `--browser <browser>`              | `BSI_BROWSER_C_BROWSER`         | Browser to check for. Only "chrome" is supported. (choices: chrome)                                                                                                                                                                                                                                                                                                                 | `chrome`      | `--browser chrome` |
+| `--browser-version <version>`      | `BSI_BROWSER_C_BROWSER_VERSION` | Browser build to check for. Either a keyword - "recommended" for the build Butler Sheet Icons is tested with, "stable" for the newest stable release, or a release channel such as "beta" - or an exact version: a milestone ("151"), a build prefix ("151.0.7922") or a full build id ("151.0.7922.77"). Use "butler-sheet-icons browser list-available" to see what is available. | `recommended` | -                  |
+| `--browser-cache-dir <directory>`  | `BSI_BROWSER_CACHE_DIR`         | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise.                                                                                                                              | -             | -                  |
+| `--browser-executable-path <path>` | `BSI_BROWSER_EXECUTABLE_PATH`   | Full path to a browser executable to use, for example a Microsoft Edge or Google Chrome already installed on this machine. Butler Sheet Icons then neither downloads nor manages a browser. Takes precedence over PUPPETEER_EXECUTABLE_PATH. If the file does not exist the run stops rather than downloading a browser instead.                                                    | -             | -                  |
+| `--headless <true\|false>`         | `BSI_BROWSER_C_HEADLESS`        | Headless (=not visible) browser (true, false)                                                                                                                                                                                                                                                                                                                                       | `true`        | -                  |
+| `--skip-launch [true\|false]`      | `BSI_BROWSER_C_SKIP_LAUNCH`     | Find a browser but do not start it. Faster, and useful where starting a browser is not allowed - but it leaves the most valuable part of the check undone.                                                                                                                                                                                                                          | `false`       | -                  |
+| `-h, --help`                       | -                               | display help for command                                                                                                                                                                                                                                                                                                                                                            | -             | `-h`               |
+
+<!-- /generated:cli-options -->
+
+::: tip Pass the same browser options your real runs use
+If your `qseow create-sheet-thumbnails` command sets `--browser-cache-dir` or `--browser-executable-path`, set them here too. Otherwise the check reports on a different browser cache than your real runs use, and a pass here proves nothing about them.
+:::
+
+#### What it checks {#check-what-it-checks}
+
+Five things, in the order the report prints them:
+
+| Section             | What it establishes                                                                                                                                     |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Environment`       | Operating system, which account BSI is running as, that account's home directory, and the working directory the command was started from                |
+| `Browser executable` | Whether a browser was named with `--browser-executable-path` or `BSI_BROWSER_EXECUTABLE_PATH`, and whether that file is there                           |
+| `Browser cache`     | Where the cache is, whether this account can read it, whether it will be consulted at all, and which browser builds are in it — each marked usable or not |
+| `Selection`         | Which browser a real run would actually pick, and where it is                                                                                           |
+| `Launch test`       | The selected browser is started and asked for its version number, then closed again                                                                     |
+
+The last one is the point. A browser file being in the right place proves much less than the browser actually starting: antivirus software, missing system libraries and browser builds BSI cannot drive all produce a browser that looks perfectly fine on disk and fails the moment it is used.
+
+#### The exit code {#check-exit-code}
+
+`browser check` sets the process exit code, so it can gate a deployment script:
+
+| Exit code | Meaning                                                                                                             |
+| --------- | --------------------------------------------------------------------------------------------------------------------- |
+| `0`       | A browser was found and — unless you passed `--skip-launch` — started successfully                                  |
+| `1`       | No usable browser was found, the browser could not be started, or a setting is wrong in a way that would stop a real run |
+
+::: code-group
+
+```powershell [PowerShell]
+.\butler-sheet-icons.exe browser check
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Butler Sheet Icons cannot take screenshots on this server. See the output above."
+    exit 1
+}
+```
+
+```bash [Bash]
+./butler-sheet-icons browser check || {
+    echo "Butler Sheet Icons cannot take screenshots on this server. See the output above." >&2
+    exit 1
+}
+```
+
+:::
+
+See [Exit codes](/reference/commands#exit-codes) for what the other Butler Sheet Icons commands report.
+
+#### A healthy server {#check-healthy-example}
+
+The command reports facts even when everything is fine. That is deliberate: it is what lets you rule things out, and it is what makes the output worth attaching to a support request.
+
+```
+info: Butler Sheet Icons browser check
+info: Environment
+info:     Platform            : win32 x64 (Puppeteer platform "win64")
+info:     Running as user     : svc_qlik
+info:     Home directory      : C:\Users\svc_qlik
+info:     Working directory   : C:\butler-sheet-icons
+info:     Standalone binary   : true
+info: Browser executable
+info:     Configured          : no
+info: Browser cache
+info:     Source              : default location next to the Butler Sheet Icons executable
+info:     Directory           : C:\butler-sheet-icons\browser-cache
+info:     Directory exists    : yes
+info:     In use              : yes
+info:     Cached builds       : 1
+info:         chrome 151.0.7922.71     platform=win64     executable present   usable
+info: Selection
+info:     Requested           : chrome recommended (build 151.0.7922.71)
+info:     Would use           : cached browser (chrome 151.0.7922.71)
+info:     Executable          : C:\butler-sheet-icons\browser-cache\chrome\win64-151.0.7922.71\chrome-win64\chrome.exe
+info: Launch test
+info:     Launched            : yes
+info:     Reported version    : Chrome/151.0.7922.71
+info: Note: these findings are best-effort. Butler Sheet Icons reports what it can observe on this
+info: machine, and cannot see everything about your environment - group policy, antivirus, proxy rules
+info: and Qlik Sense itself are all invisible to it. Review suggested commands before running them on a
+info: production server.
+info: Result: OK - Butler Sheet Icons can take screenshots on this machine without internet access.
+```
+
+Three lines are worth more attention than they look.
+
+**`Running as user`, `Home directory` and `Working directory`.** When Butler Sheet Icons runs from a Windows scheduled task under the LocalSystem account, the home directory is `C:\Windows\system32\config\systemprofile` and the working directory is `C:\Windows\system32` — not the folder you installed it in. A browser cache staged into your own user profile is invisible to that account, and a `.env` file placed beside the executable is never read. Both symptoms are baffling until you see these three lines. See [Browser Cache Directory](/guide/advanced/browser-cache-directory).
+
+**`In use`.** When you have named a browser executable and that file exists, the browser cache is never consulted. The line then reads `no (an executable path is configured, so the cache is not consulted)`, which tells you the cache directory setting is being ignored on purpose rather than silently failing.
+
+**The best-effort note.** It appears on every run and cannot be switched off. Butler Sheet Icons is reasoning from what it can observe on one machine; group policy, antivirus rules, proxy configuration and Qlik Sense itself are all invisible to it.
+
+#### How to read the output {#check-reading-the-output}
+
+The output has two parts, and telling them apart saves confusion.
+
+**The report** starts at the line `Butler Sheet Icons browser check` and runs to the end — the `Result:` line, and the numbered `Next steps:` that follow it when the run failed. Paste all of it into a support request.
+
+**Above the report** are a few lines from the steps the command runs on the way there: the Butler Sheet Icons version, and then the browser-detection step's own log output. Those are shared with a real thumbnail run — they are exactly what a real run prints at that point, which is deliberate, because it means the check reproduces what you would see in a failing job.
+
+That has one consequence worth knowing about in advance. When no staged browser matches, the detection step prints this:
+
+```
+warn: No cached chrome build matches --browser-version "recommended" (build 151.0.7922.71). Cached chrome builds that this machine can run: 151.0.7922.138. Set --browser-version to one of those build ids to use it instead. Butler Sheet Icons will now try to download chrome 151.0.7922.71, which needs internet access. On a machine without internet access this will fail.
+```
+
+::: warning `browser check` does not download anything
+That sentence describes what a **real thumbnail run** would do next, because the same detection step is shared with the run. The check stops there and reports; nothing after that line reaches the network.
+:::
+
+When the run failed, read the report in three parts:
+
+- The **`error:` lines within the report** say what was observed, with the actual values — which directory, which builds, which platform.
+- The **`Result: FAILED` line** names the single most important problem in one sentence.
+- The **`Next steps`** are ordered, and the first one is the one to try.
+
+The suggested commands are shown for the operating system you are on: PowerShell on Windows, shell commands on macOS and Linux. Steps are never repeated: when one problem explains another, only the one you can act on carries advice.
+
+Run with `--loglevel verbose` to see the one-sentence conclusion of every check, including the ones that passed:
+
+```
+verbose:     The browser cache holds no chrome builds
+```
+
+#### A server that cannot take screenshots {#check-failure-example}
+
+```
+info: Butler Sheet Icons browser check
+info: Environment
+info:     Platform            : win32 x64 (Puppeteer platform "win64")
+info:     Running as user     : svc_qlik
+info:     Home directory      : C:\Windows\system32\config\systemprofile
+info:     Working directory   : C:\Windows\system32
+info:     Standalone binary   : true
+info: Browser executable
+info:     Configured          : no
+info: Browser cache
+info:     Source              : from --browser-cache-dir / BSI_BROWSER_CACHE_DIR
+info:     Directory           : D:\qlik\bsi-browser-cache
+info:     Directory exists    : yes
+info:     In use              : yes
+info:     Cached builds       : 1
+info:         chrome 151.0.7922.71     platform=mac_arm   executable present   not usable (built for another platform)
+error:     The cache at D:\qlik\bsi-browser-cache holds 1 chrome build(s), for mac_arm. This machine is win64. A browser cache copied from a machine with a different operating system cannot be used.
+info: Selection
+info:     Requested           : chrome recommended (build 151.0.7922.71)
+info:     Would use           : nothing - a browser would have to be downloaded
+info: Note: these findings are best-effort. Butler Sheet Icons reports what it can observe on this
+info: machine, and cannot see everything about your environment - group policy, antivirus, proxy rules
+info: and Qlik Sense itself are all invisible to it. Review suggested commands before running them on a
+info: production server.
+error: Result: FAILED - the cached browsers were built for a different operating system
+error: Next steps:
+error:     1. Stage the browser from a machine running the same operating system as this one, and copy that machine's browser cache directory here.
+error:        butler-sheet-icons.exe browser install --browser chrome --browser-version recommended
+error:     2. Or, if Chrome or Edge is already installed on this machine, point Butler Sheet Icons at it with --browser-executable-path or BSI_BROWSER_EXECUTABLE_PATH.
+```
+
+This is the most common air-gapped staging mistake, and the report names it exactly: the browser was downloaded on a Mac and copied to a Windows server. **Always stage the browser from a machine running the same operating system as the target server.** [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected) in Troubleshooting explains which platform names are compatible with which.
+
+#### What it catches {#check-what-it-catches}
+
+Each row below is a real failure `browser check` reports before a thumbnail run ever starts. The Troubleshooting page covers the same failures from the other direction — the symptom you saw first.
+
+| What is wrong                                                  | The `Result:` line                                                         | Where it is explained                                                                                          |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| A browser executable path that points nowhere                  | `the configured browser executable does not exist`                         | [`--browser-executable-path` is set but no such file exists](/guide/troubleshooting#browser-executable-path-missing) |
+| A browser cache this account cannot read                       | `the browser cache directory could not be read`                            | [Browser Cache Directory](/guide/advanced/browser-cache-directory)                                              |
+| A cache built for another operating system                     | `the cached browsers were built for a different operating system`          | [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected)                           |
+| A cache copied without the browser binaries                    | `cached browsers are missing their executable files`                       | [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected)                           |
+| The staged build is not the build being asked for              | `the requested browser build is not in the cache, although other builds are` | [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected)                           |
+| Nothing usable at all                                          | `no usable browser was found, and taking screenshots would require downloading one over the internet` | [Browser detection order](/guide/concepts/browser-detection-and-environment-variables#browser-detection-order) |
+| The browser starts and then stops responding                   | `the browser starts but cannot be driven by Butler Sheet Icons`            | [Every app fails with `Target closed` or `Protocol error`](/guide/troubleshooting#every-app-fails-with-target-closed-or-protocol-error) |
+| The browser will not start at all                              | `the browser could not be started`                                         | [Browser Runtime Crashes](/guide/troubleshooting#browser-runtime-crashes)                                       |
+| `--browser-version` cannot be resolved offline                 | `the requested browser version can only be resolved over the internet`     | [Which `--browser-version` values work offline](#check-browser-version-offline) below                          |
+| `--browser-version` is not a value BSI accepts                 | `the requested browser version is not a value Butler Sheet Icons accepts`  | [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build)                         |
+
+Two of these are worth expanding, because the report says something the message alone does not.
+
+**A browser executable path that points nowhere.** Butler Sheet Icons deliberately stops rather than quietly downloading a different browser instead, so the `In use` line reads `no (an executable path is configured but missing, so detection stops before the cache)`. Staging a browser into that cache would not help until the path is corrected or removed.
+
+**A browser that starts, but far too slowly.** This one passes and still tells you something. It is reported as a warning, and the exit code stays `0`:
+
+```
+warn:     Starting the browser took 92s, longer than the 30s launch timeout allows for. It worked this time, so this check passes - but a real run can exceed the timeout on the same machine and fail with an error naming none of this.
+```
+
+On Windows this is almost always antivirus or endpoint protection scanning a browser executable it has not seen before. Excluding the browser cache directory from real-time scanning avoids it — see [Excluding it from antivirus scanning](/guide/advanced/browser-cache-directory#excluding-it-from-antivirus-scanning). A run that is merely slow today is a run that fails intermittently tomorrow.
+
+#### Which `--browser-version` values work offline {#check-browser-version-offline}
+
+Not every way of naming a browser build survives on a server with no internet access, and `browser check` treats them differently because a real thumbnail run does.
+
+| What you set                                    | Offline                                                                                                                       | Reported as       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `recommended` (the default)                     | Works. Resolves from a value built into Butler Sheet Icons.                                                                   | nothing to report |
+| A full build id, e.g. `151.0.7922.77`           | Works. Names one build, no lookup needed.                                                                                     | nothing to report |
+| `stable`, `latest`, `beta`, `dev`, `canary`     | Works, but you may get a different build than a connected machine would. BSI falls back to the newest suitable build already staged. | a warning         |
+| A milestone or partial id, e.g. `151` or `151.0.7922` | **Does not work.** There is no fallback for this form, so a real run stops with a lookup error before it looks at the cache.   | a failure         |
+
+That last row is the surprising one — a partial version looks more precise than `stable`, and offline it is the one that cannot work:
+
+```
+info:     Requested           : chrome 151
+info:     Would use           : cached browser (chrome 151.0.7922.138)
+info:     Executable          : C:\butler-sheet-icons\browser-cache\chrome\win64-151.0.7922.138\chrome-win64\chrome.exe
+info:     Requested version   : 151
+error:     --browser-version "151" names a milestone or a partial build id, and turning that into a single build is the browser vendor's lookup. Butler Sheet Icons does not fall back to a cached build for this form - only for keywords such as "recommended" and "stable" - so a real run on a machine without internet access stops with a lookup error before it looks at the cache at all. Whatever this check reports about the browser here, a run with this setting cannot start offline.
+error: Result: FAILED - the requested browser version can only be resolved over the internet
+```
+
+The report still shows which browser it *would* have used. That is not a contradiction: the browser is there and is fine — the version setting is what stops the run.
+
+A floating keyword is only a warning, because a real run does fall back to what is staged:
+
+```
+warn:     --browser-version "stable" names whichever build is newest at the time it runs, which can only be resolved over the internet. This check did not make that call, so it accepted the newest suitable build already present instead. A real run on a machine with internet access may therefore choose a different build than the one reported here.
+```
+
+::: tip None of this applies when you name a browser yourself
+When `--browser-executable-path` or `BSI_BROWSER_EXECUTABLE_PATH` names a file that exists, `--browser-version` has no bearing on the run at all — Butler Sheet Icons uses the browser you named. `browser check` says nothing about the version setting in that case, because a real run would not act on it either.
+:::
+
+#### `--headless` and `--skip-launch` {#check-boolean-options}
+
+`--headless false` is worth trying if headless runs behave oddly: starting a visible browser on a server with no display is a genuinely different test, and it fails in a way a headless launch does not.
+
+`--skip-launch` finds a browser but does not start it. When the launch test is skipped, the result line says so rather than claiming more than was checked:
+
+```
+info: Result: OK - a browser was found on this machine. It was not started, so whether it runs here is untested.
+```
+
+**Both options accept the same true/false words, and refuse anything else.** `true`, `1`, `yes` and `on` all mean on; `false`, `0`, `no` and `off` all mean off; case does not matter. Anything else is rejected with an error rather than quietly guessed at, so a typo in a scheduled task shows up as a failed command instead of a silently different test:
+
+```
+error: option '--headless <true|false>' argument 'maybe' is invalid. "maybe" is not a true/false value. Use one of: true, 1, yes, on - or false, 0, no, off.
+```
+
+`--skip-launch` can be written as a bare flag or with a value: `--skip-launch`, `--skip-launch true` and `BSI_BROWSER_C_SKIP_LAUNCH=true` all skip the launch test, while `--skip-launch false` and `BSI_BROWSER_C_SKIP_LAUNCH=false` run it. An environment variable that is set but left empty — `BSI_BROWSER_C_SKIP_LAUNCH=` — counts as "not set", so the option keeps its default.
+
+#### What it deliberately does not do {#check-limits}
+
+- **It makes no network requests of its own.** This is a hard rule, not a side effect: a diagnostic that hangs waiting for a DNS lookup on an air-gapped server is worse than no diagnostic at all. The check never downloads a browser and never contacts the browser vendor, even when the report says a real run would have to — see [How to read the output](#check-reading-the-output).
+- **It never contacts Qlik Sense.** It tells you nothing about whether your certificates, virtual proxy or credentials are correct.
+- **It changes nothing.** It installs nothing, downloads nothing and deletes nothing.
+- **It does not open a web page.** The browser is started, asked for its version, and closed.
+
+#### When to run it {#check-when-to-run}
+
+- **After installing Butler Sheet Icons on a new server**, before scheduling anything.
+- **After staging a browser** on a server with no internet access, to confirm the copy worked — this is the step that used to require a full production thumbnail run. See [Strategy 3: Use a pre-cached browser (semi-offline)](/guide/concepts/browser-detection-and-environment-variables#strategy-3-use-a-pre-cached-browser-semi-offline).
+- **As the same account the scheduled task uses.** Running it as yourself proves very little about a task that runs as LocalSystem; the `Running as user` line is there to make that difference visible.
+- **As the first step when a thumbnail run fails.** If `browser check` passes, the browser is not your problem, and you can look at Qlik Sense connectivity instead.
+- **In a deployment script**, as a gate — see [CI/CD Integration](/guide/advanced/ci-cd).
+- **When opening a support issue.** Paste the whole output, including the lines above the report. It says what operating system, which account, which directories, which browser builds and whether the browser starts, which is the single most useful thing you can attach to a browser-related bug report.
 
 ### list-installed
 
@@ -387,19 +685,27 @@ butler-sheet-icons browser list-installed
 
 If you're experiencing browser-related problems:
 
-1. **Check available versions:**
+1. **Start with `browser check`** — it reports the account, the cache, the browser
+   that would be selected and whether it actually starts, without contacting Qlik
+   Sense. See [check](#check).
+
+   ```bash
+   butler-sheet-icons browser check
+   ```
+
+2. **Check available versions** (needs internet access):
 
    ```bash
    butler-sheet-icons browser list-available --browser chrome
    ```
 
-2. **Clean browser cache:**
+3. **Clean browser cache:**
 
    ```bash
    butler-sheet-icons browser uninstall-all
    ```
 
-3. **Reinstall the browser:**
+4. **Reinstall the browser:**
 
    ```bash
    butler-sheet-icons browser install
@@ -443,3 +749,4 @@ Because the cache lives under the user's home directory, a browser installed by 
 - [Browser Management Examples](/examples/browser-management) - Hands-on browser management examples
 - [Commands Overview](/reference/commands) - Complete command reference including QS Cloud and QSEoW
 - [Troubleshooting](/guide/troubleshooting) - Solving browser-related issues
+- [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) - How BSI decides which browser to use, and how to prepare a machine with no internet access

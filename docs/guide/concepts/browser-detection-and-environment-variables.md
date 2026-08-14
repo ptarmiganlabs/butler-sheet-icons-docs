@@ -401,7 +401,8 @@ Typical flow:
 
 1. On a machine with internet access, use the `browser install` command to download a browser
 2. Copy the Puppeteer cache directory to the target machine
-3. Run BSI on the target machine without any browser env vars set
+3. Confirm the copy worked with `browser check` on the target machine
+4. Run BSI on the target machine without any browser env vars set
 
 ::: warning The connected machine must run the same operating system
 A browser cache only works on the operating system it was downloaded for. Staging on an administrator's Mac for a Windows Server does not work, and from 5.0.0 BSI says so rather than failing later for no visible reason — see [A cached browser was rejected](/guide/troubleshooting#a-cached-browser-was-rejected).
@@ -427,7 +428,19 @@ tar -czf puppeteer-cache.tar.gz .cache/puppeteer
 # 3. Copy archive to the target machine and unpack
 scp puppeteer-cache.tar.gz user@airgapped-host:~/
 ssh user@airgapped-host "tar -xzf ~/puppeteer-cache.tar.gz -C ~"
+
+# 4. On the target machine, confirm the staged browser is actually usable.
+#    Reports the platform, the account, the cache contents and whether the
+#    browser starts. Makes no network requests, so it is safe on an
+#    air-gapped host. Exits 1 if a real run would fail here.
+butler-sheet-icons browser check
 ```
+
+::: tip Run it as the account the scheduled task uses
+A browser cache staged from your own profile is invisible to a task running as
+LocalSystem. `browser check` prints the account and its home directory, which is what
+makes that difference visible. See [browser check](/reference/browser#check).
+:::
 
 On the air‑gapped machine you then run BSI as normal. It will find and use the cached browser without needing a download.
 

@@ -25,11 +25,21 @@ butler-sheet-icons qscloud create-sheet-icons --loglevel debug
 butler-sheet-icons qscloud create-sheet-icons --headless false
 ```
 
-### 4. Check Browser Installation
+### 4. Check the browser can actually be used {#check-the-browser-can-actually-be-used}
 
 ```bash
-butler-sheet-icons browser list-installed
+butler-sheet-icons browser check
 ```
+
+::: warning Requires BSI 5.0.0 or later
+In earlier versions use `butler-sheet-icons browser list-installed`, which lists the
+cache but cannot tell you whether the browser starts on this machine.
+:::
+
+This is the single most useful thing to run before anything else on this page, and the
+single most useful thing to attach to a support issue. It contacts nothing, changes
+nothing, and exits `1` when a real thumbnail run would fail here. See
+[browser check](/reference/browser#check).
 
 
 ## Fixed in 4.1.0: options and messages that told you the wrong thing
@@ -703,6 +713,7 @@ Some of the `browser` commands need internet access, and the rest do not:
 
 | Command                               | Needs internet?                          |
 | ------------------------------------- | ---------------------------------------- |
+| `browser check`                       | No                                       |
 | `browser list-installed`              | No                                       |
 | `browser uninstall` / `uninstall-all` | No                                       |
 | `browser list-available`              | Yes, for Chrome                          |
@@ -762,6 +773,10 @@ Creating thumbnails itself does not need internet access once a browser is avail
 
 If you staged a browser on the machine and BSI still tries to download one, it has rejected what you copied — see [A cached browser was rejected](#a-cached-browser-was-rejected) for the message it printed and what each one means.
 
+To confirm a staged browser is genuinely usable on the offline machine — the right
+platform, readable by this account, and able to start — run
+[`browser check`](/reference/browser#check). It makes no network requests.
+
 ### The run hangs after "Launching browser..." {#the-run-hangs-after-launching-browser}
 
 **Symptoms:**
@@ -786,6 +801,10 @@ warning: QSEOW: On Windows this is typically antivirus or endpoint protection sc
 
 Each is a single line in the log; they are wrapped here to fit. The prefix names the stage the run was in and differs between commands.
 :::
+
+[`browser check`](/reference/browser#check) reports a slow launch as a warning while
+still passing, so a server that is merely slow today can be found before it starts
+failing intermittently.
 
 **What is actually happening:**
 
@@ -1100,6 +1119,11 @@ The path you gave does not name a file on this machine. Common reasons are a typ
 
 An empty value counts as "not set", so `BSI_BROWSER_EXECUTABLE_PATH=` in a unit file does not trigger this. See [Browser detection order](/guide/concepts/browser-detection-and-environment-variables#browser-you-named).
 
+[`browser check`](/reference/browser#check) reports this before a thumbnail run
+starts, and also shows that the browser cache is not consulted at all while the path
+is set but missing — so staging a browser into the cache will not help until the path
+is corrected or removed.
+
 ### A cached browser was rejected {#a-cached-browser-was-rejected}
 
 ::: warning Requires BSI 5.0.0 or later
@@ -1206,6 +1230,12 @@ The alternative is to stage the exact build it asked for.
 - A browser named with `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH`, or with `PUPPETEER_EXECUTABLE_PATH`, is used as-is and is not subject to these checks.
 - Where the browser cache lives, and how to change it with `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR`, is unchanged — see [Browser Cache Directory](/guide/advanced/browser-cache-directory).
 
+#### Finding out before the run fails
+
+[`browser check`](/reference/browser#check) reports every one of the three situations
+above without contacting Qlik Sense, naming the directory, the builds in it, and this
+machine's platform. It is the quickest way to confirm a staged browser is usable.
+
 ### Platform-Specific Browser Issues
 
 #### Windows Issues
@@ -1276,6 +1306,9 @@ echo $DISPLAY
 Use these commands to diagnose browser-related issues:
 
 ```bash
+# Can this machine take screenshots at all? Start here.
+butler-sheet-icons browser check
+
 # Check current browser installation status
 butler-sheet-icons browser list-installed
 
@@ -1517,6 +1550,10 @@ error: Failed to process 2 of 2 app(s)
 The Chrome build being used cannot be driven by Butler Sheet Icons. Thumbnails are captured through a browser automation library, and that library is only tested against the Chrome builds current when it was released. Chrome's stable channel moves faster than the library does, so a build far enough ahead cannot be driven: Chrome launches normally, and the first instruction sent to it fails.
 
 Nothing is wrong with Chrome, and nothing is wrong with your Qlik Sense environment.
+
+[`browser check`](/reference/browser#check) distinguishes this from a browser that
+never started, and names the build to change:
+`Result: FAILED - the browser starts but cannot be driven by Butler Sheet Icons`.
 
 Before BSI 4.0.0 the default was `latest`, meaning the newest *published* build, so this could strike anyone — two servers could behave differently purely because each had a different build cached. From 4.0.0 the default is `recommended` and that class of failure went away.
 
