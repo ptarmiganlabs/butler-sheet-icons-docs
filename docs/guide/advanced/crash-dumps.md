@@ -122,10 +122,10 @@ Source: uncaughtException
 Exit Code: 1
 
 === ERROR MESSAGE ===
-Failed to install a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
+Could not obtain a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
 
 === STACK TRACE ===
-QseowError: Failed to install a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
+QseowError: Could not obtain a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
     at src/lib/qseow/qseow-process-app.js:282:1
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
 
@@ -133,6 +133,14 @@ QseowError: Failed to install a browser for QSEoW app a3e0f5d2-000a-464f-998d-33
 END OF CRASH REPORT
 ====================================
 ```
+
+::: warning This message was reworded in BSI 5.0.0
+Dumps written by earlier versions say `Failed to install a browser for ...` where 5.0.0 says **`Could not obtain a browser for ...`**. Both name the same problem, so search for either when going through older dumps.
+
+The old wording claimed an install had been attempted, which is no longer true in general: with [`--browser-executable-path`](/guide/concepts/browser-detection-and-environment-variables#browser-you-named) set to a file that does not exist, the run stops before any download is considered — and being told an install failed sent people looking for a network problem they did not have.
+
+The same rename applies to the Qlik Sense Cloud form, `Could not obtain a browser for Qlik Sense Cloud app <id>`.
+:::
 
 ## How are secrets handled in crash dumps?
 

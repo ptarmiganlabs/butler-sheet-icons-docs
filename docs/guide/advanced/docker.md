@@ -342,7 +342,7 @@ The commands in this section are written for a Linux shell, since that is where 
 info: Browser version "recommended" resolved to chrome build 150.0.7871.24 (the build this version of Butler Sheet Icons is tested with)
 info: Checking for available browsers...
 info: Found system browser at: /usr/bin/chromium-browser
-info: Using system browser (PUPPETEER_EXECUTABLE_PATH is set)
+info: Using system browser (from PUPPETEER_EXECUTABLE_PATH)
 info: Browser ready from system: chrome system-installed
 ```
 
@@ -419,7 +419,21 @@ The bottom line: **inside the Docker image, `--browser-version` cannot change wh
 
 ### If you do not want the embedded browser
 
-Some organizations require a centrally approved browser build rather than the one in the image. Set `PUPPETEER_EXECUTABLE_PATH` to an empty string and mount a browser cache from the host, and Butler Sheet Icons will use that instead. This needs no internet either, as long as the cache is populated before the machine goes offline.
+Some organizations require a centrally approved browser build rather than the one in the image. There are two ways to do it.
+
+**Point at a specific browser inside the container.** From 5.0.0, `BSI_BROWSER_EXECUTABLE_PATH` takes precedence over the `PUPPETEER_EXECUTABLE_PATH` the image sets, so it overrides the embedded browser directly:
+
+```bash
+docker run --rm \
+  -v /opt/browsers:/browsers \
+  -e BSI_BROWSER_EXECUTABLE_PATH=/browsers/chrome/chrome \
+  ptarmiganlabs/butler-sheet-icons:latest \
+  qseow create-sheet-thumbnails ...
+```
+
+The browser must be a **Linux** build, since that is what the container runs. If the path does not exist the run stops rather than falling back to the embedded browser — that is the point of the option, and it is what makes the override auditable. See [A browser you named](/guide/concepts/browser-detection-and-environment-variables#browser-you-named).
+
+**Or mount a browser cache.** Set `PUPPETEER_EXECUTABLE_PATH` to an empty string and mount a browser cache from the host, and Butler Sheet Icons will use that instead. This needs no internet either, as long as the cache is populated before the machine goes offline.
 
 That is described on [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables#docker-image-with-external-browser) and is not repeated here.
 
