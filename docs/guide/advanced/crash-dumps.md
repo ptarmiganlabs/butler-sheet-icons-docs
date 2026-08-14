@@ -259,6 +259,10 @@ Nothing had gone wrong. `head` stops reading once it has the twelve lines you as
 
 A closed output pipe is now treated as an ordinary end to the run. **No crash dump is written, and nothing is printed about it** — the stream any message would go to is the one that just died. The command above leaves your working directory exactly as it found it, and the output itself is unchanged: you still get the same twelve lines.
 
+This applies whether the reader is a command such as `head`, a pager you quit early, or **another program that started Butler Sheet Icons and captured its output** — a wrapper script, a job runner, or a scheduling tool. If you have seen occasional unexplained crash reports from a run driven by another tool, with `write ENOTCONN` or `write ECONNRESET` as the error message, that is what they were.
+
+The reason they were only occasional is invisible from the outside: output captured by another program travels over a slightly different kind of connection than output piped to `head`, and which of the two messages a dead connection reports depends on whether anything was still buffered when the reader went away. On a busy machine the reader reacts later and more has piled up behind it, so these were most likely exactly where they were hardest to reproduce.
+
 The run ends with exit code **141** rather than `0`; see [Exit code 141](/reference/commands#exit-code-141) for why, and who it affects.
 
 ### Real failures are unaffected
@@ -268,6 +272,7 @@ Worth being clear about, because the two can happen together:
 - A genuine error still writes one `.json` and one `.txt` crash report and exits with code **1**, with its `FATAL:` line in the log.
 - That remains true **even when the output pipe has already closed**. If a run crashes for a real reason while you happen to be piping it through `head`, you still get the crash report you need.
 - A failure to write output for any *other* reason — a full disk, a permission problem — is still a genuine error and still produces a crash report.
+- **A lost connection to Qlik Sense still produces a crash report.** This is the case worth knowing about, because a dropped server connection and a reader that stopped reading can surface with the same error name. Butler Sheet Icons only takes the quiet path when it knows the failure was its own output; anything else keeps its crash report and exit code 1, which is what you need when a run against a Qlik Sense server fails halfway. See [The connection to Qlik Sense drops in the middle of a run](/guide/troubleshooting#engine-session-dropped-mid-run).
 
 The `BSI_CRASH_DUMP_*` variables are unchanged, and so is the one-dump-per-run behaviour above.
 
