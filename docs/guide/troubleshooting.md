@@ -736,18 +736,24 @@ From 5.0.0 the cache is checked first, so confirming a staged browser works on t
 
    From 5.0.0 you can re-run the same command on the offline machine to confirm the browser is really there — it checks the cache before the network, and reports `is already installed at ...` without downloading anything.
 
-3. **Or point BSI at a browser installed by other means** — no download and no internet access needed:
+3. **Or point BSI at a browser installed by other means** — no download and no internet access needed. On Windows Server, Microsoft Edge is usually already there:
 
    ::: code-group
 
    ```powershell [PowerShell]
-   $env:PUPPETEER_EXECUTABLE_PATH = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+   butler-sheet-icons qseow create-sheet-thumbnails `
+     --browser-executable-path 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' ...
    ```
 
    ```bash [Bash]
-   export PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
+   butler-sheet-icons qseow create-sheet-thumbnails \
+     --browser-executable-path "/usr/bin/chromium-browser" ...
    ```
 
+   :::
+
+   ::: warning Requires BSI 5.0.0 or later
+   `--browser-executable-path` and `BSI_BROWSER_EXECUTABLE_PATH` were added in 5.0.0. In earlier versions use `PUPPETEER_EXECUTABLE_PATH` instead, which is still supported — see [`--browser-executable-path` is set but no such file exists](#browser-executable-path-missing) for how the two differ. Both take a full path to the browser program.
    :::
 
 4. **If a proxy is in the way**, and the service is reachable but answers with an error, BSI reports the HTTP status instead (for example `403`). That points at proxy rules rather than missing connectivity — see [Proxy Configuration](/guide/advanced/proxy).
@@ -1042,6 +1048,58 @@ when Butler Sheet Icons runs on Windows. See
 
    This is also the fix when a scheduled task cannot find the browser you installed by hand — the two accounts have different home directories. See [Browser Cache Directory](/guide/advanced/browser-cache-directory).
 
+### `--browser-executable-path` is set but no such file exists {#browser-executable-path-missing}
+
+::: warning Requires BSI 5.0.0 or later
+`--browser-executable-path` and `BSI_BROWSER_EXECUTABLE_PATH` were added in 5.0.0.
+:::
+
+**Symptoms:**
+
+- The run stops immediately with the message below
+- No browser is downloaded, and no thumbnails are produced
+
+```
+--browser-executable-path is set to "D:\browsers\chrome.exe" but no such file exists on this
+machine. Butler Sheet Icons will not fall back to downloading a browser when an executable path
+has been given explicitly. Correct the path, or remove the option to let Butler Sheet Icons find
+a browser itself.
+```
+
+**Cause:**
+
+The path you gave does not name a file on this machine. Common reasons are a typo, a path that is correct on a different server, a drive that is not mounted under the account running a scheduled task, or a browser that has since been uninstalled or moved by an update.
+
+**This refusal is deliberate.** Naming a browser through a BSI option states what you want to happen, so BSI does not quietly download a different browser instead — that substitution is exactly the surprise a change-controlled environment cannot tolerate, and on an air-gapped machine it would fail anyway, reported as something unrelated.
+
+**Solutions:**
+
+1. **Check the path exists, as the account that runs BSI.** A scheduled task often runs as a different account from the one you tested with:
+
+   ::: code-group
+
+   ```powershell [PowerShell]
+   Test-Path 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+   ```
+
+   ```bash [Bash]
+   test -x "/usr/bin/chromium-browser" && echo ok
+   ```
+
+   :::
+
+   The path must name the browser **program itself**, not the folder containing it.
+
+2. **Remove the option** to let BSI find a browser itself — it then falls back to the cache, and to downloading one.
+
+3. **If you meant it to be optional, use `PUPPETEER_EXECUTABLE_PATH` instead.** That one is a hint rather than a promise: when the file is missing BSI warns and carries on looking.
+
+   ```
+   warn: PUPPETEER_EXECUTABLE_PATH is set to "D:\browsers\chrome.exe" but file does not exist
+   ```
+
+An empty value counts as "not set", so `BSI_BROWSER_EXECUTABLE_PATH=` in a unit file does not trigger this. See [Browser detection order](/guide/concepts/browser-detection-and-environment-variables#browser-you-named).
+
 ### A cached browser was rejected {#a-cached-browser-was-rejected}
 
 ::: warning Requires BSI 5.0.0 or later
@@ -1056,7 +1114,7 @@ These messages were added in 5.0.0. In earlier versions the same situations prod
 
 **Cause:**
 
-A cached browser has to pass four checks before BSI will use it — the right browser, built for this operating system, with the browser program actually present, and matching the build that `--browser-version` resolved to. See [Cached browser](/guide/concepts/browser-detection-and-environment-variables#_2-cached-browser-medium-priority).
+A cached browser has to pass four checks before BSI will use it — the right browser, built for this operating system, with the browser program actually present, and matching the build that `--browser-version` resolved to. See [Cached browser](/guide/concepts/browser-detection-and-environment-variables#cached-browser).
 
 When no cached browser passes, BSI reports the check that stopped it. The three messages below are the ones you will see.
 

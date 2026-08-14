@@ -36,21 +36,57 @@ For air‑gapped use with native binaries you need to plan browser setup up fron
 
 Whenever BSI needs a browser, it looks for one in this order:
 
-1. **System browser** via `PUPPETEER_EXECUTABLE_PATH`
-2. **Cached browser** in the Puppeteer cache directory
-3. **Download from the internet**
+1. **A browser you named** with `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH`
+2. **A browser named by** `PUPPETEER_EXECUTABLE_PATH`
+3. **Cached browser** in the Puppeteer cache directory
+4. **Download from the internet**
 
-BSI stops as soon as a usable browser is found.
+BSI stops as soon as a usable browser is found. An **empty value counts as "not set"** at every level, so `BSI_BROWSER_EXECUTABLE_PATH=` in a systemd unit or `-e PUPPETEER_EXECUTABLE_PATH=""` in Docker both mean "ignore this and look further down the list".
 
-### 1. System browser (highest priority)
+### 1. A browser you named (highest priority) {#browser-you-named}
 
-If `PUPPETEER_EXECUTABLE_PATH` is set, BSI treats that as the preferred browser:
+::: warning Requires BSI 5.0.0 or later
+`--browser-executable-path` and `BSI_BROWSER_EXECUTABLE_PATH` were added in 5.0.0. In earlier versions `PUPPETEER_EXECUTABLE_PATH` was the only way to name a browser.
+:::
+
+Point BSI at a browser already installed on the machine, and it neither downloads nor manages one:
+
+```bash
+butler-sheet-icons qseow create-sheet-thumbnails \
+  --browser-executable-path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" ...
+```
+
+For a scheduled task, where editing the command line is awkward, the same value works as an environment variable:
+
+```
+BSI_BROWSER_EXECUTABLE_PATH=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+```
+
+See [Use a browser already installed on the server](#use-a-browser-already-installed-on-the-server) below for which browsers work and why you might want this.
+
+### 2. A browser named by `PUPPETEER_EXECUTABLE_PATH` {#puppeteer-executable-path-browser}
+
+Still honoured, and unchanged. The difference from the option above is **what happens when the file is not there**, and it is deliberate:
+
+- **`--browser-executable-path` is a promise.** If the file is missing, the run **stops** with an error naming the path. BSI does not quietly download a different browser instead.
+- **`PUPPETEER_EXECUTABLE_PATH` is a hint.** If the file is missing, BSI warns and carries on down the list, exactly as before.
+
+Naming a browser through a BSI option states what you want to happen, and running some other browser instead is precisely the surprise a change-controlled environment cannot tolerate. A variable inherited from a container image or a shell profile is a much weaker signal, and many existing setups rely on it falling through.
+
+When the file named by the option is missing, you will see:
+
+```
+--browser-executable-path is set to "D:\browsers\chrome.exe" but no such file exists on this
+machine. Butler Sheet Icons will not fall back to downloading a browser when an executable path
+has been given explicitly. Correct the path, or remove the option to let Butler Sheet Icons find
+a browser itself.
+```
 
 - The path must point to a valid browser executable
 - No download is attempted
 - Works well in Docker, air‑gapped environments and corporate setups with centrally managed browsers
 
-### 2. Cached browser (medium priority)
+### 3. Cached browser {#cached-browser}
 
 If no system browser is configured, BSI looks in its browser cache directory. For a standalone build that is a `browser-cache` folder next to the executable; running from Node.js it is `.cache/puppeteer` in the current user's home directory. You can point it somewhere else with `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` — see [Browser Cache Directory](/guide/advanced/browser-cache-directory) for the full order of precedence.
 
@@ -77,13 +113,13 @@ If a cached browser is rejected, BSI now says which check it failed and where it
 To use a browser you already have, pin `--browser-version` to its exact build id. `browser list-installed` prints them. See [Choosing a browser build](/guide/concepts/browser-management#choosing-a-browser-build) for what each keyword means.
 :::
 
-A browser named with `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH` or with `PUPPETEER_EXECUTABLE_PATH` is not subject to any of this — that is step 1 above, and such a browser is used as-is, without these checks.
+A browser named with `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH` or with `PUPPETEER_EXECUTABLE_PATH` is not subject to any of this — those are steps 1 and 2 above, and such a browser is used as-is, without these checks.
 
 ::: warning Requires BSI 4.0.0 or later
 In earlier versions a defect prevented BSI from ever finding a cached browser, so in practice it re-downloaded a browser on **every run** unless `PUPPETEER_EXECUTABLE_PATH` was set. From 4.0.0 the cache is used as described above. Nothing needs to be reconfigured — the improvement applies automatically, and repeat runs start faster and use far less bandwidth.
 :::
 
-### 3. Download browser (lowest priority)
+### 4. Download browser {#download-browser}
 
 If no system browser and no cached browser are found, BSI downloads a browser from the internet.
 
@@ -135,7 +171,7 @@ If the version history service is reachable but answers with an error, the messa
 ::: tip Preparing an offline machine
 Run `browser install` once while the machine still has internet access. The browser is stored in the Puppeteer cache and reused on every later run, so thumbnail creation itself works without connectivity.
 
-Setting `PUPPETEER_EXECUTABLE_PATH` to a browser installed by other means works too, and is the usual approach for Docker and centrally managed environments. See [Strategy 2](#strategy-2-use-a-system-browser-via-puppeteer-executable-path-controlled) and [Strategy 3](#strategy-3-use-a-pre-cached-browser-semi-offline) below.
+Pointing BSI at a browser installed by other means works too, with `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH`, and is the usual approach for centrally managed environments. See [Strategy 2](#use-a-browser-already-installed-on-the-server) and [Strategy 3](#strategy-3-use-a-pre-cached-browser-semi-offline) below.
 :::
 
 ::: warning Requires BSI 4.0.0 or later
@@ -178,11 +214,35 @@ Use `recommended` (or simply omit `--browser-version`) and pre-populate the cach
 
 ## Key environment variables
 
+### `BSI_BROWSER_EXECUTABLE_PATH`
+
+::: warning Requires BSI 5.0.0 or later
+Added in 5.0.0, together with the matching `--browser-executable-path` option.
+:::
+
+**Purpose:** Tell BSI exactly which browser executable to use. This is BSI's own setting, and the environment-variable form of `--browser-executable-path` — the two are interchangeable.
+
+**Effect:** BSI uses that browser and neither downloads nor manages one. **If the file does not exist, the run stops** rather than falling back to a download. See [A browser you named](#browser-you-named).
+
+**Takes precedence over `PUPPETEER_EXECUTABLE_PATH`.** For Docker users this is the point: the official image sets `PUPPETEER_EXECUTABLE_PATH` to its built-in browser, and setting `BSI_BROWSER_EXECUTABLE_PATH` overrides that, which is how you point a container at a different browser. See [Docker](/guide/advanced/docker).
+
+::: code-group
+
+```powershell [PowerShell]
+$env:BSI_BROWSER_EXECUTABLE_PATH = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+```
+
+```bash [Bash]
+export BSI_BROWSER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
+```
+
+:::
+
 ### `PUPPETEER_EXECUTABLE_PATH`
 
 **Purpose:** Tell BSI exactly which browser executable to use.
 
-**Effect:** If the path exists and is executable, BSI uses that browser and skips both cache lookup and downloads.
+**Effect:** If the path exists and is executable, BSI uses that browser and skips both cache lookup and downloads. If it does not exist, BSI warns and carries on looking — unlike `BSI_BROWSER_EXECUTABLE_PATH`, which stops the run.
 
 **Typical use cases:**
 
@@ -262,7 +322,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
   --imagedir .\img
 ```
 
-### Strategy 2: Use a system browser via `PUPPETEER_EXECUTABLE_PATH` (controlled)
+### Strategy 2: Use a browser already installed on the server (controlled) {#use-a-browser-already-installed-on-the-server}
 
 **Good for:** air‑gapped environments, corporate desktops, servers with centrally managed browsers.
 
@@ -270,16 +330,68 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 - No download is attempted
 - Works well when internet access is limited or tightly controlled
 
-**Windows / PowerShell example:**
+::: code-group
 
-```powershell
-$env:PUPPETEER_EXECUTABLE_PATH = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
-
+```powershell [PowerShell]
 butler-sheet-icons qseow create-sheet-thumbnails `
+  --browser-executable-path 'C:\Program Files\Google\Chrome\Application\chrome.exe' `
   --host $env:BSI_QSEOW_HOST `
   --appid $env:BSI_QSEOW_APP_ID `
   --imagedir .\img
 ```
+
+```bash [Bash]
+butler-sheet-icons qseow create-sheet-thumbnails \
+  --browser-executable-path "/usr/bin/chromium-browser" \
+  --host "$BSI_QSEOW_HOST" \
+  --appid "$BSI_QSEOW_APP_ID" \
+  --imagedir ./img
+```
+
+:::
+
+#### Why you might want this
+
+**No internet access.** Getting a browser onto an isolated server is the whole difficulty of running BSI there. If the server already has a suitable browser — and Windows Server usually does — this sidesteps the problem entirely, with nothing to copy across.
+
+**Change control.** In estates where software is deployed centrally, a tool that downloads its own browser is awkward to approve. Pointing at a browser your normal deployment process installed and patches keeps BSI out of that conversation.
+
+**Disk space and time.** The browser BSI downloads is around 150 MB per machine, and it is downloaded again for each new version.
+
+#### Which browsers work
+
+Any Chromium-based browser. On Windows Server that means **Microsoft Edge**, installed by default on current builds, or **Google Chrome**. Both are Chromium underneath and both work with BSI unmodified.
+
+| Browser        | Usual path on 64-bit Windows                                  |
+| -------------- | ------------------------------------------------------------- |
+| Microsoft Edge | `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe` |
+| Google Chrome  | `C:\Program Files\Google\Chrome\Application\chrome.exe`        |
+
+Confirm the real path before using it rather than trusting the table — installers vary, and both vendors have moved these over the years.
+
+If the server has no browser at all, both vendors publish **offline enterprise installers** designed for exactly this: downloaded once on a connected machine, then distributed internally through your normal software deployment process.
+
+| Browser        | Where                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| Microsoft Edge | [Microsoft Edge for Business download](https://www.microsoft.com/en-us/edge/business/download)    |
+| Google Chrome  | [Chrome Enterprise download](https://chromeenterprise.google/download/)                           |
+
+::: warning BSI does not patch a browser you point it at
+A browser installed this way stays with your normal patching process. BSI neither updates nor manages it — worth stating plainly, because a browser on a Qlik Sense server is a security-review item.
+:::
+
+#### What `--browser-version` does when a browser is named
+
+Nothing — the named browser is used as it is. If you also asked for a specific build, BSI warns that the setting is being overridden, so the two cannot silently disagree:
+
+```
+warn: The browser executable from --browser-executable-path / BSI_BROWSER_EXECUTABLE_PATH
+overrides --browser-version "121.0.6167.85": the browser at C:\Program Files\Google\Chrome\
+Application\chrome.exe will be used instead. Remove --browser-executable-path /
+BSI_BROWSER_EXECUTABLE_PATH to use the requested build.
+```
+
+Version keywords such as `recommended` do **not** produce that warning, because they are BSI's own choice rather than yours.
 
 ### Strategy 3: Use a pre-cached browser (semi-offline)
 
@@ -525,8 +637,9 @@ butler-sheet-icons qseow create-sheet-thumbnails \
 
 ## Summary
 
-- BSI always tries system browser → cached browser → download
-- `PUPPETEER_EXECUTABLE_PATH` gives you full control and is ideal for air‑gapped and managed environments
+- BSI always tries a browser you named → `PUPPETEER_EXECUTABLE_PATH` → cached browser → download
+- `--browser-executable-path` / `BSI_BROWSER_EXECUTABLE_PATH` gives you full control and is ideal for air‑gapped and managed environments. It outranks `PUPPETEER_EXECUTABLE_PATH`, and it **stops the run** rather than downloading a browser if the file is missing
+- `PUPPETEER_EXECUTABLE_PATH` still works and still falls through to the cache when the file is missing
 - The official Docker image includes a browser and is usually the easiest way to run BSI completely offline
 - Native binaries work well too, as long as you either pre‑cache a browser or point to a system browser
 
