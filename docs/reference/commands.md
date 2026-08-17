@@ -8,7 +8,7 @@ Butler Sheet Icons provides commands for Qlik Sense Cloud, Qlik Sense Enterprise
 butler-sheet-icons <platform> <command> [options]
 ```
 
-- `<platform>`: `qscloud`, `qseow`, or `browser`
+- `<platform>`: `qscloud`, `qseow`, `browser`, or `doctor`
 - `<command>`: Specific action to perform
 - `[options]`: Command-specific parameters
 
@@ -26,6 +26,7 @@ butler-sheet-icons <platform> <command> [options]
 | `browser` | `list-available`          | Show available browsers for download | —                         |
 | `browser` | `uninstall`               | Remove specific browser              | —                         |
 | `browser` | `uninstall-all`           | Remove all browsers                  | —                         |
+| `doctor`  | `check`                   | Diagnose what would stop BSI working | —                         |
 
 ::: warning No `remove-sheet-icons` on QSEoW
 Removing sheet icons is available for Qlik Sense Cloud only. There is no `qseow remove-sheet-icons` command — `create-sheet-thumbnails` is the only `qseow` command.
@@ -101,6 +102,7 @@ Use these pages for complete, per-platform command details:
 - QS Cloud: see the detailed reference at [/reference/qscloud](/reference/qscloud)
 - QSEoW: see the detailed reference at [/reference/qseow](/reference/qseow)
 - Browser: see the detailed reference at [/reference/browser](/reference/browser)
+- Doctor: see the detailed reference at [/reference/doctor](/reference/doctor)
 
 For browser cache locations, troubleshooting, and full browser command docs, see the dedicated [Browser Commands](/reference/browser) page.
 
