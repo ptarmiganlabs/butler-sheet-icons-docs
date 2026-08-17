@@ -71,6 +71,17 @@ These did not change what fails — they changed what you are told, which is the
 
 If you have monitoring rules or log filters matching the old wording, they will stop firing. That is the point — but they need removing.
 
+## Changed in 5.0.0: a run's log lines are the run card {#run-card-log-lines}
+
+**Symptom:** after upgrading, a script or monitoring rule that greps for `App version:`, `About to process app`, `Done processing app`, `Processing sheet N:`, `Removing icon for sheet`, or `Using blurred thumbnail` finds nothing, even though runs succeed.
+
+Those lines were replaced or moved to `verbose` when the [run card](/guide/concepts/run-card) — a PLAN block before writes, countable progress lines, and a closing `RESULT ok`/`RESULT FAILED` verdict — became every thumbnail run's output. The run card page carries the [full old-to-new migration table](/guide/concepts/run-card#breaking-change-log-lines-that-scripts-may-grep-for).
+
+Two things to keep in mind while adjusting:
+
+- **Exit codes are unchanged** — 0 on success, 1 on any failure — and remain the reliable automation signal.
+- The `RESULT` block closes every real run **that reaches app processing**. A run that aborts earlier (failed connection test, missing certificates, invalid option) exits 1 with error lines and no `RESULT` block, so do not key success/failure detection on the `RESULT` line alone.
+
 ## Run Failures and Exit Codes {#run-failures-and-exit-codes}
 
 ::: warning Requires BSI 4.0.0 or later
