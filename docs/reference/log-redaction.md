@@ -35,6 +35,26 @@ The redaction also matches common patterns in free text, so log messages and sta
 - **Authorization headers** — `Authorization: Bearer eyJhbGciOi…` becomes `Authorization: Bearer [REDACTED]`. The same applies to `Basic …` and `Token …` schemes.
 - **`key=value` and `key:value` patterns** — `password=hunter2`, `api_key=abcdef`, `clientSecret: topsecret`, and similar. The recognised key names are close to the property-name allow-list above, but not identical: this pattern also matches a bare `auth`, and it does not match the `BSI_*` environment variable names. Note that a match written with a colon is rewritten using `=`, so `clientSecret: topsecret` appears in the log as `clientSecret=[REDACTED]`.
 - **JSON-style quoted secrets** — `"password": "mysecret"` becomes `"password": "[REDACTED]"`.
+- **Quoted values after a secret-named setting** — `--logonpwd "my pass phrase"` becomes
+  `--logonpwd "[REDACTED]"`, and `logonpwd="my pass phrase"` becomes `logonpwd="[REDACTED]"`.
+  Quoting is the usual way to pass a password containing spaces, and the whole quoted value is
+  removed — not just its first word. *(BSI 5.0.0 and later.)*
+
+#### One command-line shape is deliberately not redacted
+
+A password given **without quotes**, as a separate word — `--logonpwd mypassword` — is **not**
+removed from free text by these patterns. There is no way to tell that shape apart from ordinary
+prose: `--logonpwd mypassword` and `Use --apikey instead.` look the same to a pattern matcher, so a
+rule that hides the first also deletes the word "instead" from the second — and an earlier attempt
+at exactly that rule removed useful words from Butler Sheet Icons' own error messages.
+
+**In practice this does not expose your password**, because Butler Sheet Icons never writes your
+command line to the log. Settings are redacted by *name* — anything called `logonpwd` or `apikey`
+is replaced whatever it contains — which is reliable in a way pattern matching is not. The
+interactive wizard does the same when it prints a command line for you to reuse.
+
+The one thing to be aware of: if you paste your own command line into a support request or a GitHub
+issue, **check it yourself first**. Butler Sheet Icons did not write that text and has not seen it.
 
 ## Where does the redaction happen?
 
@@ -42,6 +62,11 @@ The redaction is implemented in two places:
 
 1. **In the logging pipeline.** Every log line that goes through the Winston logger is run through a redaction step before it is written to the console. This means secrets are redacted even if a third-party library tries to log them.
 2. **In crash dump files.** Crash dump files apply the same best-effort **text-pattern** redaction to captured error messages and stack traces before they are written to disk.
+3. **In the `doctor check` JSON report.** The document produced by
+   [`doctor check --outputformat json`](/reference/doctor#doctor-json) is built to be attached to
+   support issues, so every part of it — details, facts, evidence and suggested commands — passes
+   through both the property-name and the text-pattern redaction before it is written. *(BSI 5.0.0
+   and later.)*
 
 In both places, the redaction runs on the message text after your code has produced it. It cannot look inside encrypted blobs or pull secrets out of binary attachments.
 
