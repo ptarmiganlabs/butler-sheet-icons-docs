@@ -19,9 +19,9 @@ Two kinds of redaction run together. Both are best-effort and run automatically.
 
 ### Property names that are always redacted
 
-When Butler Sheet Icons logs an options object — for example, the full command-line options passed to `qseow create-sheet-thumbnails` — any property whose name is in the secret allow-list is replaced with `***redacted***` before the object is written to the log.
+When Butler Sheet Icons logs an options object — for example, the full command-line options passed to `qseow create-sheet-thumbnails` — any property whose name is on the list of known secret names is replaced with `***redacted***` before the object is written to the log.
 
-The allow-list covers the property names most likely to contain a credential, including (case-insensitive):
+The list covers the property names most likely to contain a credential, including (case-insensitive):
 
 - `logonpwd`
 - `apikey`, `apiKey`, `api_key`
@@ -34,7 +34,7 @@ The allow-list covers the property names most likely to contain a credential, in
 - `clientSecret`, `client_secret`
 - `BSI_CLOUD_API_KEY`, `BSI_QSEOW_CST_LOGON_PWD`, `BSI_QSEOW_CST_CERT_FILE`, `BSI_QSEOW_CST_CERTKEY_FILE`
 
-If you add a new option that carries a credential, add the property name to the allow-list in the source code so it is redacted on the next run.
+If you add a new option that carries a credential, add the property name to the secret-names list in the source code so it is redacted on the next run.
 
 ### Patterns that are always redacted in text
 
@@ -42,7 +42,7 @@ The redaction also matches common patterns in free text, so log messages and sta
 
 - **URLs with embedded credentials** — `https://user:secret@host/...` becomes `https://[REDACTED]@host/...`
 - **Authorization headers** — `Authorization: Bearer eyJhbGciOi…` becomes `Authorization: Bearer [REDACTED]`. The same applies to `Basic …` and `Token …` schemes.
-- **`key=value` and `key:value` patterns** — `password=hunter2`, `api_key=abcdef`, `clientSecret: topsecret`, and similar. The recognised key names are close to the property-name allow-list above, but not identical: this pattern also matches a bare `auth`, and it does not match the `BSI_*` environment variable names. Note that a match written with a colon is rewritten using `=`, so `clientSecret: topsecret` appears in the log as `clientSecret=[REDACTED]`.
+- **`key=value` and `key:value` patterns** — `password=hunter2`, `api_key=abcdef`, `clientSecret: topsecret`, and similar. The recognised key names are close to the secret-names list above, but not identical: this pattern also matches a bare `auth`, and it does not match the `BSI_*` environment variable names. Note that a match written with a colon is rewritten using `=`, so `clientSecret: topsecret` appears in the log as `clientSecret=[REDACTED]`.
 - **JSON-style quoted secrets** — `"password": "mysecret"` becomes `"password": "[REDACTED]"`.
 - **Quoted values after a secret-named setting** — `--logonpwd "my pass phrase"` becomes
   `--logonpwd "[REDACTED]"`, and `logonpwd="my pass phrase"` becomes `logonpwd="[REDACTED]"`.
@@ -113,7 +113,7 @@ There is no off switch for redaction. This is by design: silently disabling reda
 
 If you are troubleshooting a problem and the redacted value is what you need, the right approach is to look at the value in its original source — for example, the environment variable, the command-line flag, or the certificate file. Run Butler Sheet Icons with `--loglevel debug` to see the full log message; the surrounding non-secret fields will still be visible, which is usually enough to confirm the option was passed in correctly.
 
-If you find yourself wanting to log a specific property that should be visible in debug output, that is a sign the property should not be on the secret allow-list. In that case, raise an issue describing the use case rather than disabling redaction.
+If you find yourself wanting to log a specific property that should be visible in debug output, that is a sign the property should not be on the secret-names list. In that case, raise an issue describing the use case rather than disabling redaction.
 
 ## What if the redaction is too aggressive?
 
@@ -121,7 +121,7 @@ If the redaction is matching text that is not actually a secret (for example, a 
 
 ## What is the difference between secret redaction in logs and in crash dumps?
 
-Log redaction and crash dump redaction overlap, but they are not identical. Crash dumps reuse the same best-effort **text-pattern** redaction for error messages and stack traces, while normal log redaction also applies the object-property allow-list when Butler Sheet Icons logs structured option/config objects. A crash dump file should still be treated with care: the redaction makes accidental disclosure much less likely, but it is not a guarantee. Always read the file before sharing it.
+Log redaction and crash dump redaction overlap, but they are not identical. Crash dumps reuse the same best-effort **text-pattern** redaction for error messages and stack traces, while normal log redaction also applies the secret-names list to object properties when Butler Sheet Icons logs structured option/config objects. A crash dump file should still be treated with care: the redaction makes accidental disclosure much less likely, but it is not a guarantee. Always read the file before sharing it.
 
 ## Related
 
