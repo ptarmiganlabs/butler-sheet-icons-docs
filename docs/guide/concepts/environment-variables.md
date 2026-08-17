@@ -259,6 +259,10 @@ BSI_LOG_TIMESTAMPS=false ./butler-sheet-icons qseow create-sheet-thumbnails ...
 In Docker, pass it with `-e BSI_LOG_TIMESTAMPS=false`. It also works from a `.env` file next
 to where you run Butler Sheet Icons, together with your other `BSI_` settings.
 
+The [run card](/guide/concepts/run-card) — the plan, progress and verdict blocks a thumbnail
+run prints — is aligned for reading with this prefix off, so scheduled setups that already
+timestamp their logs get the tidiest transcripts by setting it.
+
 If you are unsure whether the variable is reaching Butler Sheet Icons — or whether the value
 you set was understood — run `butler-sheet-icons interactive --self-test`: the **Logging**
 rows show the raw value received and whether timestamps are on or off as a result.

@@ -18,8 +18,9 @@ sheet in every selected app, and which of your options is responsible for each d
 
 A dry run announces itself immediately — the log opens with a
 `DRY RUN of <command>: planning only - NOTHING WILL BE CHANGED` banner before anything
-connects, the `PLAN` block reads `WOULD OVERWRITE …` rather than `WILL OVERWRITE …`, and
-each app line reads `plan app 1/2 …` rather than `app 1/2 …`.
+connects, the [run card](/guide/concepts/run-card)'s `PLAN` block reads `WOULD OVERWRITE …`
+rather than `WILL OVERWRITE …`, and each app line reads `plan app 1/2 …` rather than
+`app 1/2 …`.
 
 ## Why you would use it
 

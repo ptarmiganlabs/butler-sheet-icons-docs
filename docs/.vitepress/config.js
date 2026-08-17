@@ -117,6 +117,7 @@ export default withMermaid({
             { text: "Sheet Blurring", link: "/guide/concepts/sheet-blurring" },
             { text: "Sheet Parts", link: "/guide/concepts/sheet-parts" },
             { text: "Dry Runs", link: "/guide/concepts/dry-run" },
+            { text: "The Run Card", link: "/guide/concepts/run-card" },
             {
               text: "Browser Management",
               link: "/guide/concepts/browser-management",
