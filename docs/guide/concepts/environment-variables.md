@@ -155,6 +155,7 @@ These do not configure a command — they control how Butler Sheet Icons present
 | `NO_COLOR` (any value) | Never colour the log output, even in a terminal |
 | `FORCE_COLOR=1` | Always colour it, even when redirecting to a file |
 | `FORCE_COLOR=0` | Never colour it — the same as `NO_COLOR` |
+| `BSI_LOG_TIMESTAMPS=false` | Remove the timestamp prefix from every log line |
 | `BSI_NO_INTERACTIVE=1` | Refuse to prompt, even in a terminal. See [Interactive Mode](/guide/interactive-mode) |
 | `BSI_ASCII_ONLY=1` | Use plain ASCII instead of Unicode symbols in interactive mode |
 
@@ -205,6 +206,72 @@ FORCE_COLOR=1 butler-sheet-icons browser list-installed > coloured.log
 :::
 
 A terminal reporting itself as `TERM=dumb` is also treated as unable to show colour.
+
+### Timestamps in log output
+
+::: warning Requires BSI 5.0.0 or later
+In earlier versions the timestamp prefix cannot be turned off.
+:::
+
+Every log line Butler Sheet Icons writes starts with a timestamp and a log level:
+
+```
+2026-08-17T09:14:22.105Z info: Starting creation of thumbnails for Qlik Sense Enterprise on Windows (QSEoW)
+```
+
+That prefix is about 31 characters before any content. It is useful when the console is the
+only record of when something happened — and pure duplication when something else already
+records the time, which is the case in most scheduled setups:
+
+- **Docker / Kubernetes** — the container runtime stamps every line (`docker logs -t`,
+  `kubectl logs --timestamps`)
+- **systemd / journald** — the journal stamps every line
+- **Most log shippers** — the collector adds its own receive time
+
+In those environments each line effectively carries two timestamps, and the one Butler Sheet
+Icons adds is the less trustworthy of the two.
+
+Set the environment variable `BSI_LOG_TIMESTAMPS` to `false`, `0`, `no`, or `off` (any
+capitalisation; surrounding whitespace is ignored) and the prefix is dropped:
+
+```
+info: Starting creation of thumbnails for Qlik Sense Enterprise on Windows (QSEoW)
+```
+
+The log level and the message are unchanged — only the timestamp goes away. Any other value,
+and an unset variable, leave timestamps on.
+
+Set it anywhere Butler Sheet Icons reads its environment:
+
+::: code-group
+
+```powershell [PowerShell]
+$env:BSI_LOG_TIMESTAMPS = 'false'
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails ...
+```
+
+```bash [Bash]
+BSI_LOG_TIMESTAMPS=false ./butler-sheet-icons qseow create-sheet-thumbnails ...
+```
+
+:::
+
+In Docker, pass it with `-e BSI_LOG_TIMESTAMPS=false`. It also works from a `.env` file next
+to where you run Butler Sheet Icons, together with your other `BSI_` settings.
+
+If you are unsure whether the variable is reaching Butler Sheet Icons — or whether the value
+you set was understood — run `butler-sheet-icons interactive --self-test`: the **Logging**
+rows show the raw value received and whether timestamps are on or off as a result.
+
+**What it does not affect.** This switch applies to log lines only. Output that never carried
+a timestamp is unchanged: the JSON document from `doctor check --outputformat json`, the
+interactive wizard's prompts and tables, and `--help`/`--version` text. `--log-level`
+filtering and the messages themselves are also unchanged.
+
+**If you parse Butler Sheet Icons log output:** nothing changes unless you set the variable.
+With it set, anything matching on the leading timestamp (log filters, monitoring rules,
+scripts using the timestamp column) will need adjusting — log lines then start directly with
+the level, e.g. `info:` or `error:`.
 
 ## Related: Proxy environment variables
 
