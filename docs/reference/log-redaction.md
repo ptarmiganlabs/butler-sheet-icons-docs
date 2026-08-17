@@ -1,5 +1,14 @@
 # Secret redaction in logs
 
+::: warning Redaction is best-effort
+Secret redaction is taken seriously: it runs on every log line, on crash dumps, and on the
+`doctor check` JSON report, and there is deliberately no way to switch it off. It is still
+best-effort. Redaction works by recognising known property names and known text patterns, and a
+credential in a shape or place it does not recognise can reach the output intact — so there is no
+guarantee that redaction is always complete and correct. Before sharing a log file, a crash dump,
+or a diagnostic report outside your organisation, read it yourself first.
+:::
+
 Butler Sheet Icons automatically removes passwords, API keys, tokens, and other sensitive values from log output. This is on by default, requires no setup, and applies to every log message written during a run — including log messages emitted by third-party libraries, stack traces from unhandled errors, and crash dump files.
 
 This page explains what is redacted, where the redaction happens, and what to do if you ever need to look at a redacted value while troubleshooting.
