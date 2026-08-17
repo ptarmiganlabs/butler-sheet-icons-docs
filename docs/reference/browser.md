@@ -42,6 +42,12 @@ Answers one question: **will a real thumbnail run work on this machine?**
 
 It answers it without contacting Qlik Sense, without changing anything, and without making a single network request. It is safe to run on a production Qlik Sense server at any time, and it is the first thing to run when a thumbnail run has failed for reasons that are not obvious.
 
+::: tip Not sure the browser is the problem?
+If you already know the problem is the browser, `browser check` is the command to run. If a Butler
+Sheet Icons run has failed and you do not yet know why, run [`doctor`](/reference/doctor) instead —
+it runs every check Butler Sheet Icons has, including all of the ones on this page.
+:::
+
 **Usage:**
 
 ::: code-group

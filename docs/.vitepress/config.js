@@ -153,6 +153,7 @@ export default withMermaid({
             { text: "QSEoW Commands", link: "/reference/qseow" },
             { text: "QS Cloud Commands", link: "/reference/qscloud" },
             { text: "Browser Commands", link: "/reference/browser" },
+            { text: "Doctor Command", link: "/reference/doctor" },
           ],
         },
         {
