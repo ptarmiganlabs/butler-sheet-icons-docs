@@ -14,6 +14,10 @@ butler-sheet-icons qscloud create-sheet-icons [options]
 Add `-i` and Butler Sheet Icons asks for what it needs instead — 10 questions rather than 25 options, with the API key checked against your tenant as you give it, and the equivalent command line shown before anything runs. See [Interactive Mode](/guide/interactive-mode#creating-sheet-thumbnails).
 :::
 
+::: tip Check the plan first
+Thumbnails are overwritten in place, with no undo. Add `--dry-run` to see exactly which apps and sheets would be touched — and which option is responsible for each decision — before anything is changed. See [Dry Runs](/guide/concepts/dry-run).
+:::
+
 ### Options
 
 Four options have no default and must be supplied: `--tenanturl`, `--apikey`, `--logonuserid` and `--logonpwd`. Everything else has a working default.
@@ -52,6 +56,7 @@ Pick apps with `--appid`, `--collectionid`, or both — see [Selecting apps](#se
 | `--browser-cache-dir <directory>`    | `BSI_BROWSER_CACHE_DIR`                | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise.                                                                                                                        | -             | `--browser-cache-dir /opt/butler-sheet-icons/browsers` |
 | `--browser-executable-path <path>`   | `BSI_BROWSER_EXECUTABLE_PATH`          | Full path to a browser executable to use, for example a Microsoft Edge or Google Chrome already installed on this machine. Butler Sheet Icons then neither downloads nor manages a browser. Takes precedence over PUPPETEER_EXECUTABLE_PATH. If the file does not exist the run stops rather than downloading a browser instead.                                              | -             | -                                                      |
 | `-i, --interactive`                  | -                                      | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                                                                                                                                | -             | -                                                      |
+| `--dry-run`                          | -                                      | Perform every read and decision the real run would - connect, resolve apps, list sheets, apply every exclude and blur rule - but change nothing. Prints the per-sheet plan and exits.                                                                                                                                                                                         | -             | -                                                      |
 | `-h, --help`                         | -                                      | display help for command                                                                                                                                                                                                                                                                                                                                                      | -             | `-h`                                                   |
 
 <!-- /generated:cli-options -->
@@ -119,6 +124,10 @@ Remove all sheet icons from QS Cloud applications.
 butler-sheet-icons qscloud remove-sheet-icons [options]
 ```
 
+::: tip Check the plan first
+This removes icons and deletes thumbnail media files, with no undo. Add `--dry-run` to see which sheets would be cleared and how many media files would be deleted, before anything is changed. See [Dry Runs](/guide/concepts/dry-run).
+:::
+
 ### Options (remove)
 
 <!-- generated:cli-options qscloud remove-sheet-icons -->
@@ -131,6 +140,7 @@ butler-sheet-icons qscloud remove-sheet-icons [options]
 | `--apikey <key>`                  | `BSI_QSCLOUD_RSI_APIKEY`        | API key used to access the Sense APIs                                                                                                                                                                                            | **Required** | `--apikey eyJhbGciOiJFUzM4NC...`               |
 | `--appid <id...>`                 | `BSI_QSCLOUD_RSI_APPID`         | Qlik Sense app(s) whose sheet icons should be modified. Several ids can be given, separated by spaces or commas.<br>Combines with --collectionid rather than replacing it: apps named either way are all updated, each one once. | -            | `--appid 12345678-1234-1234-1234-123456789012` |
 | `--collectionid <id>`             | `BSI_QSCLOUD_RSI_COLLECTIONID`  | Used to control which Sense apps should have their sheets updated with new icons. All apps in this collection will be updated                                                                                                    | `""`         | `--collectionid 6547e7e0d0b3b0c1e4e0f1a2`      |
+| `--dry-run`                       | -                               | Perform every read and decision the real run would - connect, resolve apps, list sheets, apply every exclude and blur rule - but change nothing. Prints the per-sheet plan and exits.                                            | -            | -                                              |
 | `-h, --help`                      | -                               | display help for command                                                                                                                                                                                                         | -            | `-h`                                           |
 
 <!-- /generated:cli-options -->

@@ -14,6 +14,10 @@ butler-sheet-icons qseow create-sheet-thumbnails [options]
 Add `-i` and Butler Sheet Icons asks for what it needs instead — 14 questions rather than 36 options, with the certificate paths and the content library checked as you give them, and the equivalent command line shown before anything runs. See [Interactive Mode](/guide/interactive-mode#creating-sheet-thumbnails).
 :::
 
+::: tip Check the plan first
+Thumbnails are overwritten in place, with no undo. Add `--dry-run` to see exactly which apps and sheets would be touched — and which option is responsible for each decision — before anything is changed. See [Dry Runs](/guide/concepts/dry-run).
+:::
+
 ### Options
 
 Six options have no default and must be supplied: `--host`, `--apiuserdir`, `--apiuserid`, `--logonuserdir`, `--logonuserid` and `--logonpwd`. Everything else has a working default.
@@ -63,6 +67,7 @@ Pick apps with `--appid`, `--qliksensetag`, or both — see [Selecting apps](#se
 | `--browser-cache-dir <directory>`    | `BSI_BROWSER_CACHE_DIR`              | Directory where Butler Sheet Icons keeps downloaded browsers. Defaults to a "browser-cache" folder next to the Butler Sheet Icons executable for standalone builds, and to the .cache/puppeteer folder in the current user's home directory otherwise.                                                                                                                        | -                         | `--browser-cache-dir D:\qlik\browsers`         |
 | `--browser-executable-path <path>`   | `BSI_BROWSER_EXECUTABLE_PATH`        | Full path to a browser executable to use, for example a Microsoft Edge or Google Chrome already installed on this machine. Butler Sheet Icons then neither downloads nor manages a browser. Takes precedence over PUPPETEER_EXECUTABLE_PATH. If the file does not exist the run stops rather than downloading a browser instead.                                              | -                         | -                                              |
 | `-i, --interactive`                  | -                                    | Answer questions instead of assembling a command line.<br>Options already supplied - here or through their BSI\_\* environment variables - are kept and not asked about again.                                                                                                                                                                                                | -                         | -                                              |
+| `--dry-run`                          | -                                    | Perform every read and decision the real run would - connect, resolve apps, list sheets, apply every exclude and blur rule - but change nothing. Prints the per-sheet plan and exits.                                                                                                                                                                                         | -                         | -                                              |
 | `-h, --help`                         | -                                    | display help for command                                                                                                                                                                                                                                                                                                                                                      | -                         | `-h`                                           |
 
 <!-- /generated:cli-options -->
