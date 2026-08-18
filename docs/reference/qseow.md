@@ -140,15 +140,83 @@ butler-sheet-icons qseow create-sheet-thumbnails \
 
 ## remove-sheet-icons
 
-Remove all sheet icons from QSEoW applications.
+Remove all sheet icons from QSEoW applications. Also available as `remove-sheet-thumbnails`; the two names do the same thing.
 
 ```bash
 butler-sheet-icons qseow remove-sheet-icons [options]
 ```
 
+::: warning Requires BSI 5.0.0 or later
+Earlier versions do not have this command. On those, running it prints the `qseow` help and exits without doing anything, and the only way back was to clear each sheet icon by hand in the Qlik Sense client.
+:::
+
+::: danger There is no undo
+Each sheet goes back to the default grey appearance it had before Butler Sheet Icons was ever run, and the only way to get the icons back is to run [`create-sheet-thumbnails`](#create-sheet-thumbnails) again.
+
+Test on a single app before pointing this at a tag that matches many, and add `--dry-run` first — see [Dry Runs](/guide/concepts/dry-run).
+:::
+
 ### How it works
 
-Uses the same connection and authentication options as `create-sheet-thumbnails`, but only removes existing icons.
+The command connects to your Qlik Sense server, finds the apps you name, and clears the sheet icon on every sheet in each of them. The sheets themselves are untouched; only the icon is removed.
+
+The image files a previous thumbnail run uploaded to the content library are **not** deleted. Their names are predictable, so the next `create-sheet-thumbnails` run overwrites them.
+
+Before anything is written, the run prints a plan: the server, the identity it connects as, how many apps matched your selection, how many of those are published, and a line stating what is about to happen. That published count is worth reading — the icons are cleared in memory and then the app is saved, and it is the save that a published app refuses.
+
+### Fewer options than creating thumbnails
+
+Creating a thumbnail means opening each sheet in a browser and photographing it, which is why that command needs web UI logon credentials, a browser and a page-wait time. Clearing an icon changes a property over the engine connection, so none of that applies here and none of it is offered:
+
+- No `--logonuserdir`, `--logonuserid` or `--logonpwd` — no browser is opened, so there is nothing to log into
+- No `--headless`, `--pagewait`, `--imagedir`, `--includesheetpart` or `--browser`
+- No exclude or blur rules — the command clears every sheet icon in the apps you select
+
+What it does need is the certificate-based API connection: `--host`, `--certfile`, `--certkeyfile`, `--apiuserdir` and `--apiuserid`, exactly as `create-sheet-thumbnails` does.
+
+### Options
+
+Three options have no default and must be supplied: `--host`, `--apiuserdir` and `--apiuserid`. Everything else has a working default.
+
+Pick apps with `--appid`, `--qliksensetag`, or both — the same additive rule as [Selecting apps](#selecting-apps) above.
+
+<!-- generated:cli-options qseow remove-sheet-icons -->
+
+| Option                               | Environment Variable                | Description                                                                                                                                                                                                                     | Default                 | Example                    |
+| ------------------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------- |
+| `--log-level, --loglevel <level>`    | `BSI_QSEOW_RSI_LOG_LEVEL`           | Log level (choices: error, warn, info, verbose, debug, silly)                                                                                                                                                                   | `info`                  | `--loglevel error`         |
+| `--host <host>`                      | `BSI_QSEOW_RSI_HOST`                | Qlik Sense server IP/FQDN                                                                                                                                                                                                       | **Required**            | -                          |
+| `--engineport <port>`                | `BSI_QSEOW_RSI_ENGINE_PORT`         | Qlik Sense server engine port                                                                                                                                                                                                   | `4747`                  | -                          |
+| `--qrsport <port>`                   | `BSI_QSEOW_RSI_QRS_PORT`            | Qlik Sense server repository service (QRS) port                                                                                                                                                                                 | `4242`                  | -                          |
+| `--schemaversion <version>`          | `BSI_QSEOW_RSI_SCHEMA_VERSION`      | Qlik Sense engine schema version (choices: 12.170.2, 12.612.0, 12.936.0, 12.1306.0, 12.1477.0, 12.1657.0, 12.1823.0, 12.2015.0)                                                                                                 | `12.612.0`              | `--schemaversion 12.170.2` |
+| `--certfile <file>`                  | `BSI_QSEOW_RSI_CERT_FILE`           | Qlik Sense certificate file (exported from QMC)                                                                                                                                                                                 | `./cert/client.pem`     | -                          |
+| `--certkeyfile <file>`               | `BSI_QSEOW_RSI_CERTKEY_FILE`        | Qlik Sense certificate key file (exported from QMC)                                                                                                                                                                             | `./cert/client_key.pem` | -                          |
+| `--rejectUnauthorized <true\|false>` | `BSI_QSEOW_RSI_REJECT_UNAUTHORIZED` | Ignore warnings when Sense certificate does not match the --host paramater                                                                                                                                                      | `false`                 | -                          |
+| `--secure <true\|false>`             | `BSI_QSEOW_RSI_SECURE`              | Connection to Qlik Sense engine is via https                                                                                                                                                                                    | `true`                  | -                          |
+| `--apiuserdir <directory>`           | `BSI_QSEOW_RSI_API_USER_DIR`        | User directory for user to connect with when using Sense APIs                                                                                                                                                                   | **Required**            | -                          |
+| `--apiuserid <userid>`               | `BSI_QSEOW_RSI_API_USER_ID`         | User ID for user to connect with when using Sense APIs                                                                                                                                                                          | **Required**            | -                          |
+| `--appid <id...>`                    | `BSI_QSEOW_RSI_APP_ID`              | Qlik Sense app(s) whose sheet icons should be removed. Several ids can be given, separated by spaces or commas.<br>Combines with --qliksensetag rather than replacing it: apps named either way are all updated, each one once. | -                       | -                          |
+| `--qliksensetag <value>`             | `BSI_QSEOW_RSI_QLIKSENSE_TAG`       | Used to control which Sense apps should have their sheet icons removed. All apps with this tag will be updated.                                                                                                                 | `""`                    | -                          |
+| `--prefix <prefix>`                  | `BSI_QSEOW_RSI_PREFIX`              | Qlik Sense virtual proxy prefix                                                                                                                                                                                                 | `""`                    | -                          |
+| `--dry-run`                          | -                                   | Perform every read and decision the real run would - connect, resolve apps, list sheets - but change nothing. Prints the per-sheet plan and exits.                                                                              | -                       | -                          |
+| `-h, --help`                         | -                                   | display help for command                                                                                                                                                                                                        | -                       | `-h`                       |
+
+<!-- /generated:cli-options -->
+
+### Example: remove sheet icons
+
+```bash
+butler-sheet-icons qseow remove-sheet-icons \
+  --host qlik-server.company.com \
+  --appid a3e0f5d2-000a-464f-998d-33d333b175d7 \
+  --apiuserdir Internal \
+  --apiuserid sa_api \
+  --certfile ./cert/client.pem \
+  --certkeyfile ./cert/client_key.pem \
+  --secure true
+```
+
+If neither `--appid` nor `--qliksensetag` matches anything, the run reports `No apps to process` and exits 1 — see [Run failures and exit codes](/guide/troubleshooting#run-failures-and-exit-codes).
 
 ## See also
 

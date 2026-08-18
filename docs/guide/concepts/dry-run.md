@@ -4,15 +4,16 @@
 Earlier versions do not have the `--dry-run` option.
 :::
 
-Three Butler Sheet Icons commands change Qlik Sense apps in place, with no undo:
+Four Butler Sheet Icons commands change Qlik Sense apps in place, with no undo:
 
 - `qseow create-sheet-thumbnails` (see [/reference/qseow](/reference/qseow))
 - `qscloud create-sheet-thumbnails` (see [/reference/qscloud](/reference/qscloud))
+- `qseow remove-sheet-icons` (see [/reference/qseow](/reference/qseow#remove-sheet-icons))
 - `qscloud remove-sheet-icons` (see [/reference/qscloud](/reference/qscloud))
 
-All three accept `--dry-run`. With the flag set, Butler Sheet Icons **does every read the
+All four accept `--dry-run`. With the flag set, Butler Sheet Icons **does every read the
 real run would do — connects, signs in to the APIs, resolves the app list, lists every
-sheet, applies every exclude and blur rule — and then stops.** Nothing is captured,
+sheet, and applies every exclude and blur rule the command has — and then stops.** Nothing is captured,
 uploaded, overwritten or deleted. Instead it prints the plan: what would happen to every
 sheet in every selected app, and which of your options is responsible for each decision.
 
@@ -138,10 +139,16 @@ Things to check before running for real:
   and it withholds the "re-run without `--dry-run`" invitation until the plan is complete.
   The exit code is 1 in that case.
 
-For `qscloud remove-sheet-icons` the column reads `clear icon` instead, sheets that
-currently have no icon are marked `(no icon currently set)`, and each app's section also
-shows how many thumbnail files would be deleted from the app's media library, as
-`N thumbnail media file(s) would also be deleted from the app media library`.
+For the two `remove-sheet-icons` commands the column reads `clear icon` instead, and sheets
+that currently have no icon are marked `(no icon currently set)`.
+
+The two platforms differ in what else is removed, and the plan says so. On Qlik Sense Cloud
+each app's section also shows how many thumbnail files would be deleted from the app's media
+library, as `N thumbnail media file(s) would also be deleted from the app media library`. On
+QSEoW nothing is deleted from the content library — only the link from each sheet to its
+icon is cleared — so the plan's warning names sheet icons alone.
+
+Neither removal command has exclude or blur rules, so there are none to apply.
 
 ## What a dry run does not prove
 
