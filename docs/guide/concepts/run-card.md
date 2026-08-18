@@ -15,6 +15,11 @@ output is plain text through the normal log stream, so it lands unchanged in a f
 redirected from Windows Task Scheduler, in `docker logs`, and in CI transcripts. No new
 options are needed; there is nothing to configure.
 
+On an interactive colour terminal at least 72 characters wide, these runs show the same
+plan and verdict as a colour board instead — see
+[The Contact Sheet](/guide/concepts/contact-sheet). Redirected and scheduled runs always
+get the plain card described on this page.
+
 ## Why it exists
 
 Butler Sheet Icons overwrites sheet thumbnails in place, with no undo. Before the run card,

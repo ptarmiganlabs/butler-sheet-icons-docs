@@ -157,7 +157,8 @@ These do not configure a command — they control how Butler Sheet Icons present
 | `FORCE_COLOR=0` | Never colour it — the same as `NO_COLOR` |
 | `BSI_LOG_TIMESTAMPS=false` | Remove the timestamp prefix from every log line |
 | `BSI_NO_INTERACTIVE=1` | Refuse to prompt, even in a terminal. See [Interactive Mode](/guide/interactive-mode) |
-| `BSI_ASCII_ONLY=1` | Use plain ASCII instead of Unicode symbols in interactive mode |
+| `BSI_ASCII_ONLY=1` | Use plain ASCII instead of Unicode symbols in interactive mode and on the contact sheet |
+| `BSI_OUTPUT=board\|plain\|off` | Override the automatic run-output selection. See [The Contact Sheet](/guide/concepts/contact-sheet) |
 
 ### Colour codes in captured logs
 
