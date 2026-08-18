@@ -119,6 +119,10 @@ export default withMermaid({
             { text: "Dry Runs", link: "/guide/concepts/dry-run" },
             { text: "The Run Card", link: "/guide/concepts/run-card" },
             {
+              text: "The Contact Sheet",
+              link: "/guide/concepts/contact-sheet",
+            },
+            {
               text: "Browser Management",
               link: "/guide/concepts/browser-management",
             },
