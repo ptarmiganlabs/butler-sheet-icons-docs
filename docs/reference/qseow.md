@@ -164,6 +164,8 @@ The image files a previous thumbnail run uploaded to the content library are **n
 
 Before anything is written, the run prints a plan: the server, the identity it connects as, how many apps matched your selection, how many of those are published, and a line stating what is about to happen. That published count is worth reading — the icons are cleared in memory and then the app is saved, and it is the save that a published app refuses.
 
+Sheets that have no icon are marked `(no icon currently set)` in the plan, and the run treats them the same way: it skips them rather than clearing something that is already clear. That makes the command safe to repeat. Running it a second time over an app it has already cleared reports every sheet as having no icon, writes nothing, and does not save the app — so it does not show up as a change to a published app.
+
 ### Fewer options than creating thumbnails
 
 Creating a thumbnail means opening each sheet in a browser and photographing it, which is why that command needs web UI logon credentials, a browser and a page-wait time. Clearing an icon changes a property over the engine connection, so none of that applies here and none of it is offered:
