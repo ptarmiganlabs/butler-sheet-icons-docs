@@ -24,40 +24,40 @@ to override it if the automatic choice is ever wrong for your setup.
 
 ## What the contact sheet looks like
 
-```text
-  ┌─ 410 × 270 ──────────────────────────────────────┐
-  │                                                  │
-  │   BUTLER SHEET ICONS                     x.y.z   │
-  │   QSEoW sheet thumbnails                         │
-  │                                                  │
-  └──────────────────────────────────────────────────┘
+```ansi
+  [2m┌─ 410 × 270 ──────────────────────────────────────┐[22m
+  [2m│[22m                                                  [2m│[22m
+  [2m│[22m   [1mBUTLER SHEET ICONS[22m                     [2mx.y.z[22m   [2m│[22m
+  [2m│[22m   [2mQSEoW sheet thumbnails                      [22m   [2m│[22m
+  [2m│[22m                                                  [2m│[22m
+  [2m└──────────────────────────────────────────────────┘[22m
 
-  PLAN  qseow create-sheet-thumbnails
+  [1mPLAN[22m  qseow create-sheet-thumbnails
 
-  ● server      sense.company.com       https · engine 4747 · qrs 4242
-  ● api user    INTERNAL\sa_api         cert ./cert/client.pem
-  ● logon user  COMPANY\svc_bsi
-  ● apps        3                       0 named by --appid · 3 matched by --qliksensetag "updateSheetThumbnails"
-  ● sheet part  2 of 4                  objects + sheet title
-  ● exclude     tag "no-thumbnail" (2 sheets)
-  ● blur        tag "confidential" (1 sheets)
-  ● browser     chrome (recommended)    headless · 5s per sheet
-  ○ images      ./img/qseow/<app-id>
-  ● uploads to  content library "Butler sheet thumbnails"
+  [32m●[39m server      sense.company.com       [2mhttps · engine 4747 · qrs 4242[22m
+  [32m●[39m api user    INTERNAL\sa_api         [2mcert ./cert/client.pem[22m
+  [32m●[39m logon user  COMPANY\svc_bsi
+  [32m●[39m apps        3                       [2m0 named by --appid · 3 matched by --qliksensetag "updateSheetThumbnails"[22m
+  [32m●[39m sheet part  2 of 4                  [2mobjects + sheet title[22m
+  [32m●[39m exclude     tag "no-thumbnail" (2 sheets)
+  [32m●[39m blur        tag "confidential" (1 sheets)
+  [32m●[39m browser     chrome (recommended)    [2mheadless · 5s per sheet[22m
+  [2m○[22m images      ./img/qseow/<app-id>
+  [32m●[39m uploads to  content library "Butler sheet thumbnails"
 
-  !  sheet thumbnails will be overwritten in 3 app(s), 2 of them published
+  [33m!  sheet thumbnails will be overwritten in 3 app(s), 2 of them published[39m
 
-  ────────────────────────────────────────────────────────────────
+  [2m────────────────────────────────────────────────────────────────[22m
 
-  ✓ 1/3  Sales Discovery       ██▓█░██████   10/11 up      52s
-  ✓ 2/3  Operations Monitor    ████████      8/8 up        41s
-  ✓ 3/3  Executive KPIs        ███░██████    9/10 up       48s
+  [32m✓[39m 1/3  Sales Discovery       [32m█[39m[32m█[39m[33m▓[39m[32m█[39m[2m░[22m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m   10/11 up      [2m52s[22m
+  [32m✓[39m 2/3  Operations Monitor    [32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m      8/8 up        [2m41s[22m
+  [32m✓[39m 3/3  Executive KPIs        [32m█[39m[32m█[39m[32m█[39m[2m░[22m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m    9/10 up       [2m48s[22m
 
-  ────────────────────────────────────────────────────────────────
+  [2m────────────────────────────────────────────────────────────────[22m
 
-  ❯ done in 2m 21s  ·  3 app(s) ok  ·  27 thumbnails uploaded
-    █ 27 captured   ▓ 1 blurred   ░ 2 excluded
-    images in ./img/qseow · 27 file(s) · 1.6 MB
+  ❯ [32mdone in 2m 21s[39m  [2m·[22m  3 app(s) ok  [2m·[22m  27 thumbnails uploaded
+    [32m█[39m 27 captured   [33m▓[39m 1 blurred   [2m░[22m 2 excluded
+    [2mimages in ./img/qseow · 27 file(s) · 1.6 MB[22m
 ```
 
 The plan block at the top is the same information the
