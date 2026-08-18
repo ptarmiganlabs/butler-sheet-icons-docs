@@ -140,7 +140,10 @@ Things to check before running for real:
   The exit code is 1 in that case.
 
 For the two `remove-sheet-icons` commands the column reads `clear icon` instead, and sheets
-that currently have no icon are marked `(no icon currently set)`.
+that currently have no icon are marked `(no icon currently set)`. The real run agrees with that
+row rather than contradicting it: it skips those sheets instead of clearing something already
+clear, so a removal repeated over an app it has already cleared writes nothing and does not save
+the app.
 
 The two platforms differ in what else is removed, and the plan says so. On Qlik Sense Cloud
 each app's section also shows how many thumbnail files would be deleted from the app's media
