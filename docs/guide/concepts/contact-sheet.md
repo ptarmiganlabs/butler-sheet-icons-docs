@@ -72,12 +72,12 @@ write with no undo.
 The row of block characters after each app name is a **sheet strip**: one character per
 sheet, in sheet order.
 
-| Character | ASCII fallback | Meaning on a thumbnail run                | Meaning on `remove-sheet-icons`      |
-| --------- | -------------- | ----------------------------------------- | ------------------------------------ |
-| `█`       | `#`            | Sheet captured and its thumbnail uploaded | Sheet icon cleared                   |
-| `▓`       | `:`            | Captured, then blurred                    | —                                    |
-| `░`       | `.`            | Excluded by one of your exclude rules     | Sheet had no icon to clear           |
-| `▒`       | `!`            | Not processed — the app failed here       | Not processed — the app failed here  |
+| Character | ASCII fallback | Meaning on a thumbnail run                | Meaning on `remove-sheet-icons`     |
+| --------- | -------------- | ----------------------------------------- | ----------------------------------- |
+| `█`       | `#`            | Sheet captured and its thumbnail uploaded | Sheet icon cleared                  |
+| `▓`       | `:`            | Captured, then blurred                    | —                                   |
+| `░`       | `.`            | Excluded by one of your exclude rules     | Sheet had no icon to clear          |
+| `▒`       | `!`            | Not processed — the app failed here       | Not processed — the app failed here |
 
 This makes selection mistakes visible per app, at a glance. A mistyped
 `--exclude-sheet-tag` shows up as a row of solid blocks where you expected gaps. A
@@ -116,12 +116,12 @@ too; the detailed per-sheet dry-run report itself is unchanged.
 `BSI_OUTPUT` is an environment variable, like `BSI_ASCII_ONLY` and `BSI_NO_INTERACTIVE`:
 it describes your console, not one invocation, so it is not a per-command flag.
 
-| Value   | Effect                                                                                                                                              |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `board` | Force the contact sheet, even where detection would not pick it (for example, when recording a run, or on a terminal that is detected incorrectly)   |
-| `plain` | Force the plain run card                                                                                                                             |
-| `off`   | Suppress the framed plan and verdict blocks entirely. Per-app and per-sheet progress lines still print, so the run is not silent                     |
-| `live`  | Reserved for a future live view; today it behaves like automatic selection                                                                           |
+| Value   | Effect                                                                                                                                                                                   |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `board` | Force the contact sheet, even where detection would not pick it (for example, when recording a run, or on a terminal that is detected incorrectly)                                       |
+| `plain` | Force the plain run card                                                                                                                                                                 |
+| `off`   | Suppress the framed plan and verdict blocks entirely. Per-app and per-sheet progress lines still print, so the run is not silent                                                         |
+| `live`  | Permission for the [live view](/guide/concepts/live-view), not a force — it is one of that view's conditions, and can never point a repainting display at a stream that cannot render it |
 
 Values are case-insensitive. An unrecognised value logs a warning and falls back to
 automatic selection — it never stops the run, so a typo in a scheduler's environment
@@ -162,7 +162,7 @@ BSI_OUTPUT=off ./butler-sheet-icons qscloud create-sheet-thumbnails ...
 
 ## Scheduled and captured runs are unaffected
 
-The contact sheet is only ever what an interactive terminal *sees*. Redirected output is
+The contact sheet is only ever what an interactive terminal _sees_. Redirected output is
 not a terminal, so a redirected or scheduled run selects the
 [plain run card](/guide/concepts/run-card) automatically — a file, a Task Scheduler
 transcript or a captured CI log gets the run card, never the board. And when the contact

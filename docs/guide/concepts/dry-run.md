@@ -145,6 +145,24 @@ row rather than contradicting it: it skips those sheets instead of clearing some
 clear, so a removal repeated over an app it has already cleared writes nothing and does not save
 the app.
 
+The summary line counts them the same way, so the plan and the run it predicts state the same
+numbers. On an app with nine sheets, eight of which carry an icon:
+
+```
+Summary: 1 app(s), 9 sheets. 8 icon(s) would be cleared, 1 with no icon, 0 skipped.
+```
+
+and the real run on that app reports the matching split:
+
+```
+  sheets        9 seen, 8 icon(s) cleared, 1 had no icon
+```
+
+The `with no icon` part appears only when there is at least one such sheet. It is worth reading
+before a repeat removal: over an app that has already been cleared the plan reads
+`0 icon(s) would be cleared, 9 with no icon`, which says plainly that the run would write
+nothing — rather than appearing to promise a fresh sweep.
+
 The two platforms differ in what else is removed, and the plan says so. On Qlik Sense Cloud
 each app's section also shows how many thumbnail files would be deleted from the app's media
 library, as `N thumbnail media file(s) would also be deleted from the app media library`. On
@@ -157,7 +175,7 @@ Neither removal command has exclude or blur rules, so there are none to apply.
 
 - **It does not verify the web UI login.** No browser is started, so the
   `--logonuserdir`/`--logonuserid`/`--logonpwd` credentials (and the Cloud login) are never
-  exercised. On client-managed Qlik Sense the certificate and repository API path *is*
+  exercised. On client-managed Qlik Sense the certificate and repository API path _is_
   exercised — those are different credentials.
 - **It does not check that `--imagedir` is writable.** Creating the image directory is a
   write, so a dry run never attempts it. A real run in Docker can still fail on a
