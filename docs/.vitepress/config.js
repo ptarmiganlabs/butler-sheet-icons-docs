@@ -122,6 +122,7 @@ export default withMermaid({
               text: "The Contact Sheet",
               link: "/guide/concepts/contact-sheet",
             },
+            { text: "The Live View", link: "/guide/concepts/live-view" },
             {
               text: "App Overview Screenshots",
               link: "/guide/concepts/app-overview-screenshots",
