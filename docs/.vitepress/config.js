@@ -123,6 +123,10 @@ export default withMermaid({
               link: "/guide/concepts/contact-sheet",
             },
             {
+              text: "App Overview Screenshots",
+              link: "/guide/concepts/app-overview-screenshots",
+            },
+            {
               text: "Browser Management",
               link: "/guide/concepts/browser-management",
             },
@@ -170,7 +174,10 @@ export default withMermaid({
               link: "/reference/supported-versions",
             },
             { text: "Security", link: "/reference/security" },
-            { text: "Secret Redaction in Logs", link: "/reference/log-redaction" },
+            {
+              text: "Secret Redaction in Logs",
+              link: "/reference/log-redaction",
+            },
           ],
         },
       ],
@@ -243,7 +250,7 @@ export default withMermaid({
         rel: "canonical",
         href: joinURL(
           "https://butler-sheet-icons.ptarmiganlabs.com",
-          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, "")),
         ),
       },
     ]);
@@ -254,7 +261,7 @@ export default withMermaid({
         property: "og:url",
         content: joinURL(
           "https://butler-sheet-icons.ptarmiganlabs.com",
-          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, "")),
         ),
       },
     ]);
@@ -300,7 +307,7 @@ export default withMermaid({
             pageData.description ||
             siteConfig.site.description,
         },
-      ]
+      ],
     );
   },
 });

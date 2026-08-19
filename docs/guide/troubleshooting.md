@@ -41,7 +41,6 @@ single most useful thing to attach to a support issue. It contacts nothing, chan
 nothing, and exits `1` when a real thumbnail run would fail here. See
 [browser check](/reference/browser#check).
 
-
 ## Fixed in 4.1.0: options and messages that told you the wrong thing
 
 ::: warning Requires BSI 4.1.0 or later
@@ -52,10 +51,10 @@ Five fixes in 4.1.0 share a theme: Butler Sheet Icons accepted something, or rep
 
 ### Two options that never took effect
 
-| Option | What happened before |
-|---|---|
+| Option                    | What happened before                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `--skip-login` (QS Cloud) | Silently ignored. Login was always attempted, and the log line announcing the skip could never appear. |
-| `--port` (QSEoW) | Not available, so a Qlik Sense server on a non-default port could not be reached without a proxy. |
+| `--port` (QSEoW)          | Not available, so a Qlik Sense server on a non-default port could not be reached without a proxy.      |
 
 Both now behave as documented. If you set `--skip-login` and worked around it being ignored, that workaround is no longer needed.
 
@@ -63,11 +62,11 @@ Both now behave as documented. If you set `--skip-login` and worked around it be
 
 These did not change what fails — they changed what you are told, which is the difference between a five-minute fix and an afternoon.
 
-| Symptom | Before | Now |
-|---|---|---|
-| A certificate file exists but cannot be read — wrong permissions, or a directory where a file was expected | Reported as a **missing** certificate, sending you to look for a file that was there all along | Reports that the file could not be read, and why |
-| The Qlik Sense server answers, but with something unexpected — a proxy login page, an error body | Reported as a **missing content library**, sending you to check a content library that was fine | Reports that the server's answer could not be understood |
-| A per-app lookup fails for one app | Surfaced as an internal error, with no indication which app | Names the app and continues with the rest |
+| Symptom                                                                                                    | Before                                                                                          | Now                                                      |
+| ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| A certificate file exists but cannot be read — wrong permissions, or a directory where a file was expected | Reported as a **missing** certificate, sending you to look for a file that was there all along  | Reports that the file could not be read, and why         |
+| The Qlik Sense server answers, but with something unexpected — a proxy login page, an error body           | Reported as a **missing content library**, sending you to check a content library that was fine | Reports that the server's answer could not be understood |
+| A per-app lookup fails for one app                                                                         | Surfaced as an internal error, with no indication which app                                     | Names the app and continues with the rest                |
 
 If you have monitoring rules or log filters matching the old wording, they will stop firing. That is the point — but they need removing.
 
@@ -225,11 +224,11 @@ Earlier versions failed with `TypeError: allCollections.map is not a function`, 
 
 The quoted part is the request that failed, which tells you what to look at:
 
-| Request | What Butler Sheet Icons was asking for |
+| Request                  | What Butler Sheet Icons was asking for |
 | ------------------------ | -------------------------------------- |
-| `collections` | The collections on your tenant |
-| `collections/<id>/items` | The contents of one collection |
-| `items?resourceType=app` | Every app on the tenant |
+| `collections`            | The collections on your tenant         |
+| `collections/<id>/items` | The contents of one collection         |
+| `items?resourceType=app` | Every app on the tenant                |
 
 **What to check:**
 
@@ -277,13 +276,13 @@ Fixed. Such sheets are now sorted to the end of the sheet list and processed lik
 
 Search your logs for `reading 'rank'` — that phrase is identical in every case. The text before it varies by platform and by how far the run had got:
 
-| Platform | Stage | Log line begins |
-| --- | --- | --- |
-| Qlik Sense Cloud | Creating thumbnails | `CLOUD APP (stack):` |
-| Qlik Sense Cloud | Applying thumbnails to sheets | `CLOUD UPDATE SHEETS (stack):` |
-| Qlik Sense Cloud | Removing sheet icons | `CLOUD REMOVE SHEET ICONS 1 (stack):` |
-| Enterprise on Windows | Creating thumbnails | `QSEOW: qseowProcessApp (stack):` |
-| Enterprise on Windows | Applying thumbnails to sheets | `QSEOW UPDATE SHEETS (stack):` |
+| Platform              | Stage                         | Log line begins                       |
+| --------------------- | ----------------------------- | ------------------------------------- |
+| Qlik Sense Cloud      | Creating thumbnails           | `CLOUD APP (stack):`                  |
+| Qlik Sense Cloud      | Applying thumbnails to sheets | `CLOUD UPDATE SHEETS (stack):`        |
+| Qlik Sense Cloud      | Removing sheet icons          | `CLOUD REMOVE SHEET ICONS 1 (stack):` |
+| Enterprise on Windows | Creating thumbnails           | `QSEOW: qseowProcessApp (stack):`     |
+| Enterprise on Windows | Applying thumbnails to sheets | `QSEOW UPDATE SHEETS (stack):`        |
 
 A closely related failure, `reading 'showCondition'`, is fixed by the same change and is worth searching for too. It struck slightly later — after thumbnails had been generated but before they were uploaded, so the work was still discarded.
 
@@ -299,7 +298,67 @@ A closely related failure, `reading 'showCondition'`, is fixed by the same chang
 
 An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
 
+### A thumbnail shows a loading screen instead of the sheet {#thumbnail-shows-loading-screen}
+
+::: warning Requires BSI 5.0.0 or later
+Earlier versions did not detect this, and reported such a run as a complete success.
+:::
+
+**Symptom:** a sheet's thumbnail is Qlik Sense's "opening the sheet" placeholder — a faint monitor icon, or an almost blank image — rather than a miniature of the sheet. The run itself reported success.
+
+Butler Sheet Icons now says so while it happens:
+
+```
+Sheet 4 ('Regional sales') was still opening when its thumbnail was captured, so the image
+shows Qlik Sense's loading screen rather than the sheet. It was uploaded and assigned anyway.
+Raise --pagewait (currently 1) and run again.
+```
+
+**What causes it:** `--pagewait` is a **fixed wait, not a readiness check**. Butler Sheet Icons navigates to a sheet, waits that many seconds, and photographs whatever is on screen. How long a sheet takes to draw depends on its charts, the data volume, the server's load and the network — so the same value can be comfortably enough for one sheet and too short for the next. It is a race, and the sheets that lose it are not always the same ones from run to run.
+
+**What to do:** raise `--pagewait`. The default is 5 seconds; if you have lowered it, or your sheets are heavy, raise it until the warning stops:
+
+```bash
+./butler-sheet-icons qseow create-sheet-thumbnails \
+    --host sense.company.com \
+    --appid a1b2c3d4-0000-4a1b-9c8d-000000000001 \
+    --apiuserdir INTERNAL --apiuserid sa_api \
+    --logonuserdir COMPANY --logonuserid svc_bsi --logonpwd password-here \
+    --pagewait 15
+```
+
+The cost is run time, paid once per sheet: `--pagewait 15` over 40 sheets adds about seven minutes. Then run again — a rerun overwrites the affected thumbnails, and sheets that were captured correctly are simply recaptured. There is nothing to clean up.
+
+**Checking the result:** `overview-after.png` in the image directory shows the app overview as Qlik Sense draws it once the run has finished, so a sheet whose thumbnail is a loading screen is obvious there. See [App overview screenshots](/guide/concepts/app-overview-screenshots).
+
 ## Authentication Issues
+
+### "Too many sessions active in parallel" {#too-many-sessions-active-in-parallel}
+
+**Symptom:** on client-managed Qlik Sense, a run fails like this:
+
+```
+error: QSEOW: qseowProcessApp: Waiting for selector `#grid-wrap` failed
+       [caused by: Waiting failed: 90000ms exceeded]
+```
+
+That message names a selector and says nothing about sessions, which sends most people looking at the browser or the sheet. Two facts identify it quickly:
+
+- **The run's own screenshots show the real error.** Open `loginpage-1.png` or `overview-before.png` in the image directory. When this is the cause, the page shows a Qlik Sense dialog reading _"You cannot access Qlik Sense because you have too many sessions active in parallel."_
+- **The APIs stay healthy.** The repository API and the hub keep answering normally while the web client is unusable, so "Qlik Sense is up" does not rule this out. Only the browser-driven part of a run is affected — a [dry run](/guide/concepts/dry-run), which opens no browser, still works.
+
+**What causes it:** each run signs in to the Qlik Sense web UI, and every signed-in session counts against the logon user's parallel-session limit. Sessions that are not released stay alive until Qlik Sense times them out.
+
+::: tip Fixed in 5.0.0: failed runs used to strand their session
+Before 5.0.0 the logout only ran when a run succeeded, so a run that failed partway through left its session alive until it timed out. That made the problem self-reinforcing — one failed run brought the next one closer to the limit. Runs now log out on both paths.
+:::
+
+**If you are already in this state:** sessions are released when they time out, which is governed by the Qlik Sense proxy's session-inactivity setting. If you cannot wait, restarting the Qlik Sense Engine and Proxy services clears them. A low current session count does not always mean the limit has stopped being enforced.
+
+**Reducing the pressure:**
+
+- **Watch the per-app cost.** A thumbnail run signs in once per app, plus a second time per app when `--capture-overview-after` is on (its default). Over a large tag or collection that is a lot of sessions in a short window; `--capture-overview-after false` halves it. See [App overview screenshots](/guide/concepts/app-overview-screenshots).
+- **Give the runs their own account.** A dedicated service account for `--logonuserid` keeps a failed run from locking a human out of Qlik Sense, and makes the session count attributable.
 
 ### QS Cloud Authentication Problems {#qs-cloud-authentication-problems}
 
@@ -441,11 +500,11 @@ A browser running on Windows announces itself with a User-Agent containing `Wind
 default pattern, so Qlik Sense decides this visitor should use Windows authentication and sends the
 browser to NTLM instead of the login page:
 
-| Butler Sheet Icons runs on | User-Agent contains       | Qlik Sense sends the browser to               |
-| -------------------------- | ------------------------- | --------------------------------------------- |
-| macOS                      | `Macintosh; Intel Mac OS X` | `/internal_forms_authentication/` — login page |
-| Linux                      | `X11; Linux x86_64`         | `/internal_forms_authentication/` — login page |
-| Windows                    | `Windows NT 10.0; Win64; x64` | `/internal_windows_authentication` — NTLM    |
+| Butler Sheet Icons runs on | User-Agent contains           | Qlik Sense sends the browser to                |
+| -------------------------- | ----------------------------- | ---------------------------------------------- |
+| macOS                      | `Macintosh; Intel Mac OS X`   | `/internal_forms_authentication/` — login page |
+| Linux                      | `X11; Linux x86_64`           | `/internal_forms_authentication/` — login page |
+| Windows                    | `Windows NT 10.0; Win64; x64` | `/internal_windows_authentication` — NTLM      |
 
 Butler Sheet Icons cannot complete an NTLM login. The browser it runs has no window and no way to ask
 anyone for credentials, so Windows quietly offers whatever account the machine is signed in as. On a
@@ -530,9 +589,9 @@ curl -sk -o /dev/null -D - -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
 
 Read the `Location:` line in the reply:
 
-| `Location` contains               | Meaning                                                              |
-| --------------------------------- | -------------------------------------------------------------------- |
-| `internal_forms_authentication`   | The login page. Butler Sheet Icons will work through this proxy.     |
+| `Location` contains               | Meaning                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------- |
+| `internal_forms_authentication`   | The login page. Butler Sheet Icons will work through this proxy.        |
 | `internal_windows_authentication` | NTLM. Butler Sheet Icons will fail with `ERR_INVALID_AUTH_CREDENTIALS`. |
 
 On Windows use `curl.exe` rather than `curl` — in PowerShell, `curl` is an alias for something else and
@@ -722,12 +781,12 @@ Browser-related problems are among the most common issues when using Butler Shee
 
 Some of the `browser` commands need internet access, and the rest do not:
 
-| Command                               | Needs internet?                          |
-| ------------------------------------- | ---------------------------------------- |
-| `browser check`                       | No                                       |
-| `browser list-installed`              | No                                       |
-| `browser uninstall` / `uninstall-all` | No                                       |
-| `browser list-available`              | Yes, for Chrome                          |
+| Command                               | Needs internet?                                 |
+| ------------------------------------- | ----------------------------------------------- |
+| `browser check`                       | No                                              |
+| `browser list-installed`              | No                                              |
+| `browser uninstall` / `uninstall-all` | No                                              |
+| `browser list-available`              | Yes, for Chrome                                 |
 | `browser install`                     | Only if it has to download or look up a version |
 
 On an air-gapped server, or one behind a proxy that blocks outbound HTTPS, the commands that need internet access will fail. This is expected behaviour, not a fault in BSI.
@@ -832,11 +891,11 @@ Two things follow, and both are recognisable:
 
 1. **Exclude the browser cache directory from real-time scanning.** This is the directory Butler Sheet Icons downloads its browsers into, and where that is depends on how you run it:
 
-   | How you run it | Directory to exclude |
-   | --- | --- |
-   | Standalone build | `browser-cache`, next to `butler-sheet-icons.exe` |
-   | From Node.js | `.cache\puppeteer` in the home directory of the account running BSI |
-   | A directory you chose | Whatever `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` names |
+   | How you run it        | Directory to exclude                                                |
+   | --------------------- | ------------------------------------------------------------------- |
+   | Standalone build      | `browser-cache`, next to `butler-sheet-icons.exe`                   |
+   | From Node.js          | `.cache\puppeteer` in the home directory of the account running BSI |
+   | A directory you chose | Whatever `--browser-cache-dir` or `BSI_BROWSER_CACHE_DIR` names     |
 
    Check the log if you are not sure — Butler Sheet Icons names the directory it used whenever it is not the last of these. See [Browser Cache Directory](/guide/advanced/browser-cache-directory).
 
@@ -1013,6 +1072,7 @@ when Butler Sheet Icons runs on Windows. See
    ```
 
 3. **Try a different Chrome build**:
+
    ```bash
    # If one Chrome build has issues, install and use another
    butler-sheet-icons browser install --browser chrome --browser-version 120.0.6099.109
@@ -1168,14 +1228,14 @@ This is the most common mistake when staging a browser for a server with no inte
 
 The message names both sides: the platform this machine needs, and the platforms the cached builds were built for. The names are the ones the browser download service uses:
 
-| Name        | Operating system         |
-| ----------- | ------------------------ |
-| `win64`     | 64-bit Windows           |
-| `win32`     | 32-bit Windows           |
-| `mac_arm`   | macOS on Apple Silicon   |
-| `mac`       | macOS on Intel           |
-| `linux`     | 64-bit Linux             |
-| `linux_arm` | Linux on ARM             |
+| Name        | Operating system       |
+| ----------- | ---------------------- |
+| `win64`     | 64-bit Windows         |
+| `win32`     | 32-bit Windows         |
+| `mac_arm`   | macOS on Apple Silicon |
+| `mac`       | macOS on Intel         |
+| `linux`     | 64-bit Linux           |
+| `linux_arm` | Linux on ARM           |
 
 Two combinations are **not** a mismatch, because the machine can run the build even though the names differ. BSI accepts both without a warning:
 
@@ -1457,10 +1517,10 @@ Re-running Butler Sheet Icons for that app is safe, and is the right response.
 
 **What the close code tells you:**
 
-| Code | Meaning | What to do |
-| ---- | ------- | ---------- |
-| `1006` | The connection ended without a proper goodbye — typically a network device, firewall or proxy between Butler Sheet Icons and Qlik Sense dropping it | If it repeats, ask whoever manages that equipment whether long-lived WebSocket connections to Qlik Sense are being timed out for idleness |
-| Anything else, usually with a `reason` | The Qlik Sense end closed the connection deliberately | Investigate the reason text; include it in a support request |
+| Code                                   | Meaning                                                                                                                                             | What to do                                                                                                                                |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `1006`                                 | The connection ended without a proper goodbye — typically a network device, firewall or proxy between Butler Sheet Icons and Qlik Sense dropping it | If it repeats, ask whoever manages that equipment whether long-lived WebSocket connections to Qlik Sense are being timed out for idleness |
+| Anything else, usually with a `reason` | The Qlik Sense end closed the connection deliberately                                                                                               | Investigate the reason text; include it in a support request                                                                              |
 
 A run that loses its connection occasionally and succeeds on a re-run is a network hiccup, not a
 misconfiguration.
@@ -1485,8 +1545,8 @@ nothing here and produces thumbnails of half-drawn charts.
 :::
 
 ::: tip A message that is not this — on BSI 4.1.0 and earlier
-Up to and including 4.1.0, a warning about the engine session being *"closed from the other end, code
-1000"* appeared on **successful** runs too. Butler Sheet Icons was reporting its own tidy-up as though the
+Up to and including 4.1.0, a warning about the engine session being _"closed from the other end, code
+1000"_ appeared on **successful** runs too. Butler Sheet Icons was reporting its own tidy-up as though the
 far end had hung up. Ignore it on those versions.
 
 From 5.0.0 a message of this kind means what it says, and the code it quotes is worth including in a bug
@@ -1523,13 +1583,13 @@ export http_proxy=http://user:pass@proxy.company.com:8080
 
 Before BSI 4.0.0, names supplied to `--qliksensetag`, `--exclude-sheet-tag` and `--contentlibrary` were sent to the Qlik Sense Repository Service unprotected, so punctuation in a name was read as instructions rather than as part of the name. Each character failed in its own way:
 
-| Character in the name | What you saw |
-| --- | --- |
-| `&` | `400::Missing parameter value(s)` |
-| `'` | `400::Cannot parse the expression:` followed by the query |
-| `#` | `403::XSRF prevention check failed. Possible XSRF discovered.` |
-| `?` or `/` | `Request path contains unescaped characters` |
-| `%` | `URI malformed` |
+| Character in the name | What you saw                                                   |
+| --------------------- | -------------------------------------------------------------- |
+| `&`                   | `400::Missing parameter value(s)`                              |
+| `'`                   | `400::Cannot parse the expression:` followed by the query      |
+| `#`                   | `403::XSRF prevention check failed. Possible XSRF discovered.` |
+| `?` or `/`            | `Request path contains unescaped characters`                   |
+| `%`                   | `URI malformed`                                                |
 
 Names containing `+`, `=` or `,` were unaffected, as were names made only of letters, digits, spaces, hyphens and underscores.
 
@@ -1566,17 +1626,17 @@ Nothing is wrong with Chrome, and nothing is wrong with your Qlik Sense environm
 never started, and names the build to change:
 `Result: FAILED - the browser starts but cannot be driven by Butler Sheet Icons`.
 
-Before BSI 4.0.0 the default was `latest`, meaning the newest *published* build, so this could strike anyone — two servers could behave differently purely because each had a different build cached. From 4.0.0 the default is `recommended` and that class of failure went away.
+Before BSI 4.0.0 the default was `latest`, meaning the newest _published_ build, so this could strike anyone — two servers could behave differently purely because each had a different build cached. From 4.0.0 the default is `recommended` and that class of failure went away.
 
 ::: warning It can still happen if you deliberately track Chrome's stable channel
 `recommended` cannot get ahead of what Butler Sheet Icons can drive. Anything that floats can:
 
-| `--browser-version` (or `BSI_*_BROWSER_VERSION`) | Can drift ahead? |
-| --- | --- |
-| `recommended` — the default | No |
-| `stable`, or its old alias `latest` | **Yes**, once Chrome's stable channel moves far enough ahead |
-| A release channel: `beta`, `dev`, `canary` | **Yes** |
-| An explicit recent build id, e.g. `151.0.7922.138` | **Yes** |
+| `--browser-version` (or `BSI_*_BROWSER_VERSION`)   | Can drift ahead?                                             |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| `recommended` — the default                        | No                                                           |
+| `stable`, or its old alias `latest`                | **Yes**, once Chrome's stable channel moves far enough ahead |
+| A release channel: `beta`, `dev`, `canary`         | **Yes**                                                      |
+| An explicit recent build id, e.g. `151.0.7922.138` | **Yes**                                                      |
 
 Because `stable` means "whatever Chrome publishes as stable today", this appears overnight on a machine whose configuration has not been touched for months. That is the nature of the setting, not a fault in your environment.
 
@@ -1799,12 +1859,12 @@ It is now written at `info`, matching every other command that works on an app y
 
 **Cause and fix, by symptom:**
 
-| What you see | Why | What to do |
-| --- | --- | --- |
-| No digital signature at all | You are on **4.0.0 or 4.1.0**. The previous certificate expired shortly before 4.0.0, so those two releases shipped unsigned | Upgrade to 5.0.0 or later. No configuration change is needed |
-| SmartScreen still warns, even on a signed release | SmartScreen goes on accumulated *reputation*, not merely on whether a signature exists. Only Extended Validation certificates get reputation immediately | Choose **More info**, then **Run anyway**. It becomes less frequent as the release is downloaded more widely |
-| A publisher rule does not match | An unsigned executable cannot be permitted by a publisher rule under any configuration | Upgrade to a signed release, then build the rule from the publisher certificate rather than a file hash |
-| The publisher is a person's name | The certificate is issued to an individual open source developer rather than to a company | Expected. Confirm it with the thumbprint rather than the name |
+| What you see                                      | Why                                                                                                                                                      | What to do                                                                                                   |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| No digital signature at all                       | You are on **4.0.0 or 4.1.0**. The previous certificate expired shortly before 4.0.0, so those two releases shipped unsigned                             | Upgrade to 5.0.0 or later. No configuration change is needed                                                 |
+| SmartScreen still warns, even on a signed release | SmartScreen goes on accumulated _reputation_, not merely on whether a signature exists. Only Extended Validation certificates get reputation immediately | Choose **More info**, then **Run anyway**. It becomes less frequent as the release is downloaded more widely |
+| A publisher rule does not match                   | An unsigned executable cannot be permitted by a publisher rule under any configuration                                                                   | Upgrade to a signed release, then build the rule from the publisher certificate rather than a file hash      |
+| The publisher is a person's name                  | The certificate is issued to an individual open source developer rather than to a company                                                                | Expected. Confirm it with the thumbprint rather than the name                                                |
 
 **Always confirm the thumbprint, not just the status.** `Status` reading `Valid` only means the file carries an intact signature from a certificate Windows trusts — any correctly signed program passes that test.
 
