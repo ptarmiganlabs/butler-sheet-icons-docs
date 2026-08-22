@@ -105,7 +105,7 @@ BSI.CORE 2026-06-24 10:30:45 debug: Options: {
 }
 ```
 
-The non-secret properties are preserved as-is so the logs remain useful for troubleshooting. The `tenanturl` is left intact because it is a host name, not a credential.
+The non-secret properties are preserved as-is so the logs remain useful for troubleshooting. The `tenanturl` is left intact because it is a host name, not a credential. From BSI 5.0.1 a host that arrives with a password embedded in it — `https://user:password@host` — is refused at startup rather than accepted and redacted, so a credential can no longer reach the logs by that route in the first place.
 
 ## What if I need to see a redacted value?
 

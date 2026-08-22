@@ -156,6 +156,31 @@ The run then failed later for reasons that looked unrelated.
 
 **What to do:** verify `--tenanturl` points at a Qlik Sense Cloud tenant and that `--apikey` is valid and unexpired. See [QS Cloud Authentication Problems](#qs-cloud-authentication-problems).
 
+### `getaddrinfo ENOTFOUND https` after the tenant checked out {#tenant-url-or-host-carries-a-scheme}
+
+The run header confirmed the tenant with a green tick, and then the first app failed looking up a host called `https`:
+
+```
+  ✓ tenant            https://plabs.eu.qlikcloud.com
+  ✓ app list          1 apps · 1 named
+...
+error: CLOUD APP: getaddrinfo ENOTFOUND https
+```
+
+This means `--tenanturl` (or, on Qlik Sense Enterprise on Windows, `--host`) was given with `https://` in front, on a version that did not accept it. The startup checks go over the REST API, which tolerated the scheme — hence the green tick — but the engine and browser then built an address of the form `wss://https://.../...`, and `https` is not a host any DNS server knows.
+
+**What to do:** upgrade to BSI 5.0.1 or later, where the scheme is accepted and removed for you on both platforms — see [Tenant URL Format](/guide/configuration/qlik-sense-cloud#tenant-url-format) and [Server Connection Details](/guide/configuration/qseow#server-connection-details). On an earlier version, drop the `https://` and pass the host on its own.
+
+::: warning Requires BSI 5.0.1 or later to paste a URL
+From 5.0.1 a pasted URL is accepted, but only its host is used. A value carrying a **path**, a **port**, **credentials**, or a value that is **blank** is refused at startup with a message naming what to do instead — for example:
+
+```text
+error: option '--host <host>' argument 'https://sense.example.com/form/hub' is invalid. Enter the host on its own, for example "sense.example.com" - a path is not part of it. A virtual proxy prefix, if there is one, goes in --prefix.
+```
+
+Each of those parts has its own option — the ports are `--engineport`, `--qrsport` and `--port`; a virtual proxy prefix is `--prefix`; the logon and API users carry the credentials. A blank value most often comes from an empty `BSI_QSEOW_CST_HOST=` line in a `.env` file; the [interactive wizard](/guide/interactive-mode#before-anything-runs) can now repair such a value in place.
+:::
+
 ### `Failed to upload N of M thumbnail image(s)`
 
 Thumbnail images were generated but could not be uploaded, so **the app was left untouched** and its sheets keep the icons they already had.
