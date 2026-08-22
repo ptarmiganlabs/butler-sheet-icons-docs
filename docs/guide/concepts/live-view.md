@@ -115,10 +115,11 @@ and cmd.exe, so no special terminal is needed on Windows.
 ## If the terminal ever looks wrong
 
 The live view restores the terminal — cursor visible, output back to normal — when a
-run completes, when it fails, and when Butler Sheet Icons crashes. One case is not yet
-covered: **stopping a run with Ctrl-C** (or killing the process any other way) ends it
-before the cleanup can run, and can leave the cursor invisible. The standard `reset`
-command restores the terminal; graceful Ctrl-C handling is planned separately.
+run completes, when it fails, when Butler Sheet Icons crashes, and (from BSI 5.0.0) when
+you **stop a run with Ctrl-C**: the progress display collapses and the terminal is handed
+back the same as at any other ending. See [Stopping a run part-way through](/guide/concepts/interrupting-a-run).
+If a process is killed some other way and leaves the cursor hidden, the standard `reset`
+command restores the terminal.
 
 If your console renders the animation as garbage (an unusual terminal emulator, an
 over-SSH session with a broken `TERM`), set `BSI_OUTPUT=board` or `BSI_OUTPUT=plain`

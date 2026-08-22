@@ -124,6 +124,10 @@ export default withMermaid({
             },
             { text: "The Live View", link: "/guide/concepts/live-view" },
             {
+              text: "Stopping a Run",
+              link: "/guide/concepts/interrupting-a-run",
+            },
+            {
               text: "App Overview Screenshots",
               link: "/guide/concepts/app-overview-screenshots",
             },

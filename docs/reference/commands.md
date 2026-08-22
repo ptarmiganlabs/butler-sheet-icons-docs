@@ -63,7 +63,10 @@ Every command reports its outcome in the process exit code:
 | --------- | ----------------------------------------------------------------------------- |
 | `0`       | The command completed, and everything it was asked to do succeeded.           |
 | `1`       | The command failed, or finished with one or more apps it could not process.   |
+| `130`     | The run was stopped with Ctrl-C (SIGINT) — see [Stopping a run](/guide/concepts/interrupting-a-run#exit-codes). |
 | `141`     | The command's output pipe closed before it finished writing — see below.      |
+| `143`     | The run was stopped with SIGTERM (`docker stop`, `kubectl delete pod`) — see [Stopping a run](/guide/concepts/interrupting-a-run#exit-codes). |
+| `129`     | The terminal was closed or the connection dropped (SIGHUP) — see [Stopping a run](/guide/concepts/interrupting-a-run#exit-codes). |
 
 ### Exit code 141: the output pipe closed {#exit-code-141}
 
