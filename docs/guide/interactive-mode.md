@@ -329,6 +329,32 @@ retyping the library name will fix it. Press **Ctrl+C**, correct the file, and s
 Without this, a stale `.env` file failed only once the run had started — on QSEoW, a missing content
 library aborts after every screenshot has already been taken.
 
+#### A value the CLI cannot use is repaired here, not fatal {#a-value-the-cli-cannot-use-is-repaired-here}
+
+The checks above contact your server. A separate class of problem is caught earlier, without any network
+call: a value that is malformed on its face — a `--host` with a path or a port in it, a mistyped
+`--engineport`, a tenant URL that is blank. On the plain command line these stop Butler Sheet Icons
+before anything runs, and — this is the part that used to hurt — they stopped `-i` too, so the wizard
+that exists to fix such a value could not be reached from a `.env` file that contained a bad one.
+
+From BSI 5.0.1 the wizard opens instead. It lists what it could not use, names the variable the value came
+from, repeats the reason, and then asks that question with the rejected value pre-filled, so fixing it is
+an edit rather than a retype:
+
+```
+  Supplied, but not usable as given, so asked about below:
+  ✗ --host (from BSI_QSEOW_CST_HOST): Enter the host on its own, for example "sense.example.com" - a path is not part of it. A virtual proxy prefix, if there is one, goes in --prefix.
+```
+
+Choosing **Save the answers to .env** at the end writes the corrected value back, so the next run passes
+without being asked. This covers every validated option, not only the host — a mistyped
+`BSI_QSEOW_CST_ENGINE_PORT` is repaired the same way.
+
+::: warning Requires BSI 5.0.1 or later
+In earlier versions a value the CLI refused stopped `-i` before the wizard opened, with only the error
+and no prompt.
+:::
+
 #### Apps you supplied are listed first, and ticked
 
 ```

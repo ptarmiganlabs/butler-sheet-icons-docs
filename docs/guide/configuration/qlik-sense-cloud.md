@@ -91,17 +91,29 @@ The `--skip-login` option is experimental and may not work with all SSO configur
 
 ### Tenant URL Format
 
-When using Butler Sheet Icons, use the tenant URL as you see it in your browser when accessing Qlik Sense Cloud.
-
-For example:
+`--tenanturl` takes the host name of your tenant. From BSI 5.0.1 you can also paste the address with the scheme in front — both of these mean the same thing:
 
 ```bash
-# Full URL with protocol
---tenanturl https://your-tenant.region.qlikcloud.com
-
-# For example
+# Host name
 --tenanturl mytenant.eu.qlikcloud.com
+
+# Address with the scheme in front (5.0.1 and later)
+--tenanturl https://mytenant.eu.qlikcloud.com
 ```
+
+Butler Sheet Icons reads the value as a URL and keeps only the host name from it, so a leading `https://`, a trailing slash, and upper-case letters are all handled for you. The same applies wherever the value is supplied: on the command line, in `BSI_QSCLOUD_*_TENANTURL`, in a `.env` file, and in the [interactive wizard](/guide/interactive-mode).
+
+::: warning Requires BSI 5.0.1 or later
+In earlier versions `--tenanturl https://mytenant.eu.qlikcloud.com` was accepted by the startup connection test and then failed on the first app with `error: CLOUD APP: getaddrinfo ENOTFOUND https`. Only the bare host worked. See [that symptom in Troubleshooting](/guide/troubleshooting#tenant-url-or-host-carries-a-scheme).
+:::
+
+**A complete page address is not a tenant URL.** The address in your browser while you are *looking at an app* carries a path — `.../sense/app/<id>` — and that path is not part of the host, so it is refused at startup rather than quietly dropped:
+
+```text
+error: option '--tenanturl <url>' argument 'https://mytenant.eu.qlikcloud.com/sense/app/x' is invalid. Enter the host on its own, for example "tenant.eu.qlikcloud.com" - a path is not part of it.
+```
+
+Give the host on its own; name the app with [`--appid`](/reference/qscloud) instead.
 
 ## App Selection Methods
 
