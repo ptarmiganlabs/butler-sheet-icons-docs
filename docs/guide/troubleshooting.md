@@ -133,6 +133,28 @@ The per-sheet line names the sheet by title and ID, which is what you need to fi
 
 **What to do:** open the named sheet. A read-only or published sheet cannot be updated by the account BSI is running as. See [App Access Issues](#app-access-issues).
 
+### `Failed to create a thumbnail for N of M sheet(s) in app <id>` {#failed-to-create-a-thumbnail-for-some-sheets}
+
+One or more sheets in an app could not be captured — most often because the sheet took longer to render than `--pagewait` allows. The app is reported as failed, and so is the run.
+
+```
+Failed to create a thumbnail for 1 of 9 sheet(s) in app a1b2c3d4-...
+```
+
+::: warning Requires BSI 5.0.0 or later
+On Qlik Sense Enterprise on Windows, one uncapturable sheet used to discard the whole app — no thumbnails were uploaded and nothing changed, even for the eight sheets that captured fine. From 5.0.0 the sheets that were captured are uploaded and applied; only the one that failed keeps the icon it already had. Qlik Sense Cloud has always behaved this way, and the two platforms now match.
+:::
+
+This changes what a **failed** QSEoW run leaves behind: it can now have applied new thumbnails to some sheets even though the run reports failure. The run report lists the sheets that were updated, so the account of what changed is accurate rather than reporting zero for work that was done. A sheet that failed is never left pointing at an image that was not created — if it had a thumbnail before, it still has that one.
+
+**What to do:** find the sheet named in the per-sheet log line and work through the usual causes in order:
+
+| Cause                                                 | What to try                                                          |
+| ----------------------------------------------------- | ------------------------------------------------------------------- |
+| The sheet takes longer to render than BSI waits       | Raise `--pagewait`; see [A thumbnail shows a loading screen](#thumbnail-shows-loading-screen) |
+| The sheet is empty, broken, or errors in Sense itself | Open it in a browser as the same user BSI signs in as               |
+| The whole app is affected, not one sheet              | This is usually authentication or the engine session, not the sheet |
+
 ### `Connection test to tenant ... returned a response with no user in it`
 
 The Qlik Sense Cloud connection test reached something, but the response did not describe a user.
@@ -322,6 +344,8 @@ A closely related failure, `reading 'showCondition'`, is fixed by the same chang
 ### The run failed — has anything changed in Qlik Sense?
 
 An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
+
+One exception, from BSI 5.0.0: if the app was captured but **one of its sheets could not be**, the sheets that succeeded are saved even though the run reports failure — see [`Failed to create a thumbnail for N of M sheet(s)`](#failed-to-create-a-thumbnail-for-some-sheets). Re-running is still a clean retry: every sheet is captured again from scratch.
 
 ### A thumbnail shows a loading screen instead of the sheet {#thumbnail-shows-loading-screen}
 
