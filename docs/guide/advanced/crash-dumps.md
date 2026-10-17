@@ -122,10 +122,10 @@ Source: uncaughtException
 Exit Code: 1
 
 === ERROR MESSAGE ===
-Failed to install a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
+Could not obtain a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
 
 === STACK TRACE ===
-QseowError: Failed to install a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
+QseowError: Could not obtain a browser for QSEoW app a3e0f5d2-000a-464f-998d-33d333b175d7
     at src/lib/qseow/qseow-process-app.js:282:1
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
 
@@ -133,6 +133,14 @@ QseowError: Failed to install a browser for QSEoW app a3e0f5d2-000a-464f-998d-33
 END OF CRASH REPORT
 ====================================
 ```
+
+::: warning This message was reworded in BSI 5.0.0
+Dumps written by earlier versions say `Failed to install a browser for ...` where 5.0.0 says **`Could not obtain a browser for ...`**. Both name the same problem, so search for either when going through older dumps.
+
+The old wording claimed an install had been attempted, which is no longer true in general: with [`--browser-executable-path`](/guide/concepts/browser-detection-and-environment-variables#browser-you-named) set to a file that does not exist, the run stops before any download is considered — and being told an install failed sent people looking for a network problem they did not have.
+
+The same rename applies to the Qlik Sense Cloud form, `Could not obtain a browser for Qlik Sense Cloud app <id>`.
+:::
 
 ## How are secrets handled in crash dumps?
 
@@ -222,6 +230,51 @@ rm /tmp/butler-sheet-icons-crash-*
 :::
 
 Adjust the path if `BSI_CRASH_DUMP_DIR` points somewhere else.
+
+## A closed output pipe is not a crash {#a-closed-output-pipe-is-not-a-crash}
+
+::: warning Requires BSI 5.0.0 or later
+Earlier versions wrote a crash dump when the command's output pipe closed.
+:::
+
+Looking at the first few lines of a long list is an everyday thing to do:
+
+```bash
+butler-sheet-icons browser list-available --channel stable | head -12
+```
+
+Until 5.0.0 that left a `.json` and a `.txt` crash report behind, in whatever directory you happened to be standing in, saying Butler Sheet Icons had crashed:
+
+```
+=== CRASH INFO ===
+Error Type: Error
+Source: uncaughtException
+Exit Code: 1
+
+=== ERROR MESSAGE ===
+write EPIPE
+```
+
+Nothing had gone wrong. `head` stops reading once it has the twelve lines you asked for, and the next line Butler Sheet Icons tried to print had nowhere to go. That is what `write EPIPE` means: *the thing reading my output has gone away*. The same happened with a pager you quit before the end, with `grep -m1`, and with any other command that stops reading early.
+
+A closed output pipe is now treated as an ordinary end to the run. **No crash dump is written, and nothing is printed about it** — the stream any message would go to is the one that just died. The command above leaves your working directory exactly as it found it, and the output itself is unchanged: you still get the same twelve lines.
+
+This applies whether the reader is a command such as `head`, a pager you quit early, or **another program that started Butler Sheet Icons and captured its output** — a wrapper script, a job runner, or a scheduling tool. If you have seen occasional unexplained crash reports from a run driven by another tool, with `write ENOTCONN` or `write ECONNRESET` as the error message, that is what they were.
+
+The reason they were only occasional is invisible from the outside: output captured by another program travels over a slightly different kind of connection than output piped to `head`, and which of the two messages a dead connection reports depends on whether anything was still buffered when the reader went away. On a busy machine the reader reacts later and more has piled up behind it, so these were most likely exactly where they were hardest to reproduce.
+
+The run ends with exit code **141** rather than `0`; see [Exit code 141](/reference/commands#exit-code-141) for why, and who it affects.
+
+### Real failures are unaffected
+
+Worth being clear about, because the two can happen together:
+
+- A genuine error still writes one `.json` and one `.txt` crash report and exits with code **1**, with its `FATAL:` line in the log.
+- That remains true **even when the output pipe has already closed**. If a run crashes for a real reason while you happen to be piping it through `head`, you still get the crash report you need.
+- A failure to write output for any *other* reason — a full disk, a permission problem — is still a genuine error and still produces a crash report.
+- **A lost connection to Qlik Sense still produces a crash report.** This is the case worth knowing about, because a dropped server connection and a reader that stopped reading can surface with the same error name. Butler Sheet Icons only takes the quiet path when it knows the failure was its own output; anything else keeps its crash report and exit code 1, which is what you need when a run against a Qlik Sense server fails halfway. See [The connection to Qlik Sense drops in the middle of a run](/guide/troubleshooting#engine-session-dropped-mid-run).
+
+The `BSI_CRASH_DUMP_*` variables are unchanged, and so is the one-dump-per-run behaviour above.
 
 ## Related
 

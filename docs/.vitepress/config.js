@@ -74,6 +74,10 @@ export default withMermaid({
             link: "https://github.com/ptarmiganlabs/butler-sheet-icons/blob/main/CHANGELOG.md",
           },
           {
+            text: "Butler Sheet Icons at ptarmiganlabs.com",
+            link: "https://ptarmiganlabs.com/products/butler-sheet-icons/",
+          },
+          {
             text: "Ptarmigan Labs main site",
             link: "https://ptarmiganlabs.com",
           },
@@ -116,6 +120,21 @@ export default withMermaid({
             },
             { text: "Sheet Blurring", link: "/guide/concepts/sheet-blurring" },
             { text: "Sheet Parts", link: "/guide/concepts/sheet-parts" },
+            { text: "Dry Runs", link: "/guide/concepts/dry-run" },
+            { text: "The Run Card", link: "/guide/concepts/run-card" },
+            {
+              text: "The Contact Sheet",
+              link: "/guide/concepts/contact-sheet",
+            },
+            { text: "The Live View", link: "/guide/concepts/live-view" },
+            {
+              text: "Stopping a Run",
+              link: "/guide/concepts/interrupting-a-run",
+            },
+            {
+              text: "App Overview Screenshots",
+              link: "/guide/concepts/app-overview-screenshots",
+            },
             {
               text: "Browser Management",
               link: "/guide/concepts/browser-management",
@@ -135,6 +154,10 @@ export default withMermaid({
           items: [
             { text: "CI/CD Integration", link: "/guide/advanced/ci-cd" },
             { text: "Docker Usage", link: "/guide/advanced/docker" },
+            {
+              text: "Browser Cache Directory",
+              link: "/guide/advanced/browser-cache-directory",
+            },
             { text: "Proxy Configuration", link: "/guide/advanced/proxy" },
             { text: "Troubleshooting", link: "/guide/troubleshooting" },
             { text: "Crash Dump Files", link: "/guide/advanced/crash-dumps" },
@@ -149,6 +172,7 @@ export default withMermaid({
             { text: "QSEoW Commands", link: "/reference/qseow" },
             { text: "QS Cloud Commands", link: "/reference/qscloud" },
             { text: "Browser Commands", link: "/reference/browser" },
+            { text: "Doctor Command", link: "/reference/doctor" },
           ],
         },
         {
@@ -159,7 +183,10 @@ export default withMermaid({
               link: "/reference/supported-versions",
             },
             { text: "Security", link: "/reference/security" },
-            { text: "Secret Redaction in Logs", link: "/reference/log-redaction" },
+            {
+              text: "Secret Redaction in Logs",
+              link: "/reference/log-redaction",
+            },
           ],
         },
       ],
@@ -232,7 +259,7 @@ export default withMermaid({
         rel: "canonical",
         href: joinURL(
           "https://butler-sheet-icons.ptarmiganlabs.com",
-          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, "")),
         ),
       },
     ]);
@@ -243,7 +270,7 @@ export default withMermaid({
         property: "og:url",
         content: joinURL(
           "https://butler-sheet-icons.ptarmiganlabs.com",
-          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, ""))
+          withoutTrailingSlash(pageData.filePath.replace(/(index)?\.md$/, "")),
         ),
       },
     ]);
@@ -289,7 +316,7 @@ export default withMermaid({
             pageData.description ||
             siteConfig.site.description,
         },
-      ]
+      ],
     );
   },
 });

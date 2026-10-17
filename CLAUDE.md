@@ -71,6 +71,38 @@ reviewable without diffing the branch.
 - **VitePress markdown features** (line highlighting, code diffs, line numbers, custom anchors,
   table of contents, etc.): See [VITEPRESS_MARKDOWN.md](./VITEPRESS_MARKDOWN.md)
 
+## Generated option tables — do not edit between the markers
+
+Some pages carry CLI option tables wrapped in markers:
+
+```markdown
+<!-- generated:cli-options browser install -->
+
+| Option | Environment Variable | ... |
+...
+
+<!-- /generated:cli-options -->
+```
+
+**Everything between those two markers is generated and will be overwritten.** It is produced from
+the Commander definitions in the [butler-sheet-icons](https://github.com/ptarmiganlabs/butler-sheet-icons)
+repository, so the flag names, environment variables, accepted values and defaults on the page
+cannot drift from what the tool actually does. Editing inside the markers looks like it works and
+is silently undone on the next run.
+
+To change one of these tables, change the option declaration in `src/lib/commands/` in that repo —
+which corrects `butler-sheet-icons --help` at the same time — then regenerate from a checkout of
+it:
+
+```bash
+npm run docs:cli-tables -- ../butler-sheet-icons-docs/docs/reference/browser.md --write
+```
+
+`--check` reports staleness without changing anything and exits non-zero. Prose outside the
+markers is never touched, so a page is normal markdown everywhere else.
+
+Pages using this today: `docs/reference/browser.md`.
+
 ## Testing the site locally
 
 You can run the site and look at it yourself. Do this whenever a change is visual, structural, or

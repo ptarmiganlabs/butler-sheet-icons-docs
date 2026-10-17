@@ -124,6 +124,22 @@ Here's how the virtual proxy configuration should look:
 --port 443                        # HTTPS port (default)
 ```
 
+`--host` takes the server's host name or IP address. From BSI 5.0.1 you can also paste an address with the scheme in front — `--host https://qlik-server.company.com` is read the same as `--host qlik-server.company.com`. A leading `https://`, a trailing slash and upper-case letters are handled for you.
+
+::: warning Requires BSI 5.0.1 or later
+In earlier versions a scheme in `--host` was not stripped and broke the connection to the engine, the repository service and the hub. See [Troubleshooting](/guide/troubleshooting#tenant-url-or-host-carries-a-scheme).
+:::
+
+::: tip The scheme names the host — it does not choose the protocol
+Pasting `http://` does not turn off TLS. Whether Butler Sheet Icons connects over HTTPS is decided by `--secure`, which defaults to `true`; a server reached over plain HTTP still needs `--secure false`. The scheme in a pasted `--host` is only ever used to find the host name and is then discarded.
+:::
+
+Only the host belongs in `--host`. A port, a path or credentials in the pasted value are refused at startup, each pointing at the option that part belongs in — a port at the [port options](#custom-ports) below, a path's virtual proxy prefix at `--prefix`, and a user and password at the logon and API user options:
+
+```text
+error: option '--host <host>' argument 'https://qlik-server.company.com:8443' is invalid. A port is not part of the host - the ports have their own options. Enter the host on its own, for example "sense.example.com".
+```
+
 ### Custom Ports
 
 If using non-standard ports:
@@ -144,16 +160,16 @@ For development/testing environments:
 
 ## QSEoW Version Specification
 
-**Critical**: You must specify your QSEoW version for compatibility:
+`--sense-version` tells Butler Sheet Icons which Qlik Sense hub layout to expect. It defaults to the most recent supported release, so set it when your server is older:
 
 ```bash
---sense-version 2024-Nov          # Use the version used in your Qlik Sense environment
+--sense-version 2025-Nov          # Use the version used in your Qlik Sense environment
 ```
 
 For a list of supported QSEoW versions and the exact values to use with `--sense-version`, see [Supported Versions → QSEoW](/reference/supported-versions#qlik-sense-enterprise-on-windows-qseow).
 
 ::: warning Version Compatibility
-Using the wrong version parameter may cause login or navigation failures. Always specify the correct version for your QSEoW installation.
+Setting this explicitly is worth doing on a server you do not upgrade often, so a change to the default in a later Butler Sheet Icons release cannot move underneath you. See [What the version is used for](/reference/supported-versions#what-the-version-is-used-for) for what it actually affects.
 :::
 
 ::: tip Command alias

@@ -63,21 +63,30 @@ butler-sheet-icons qscloud create-sheet-icons \
   --appid app-id
 ```
 
-## See it in Action
-
-Here's Butler Sheet Icons running on macOS, updating sheet icons in a Qlik Sense Cloud app:
-
-![Butler Sheet Icons Demo](/images/demo-animated.gif "Butler Sheet Icons in action")
-
 ## Before and After
 
-Butler Sheet Icons transforms your app overview from plain sheet listings to visual thumbnails:
+Butler Sheet Icons transforms your app overview from plain sheet listings to visual thumbnails.
 
 ### Before
 
+Every sheet looks the same, so the only way to tell them apart is to read the names.
+
 ![App Overview Before](/images/app-overview-before.png "App overview without thumbnails")
 
+### The plan
+
+Before it changes anything, Butler Sheet Icons can tell you exactly what it would do — which sheets get a thumbnail, which are skipped, and which of your options is responsible for each decision. That is [`--dry-run`](/guide/concepts/dry-run), and it is the recommended way to start:
+
+<video autoplay loop muted playsinline style="width:100%;height:auto;border-radius:8px;">
+  <source src="/images/qseow-dry-run.webm" type="video/webm" />
+  <source src="/images/qseow-dry-run.mp4" type="video/mp4" />
+</video>
+
+Note the first sheet: the plan lists it as hidden by a show condition. The Qlik Sense hub never displays that sheet, but Butler Sheet Icons reads the app itself, so it accounts for every sheet the app actually has.
+
 ### After
+
+Run it without `--dry-run` and each sheet carries a miniature of its own layout.
 
 ![App Overview After](/images/app-overview-after.png "App overview with generated thumbnails")
 

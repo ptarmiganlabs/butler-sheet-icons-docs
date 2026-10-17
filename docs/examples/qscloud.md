@@ -151,6 +151,78 @@ On macOS:
 
 :::
 
+## Several Named Apps in One Run
+
+::: warning Requires BSI 5.0.0 or later
+Earlier versions accepted exactly one `--appid`. Updating three named apps meant three runs, or putting
+them in a collection first.
+:::
+
+`--appid` takes as many app IDs as you like, separated by spaces or by commas:
+
+::: code-group
+
+```bash [macOS/Linux]
+./butler-sheet-icons qscloud create-sheet-thumbnails \
+  --appid 12345678-1234-1234-1234-123456789012,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff \
+  --tenanturl mytenant.eu.qlikcloud.com \
+  ...
+```
+
+```powershell [Windows PowerShell]
+.\butler-sheet-icons.exe qscloud create-sheet-thumbnails `
+  --appid 12345678-1234-1234-1234-123456789012,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff `
+  --tenanturl mytenant.eu.qlikcloud.com `
+  ...
+```
+
+:::
+
+The same applies to the environment variable, and to
+[`qscloud remove-sheet-icons`](/reference/qscloud#remove-sheet-icons):
+
+::: code-group
+
+```powershell [PowerShell]
+$env:BSI_QSCLOUD_CST_APP_ID = '12345678-1234-1234-1234-123456789012,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff'
+```
+
+```bash [Bash]
+export BSI_QSCLOUD_CST_APP_ID='12345678-1234-1234-1234-123456789012,9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff'
+```
+
+:::
+
+A single `--appid <id>` behaves exactly as it always has, so existing scripts and scheduled tasks need no
+changes.
+
+### Combining with a collection
+
+`--appid` and `--collectionid` are **added together**, not chosen between — see
+[Selecting apps](/reference/qscloud#selecting-apps). This processes every app in the collection, **plus**
+the one named explicitly, and an app that is both is processed **once**:
+
+```bash
+./butler-sheet-icons qscloud create-sheet-thumbnails \
+  --collectionid 6547e7e0d0b3b0c1e4e0f1a2 \
+  --appid 12345678-1234-1234-1234-123456789012 \
+  ...
+```
+
+Run with `--loglevel debug` to see exactly which apps were selected, before any work starts:
+
+```
+debug: Will process these app IDs:
+debug: 12345678-1234-1234-1234-123456789012
+debug: 9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff
+```
+
+::: tip An empty variable means no apps, not one blank app
+A variable that is set but empty — a bare `BSI_QSCLOUD_CST_APP_ID=` line in a Docker environment file —
+counts as no app being named. If nothing else selects any apps, the run reports `No apps to process` and
+exits 1 rather than failing on a blank ID.
+:::
+
 ## Collection-Based Bulk Update
 
 Update all apps in a collection, excluding specific sheets:
