@@ -74,6 +74,10 @@ export default withMermaid({
             link: "https://github.com/ptarmiganlabs/butler-sheet-icons/blob/main/CHANGELOG.md",
           },
           {
+            text: "Butler Sheet Icons at ptarmiganlabs.com",
+            link: "https://ptarmiganlabs.com/products/butler-sheet-icons/",
+          },
+          {
             text: "Ptarmigan Labs main site",
             link: "https://ptarmiganlabs.com",
           },
