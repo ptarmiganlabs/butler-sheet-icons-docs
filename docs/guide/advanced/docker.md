@@ -432,4 +432,4 @@ That is described on [Browser detection and environment variables](/guide/concep
 
 ### Running Butler Sheet Icons air-gapped without Docker
 
-The pre-built binaries contain no browser, so an air-gapped host running them has to be given one up front. See [Strategy 3: use a pre-cached browser](/guide/concepts/browser-detection-and-environment-variables#strategy-3-use-a-pre-cached-browser-semi-offline).
+The pre-built binaries contain no browser, so an air-gapped host running them has to be given one up front. [Running on an Air-Gapped Server](/guide/advanced/air-gapped) walks through it, from choosing how to provide the browser to a verified result.

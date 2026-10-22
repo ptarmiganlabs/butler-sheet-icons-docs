@@ -332,6 +332,8 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 
 **Good for:** air‑gapped environments, corporate desktops, servers with centrally managed browsers.
 
+For the step-by-step procedure on a server with no internet access, see [Running on an Air-Gapped Server](/guide/advanced/air-gapped).
+
 - You decide which browser BSI uses
 - No download is attempted
 - Works well when internet access is limited or tightly controlled
@@ -402,6 +404,8 @@ Version keywords such as `recommended` do **not** produce that warning, because 
 ### Strategy 3: Use a pre-cached browser (semi-offline)
 
 **Good for:** environments where you can briefly connect to the internet to pre‑download browsers, then run offline.
+
+For the step-by-step procedure with the standalone binaries, where the browser cache lives next to the executable, see [Running on an Air-Gapped Server](/guide/advanced/air-gapped).
 
 Typical flow:
 
