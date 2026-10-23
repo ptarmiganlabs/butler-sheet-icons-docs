@@ -131,7 +131,7 @@ If the environment has no internet access and no browser can be found via steps 
 
 ## Which browser commands need internet access?
 
-Creating thumbnails does not need internet access for the browser itself, as long as step 1 or step 2 above finds one — **but the value of `--browser-version` decides whether the run needs a lookup before it gets that far.** See [What `--browser-version` costs on an offline machine](#what-browser-version-costs-on-an-offline-machine) below.
+Creating thumbnails does not need internet access for the browser itself, as long as step 1, 2 or 3 above finds one. A named browser that exists (step 1 or 2) is used without resolving `--browser-version` at all. A cached browser (step 3) is different: **the value of `--browser-version` decides whether the run needs a lookup before it can pick one.** See [What `--browser-version` costs on an offline machine](#what-browser-version-costs-on-an-offline-machine) below.
 
 The `browser` management commands are different — only some of them reach out to the internet:
 
@@ -181,6 +181,12 @@ Earlier versions reported a failed `browser list-available` on an offline machin
 ## What `--browser-version` costs on an offline machine
 
 A thumbnail run has to turn `--browser-version` into a specific build before it can look in the cache. Some values need the browser vendor's version service to do that, and some do not — which is the difference between a run that works offline and one that depends on connectivity every time.
+
+::: tip A browser you named skips all of this
+This section is about picking a build from the browser cache. When `--browser-executable-path`, `BSI_BROWSER_EXECUTABLE_PATH` or `PUPPETEER_EXECUTABLE_PATH` names a browser that exists, BSI uses it without resolving `--browser-version` first — no value needs a lookup, and none can fail one. A pinned build only produces a warning that it was overridden; see [What `--browser-version` does when a browser is named](#what-browser-version-does-when-a-browser-is-named).
+
+This is from BSI 5.0.0. Earlier versions resolved `--browser-version` first even when a browser was named.
+:::
 
 | Value | Needs a lookup? |
 | --- | --- |
@@ -326,6 +332,8 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 
 **Good for:** air‑gapped environments, corporate desktops, servers with centrally managed browsers.
 
+For the step-by-step procedure on a server with no internet access, see [Running on an Air-Gapped Server](/guide/advanced/air-gapped).
+
 - You decide which browser BSI uses
 - No download is attempted
 - Works well when internet access is limited or tightly controlled
@@ -396,6 +404,8 @@ Version keywords such as `recommended` do **not** produce that warning, because 
 ### Strategy 3: Use a pre-cached browser (semi-offline)
 
 **Good for:** environments where you can briefly connect to the internet to pre‑download browsers, then run offline.
+
+For the step-by-step procedure with the standalone binaries, where the browser cache lives next to the executable, see [Running on an Air-Gapped Server](/guide/advanced/air-gapped).
 
 Typical flow:
 

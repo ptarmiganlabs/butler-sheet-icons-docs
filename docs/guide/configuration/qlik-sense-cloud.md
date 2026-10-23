@@ -79,12 +79,18 @@ If your organization uses Single Sign-On (SSO), you may need to use the `--skip-
 
 ```bash
 butler-sheet-icons qscloud create-sheet-icons \
-  --skip-login \
-  --logonuserid your-email@company.com
+  --skip-login
 ```
+
+`--skip-login` relies on the browser profile Butler Sheet Icons uses already being signed in to Qlik Sense Cloud. If it is not — most often because the session has expired — the run stops at the first app rather than capturing the login page; see [If you use `--skip-login` on Qlik Sense Cloud](/guide/troubleshooting#skip-login-not-signed-in).
 
 ::: warning SSO Compatibility
 The `--skip-login` option is experimental and may not work with all SSO configurations. Test thoroughly in your environment.
+:::
+
+::: tip Changed in BSI 5.3.0
+- **`--logonuserid` and `--logonpwd` are no longer needed with `--skip-login`.** They used to be required even though they were never used. Given anyway, they are ignored with a warning; a future major release will refuse the combination, so remove them from the job. Without `--skip-login`, both are still required.
+- **`BSI_QSCLOUD_CST_SKIP_LOGIN=false` now turns skip-login off.** Until 5.2.x, setting the variable to *any* value — `false` included — turned it on. Its value is now read: `true`, `1`, `yes` or `on` mean on; `false`, `0`, `no`, `off` or empty mean off; anything else stops the run with a message listing the accepted values. A job that has `=false` and still worked has been skipping login without meaning to, and now signs in with the credentials it is given. `--skip-login false` on the command line works the same way.
 :::
 
 ## Tenant Configuration

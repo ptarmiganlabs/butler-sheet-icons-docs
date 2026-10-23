@@ -98,6 +98,8 @@ Here's what it looks like when running Butler Sheet Icons for QS Cloud on Window
 
 ::: tip Note about Windows Authentication
 The `--prefix form` parameter tells Butler Sheet Icons to use a virtual proxy called "form", which is configured to use form-based authentication. This is required when running on Windows, as the default Windows authentication doesn't work with the embedded browser. The virtual proxy ("form" in this case) can be called anything as long as there is a matching virtual proxy - using form based authentication - configured in the Qlik Management Console (QMC).
+
+From BSI 5.3.0 there is an alternative when Butler Sheet Icons runs as a Windows account that can open the apps: let the virtual proxy sign the browser in with Windows authentication, using `--skip-login` instead of the logon options. See [Windows Authentication: `--skip-login`](/guide/configuration/qseow#skip-login).
 :::
 
 ### Example: QSEoW Execution

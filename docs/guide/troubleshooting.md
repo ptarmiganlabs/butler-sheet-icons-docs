@@ -419,6 +419,8 @@ CLOUD APP: not authenticated after opening the app with --skip-login. The login 
 
 Sign in again in the browser profile Butler Sheet Icons uses, or stop passing `--skip-login` and let BSI sign in itself.
 
+From 5.3.0, `--logonuserid` and `--logonpwd` are not needed alongside `--skip-login`, and `BSI_QSCLOUD_CST_SKIP_LOGIN=false` turns skip-login off rather than on — see [SSO Environments](/guide/configuration/qlik-sense-cloud#sso-environments). On Qlik Sense Enterprise on Windows, `--skip-login` means something related: the virtual proxy signs the browser in with Windows authentication. See [Windows Authentication: `--skip-login`](/guide/configuration/qseow#skip-login).
+
 ### "Too many sessions active in parallel" {#too-many-sessions-active-in-parallel}
 
 **Symptom:** on client-managed Qlik Sense, a run fails like this:
@@ -494,6 +496,7 @@ Before 5.0.0 the logout only ran when a run succeeded, so a run that failed part
 - Connection timeouts
 - A sign-in that leaves the browser on the login page — see [thumbnails that show the login screen](#thumbnails-show-the-login-screen)
 - `net::ERR_INVALID_AUTH_CREDENTIALS` — see [The run fails on Windows but works from macOS](#windows-invalid-auth-credentials)
+- `no login form on the page`, or a run with `--skip-login` that stops — see [`--skip-login` stops the run](#qseow-skip-login-errors)
 
 **Solutions:**
 
@@ -593,16 +596,31 @@ browser to NTLM instead of the login page:
 | Linux                      | `X11; Linux x86_64`           | `/internal_forms_authentication/` — login page |
 | Windows                    | `Windows NT 10.0; Win64; x64` | `/internal_windows_authentication` — NTLM      |
 
-Butler Sheet Icons cannot complete an NTLM login. The browser it runs has no window and no way to ask
-anyone for credentials, so Windows quietly offers whatever account the machine is signed in as. On a
-machine that is not domain-joined — or is signed in as the wrong user — Qlik Sense rejects that account,
-the browser has nothing else to offer, and it gives up.
+Without `--skip-login`, Butler Sheet Icons expects the login page and has no use for NTLM. The browser it
+runs has no window and no way to ask anyone for credentials, so Windows offers whatever account the
+machine is signed in as — or nothing, for a server outside the local intranet zone. If Qlik Sense does not
+accept that, the browser has nothing else to offer, and it gives up.
+
+From BSI 5.3.0 the message says so itself, and names both ways out:
+
+```text
+QSEOW APP: the browser could not sign in at https://sense.example.com/sense/app/ded8d27d-... (ERR_INVALID_AUTH_CREDENTIALS). The virtual proxy asked for Windows authentication instead of serving its login form. Qlik Sense decides this from the browser's User-Agent, and a browser on Windows matches the default pattern. Use --prefix with a virtual proxy whose Windows authentication pattern does not match (the convention is 'Form'), or, if the Windows account running Butler Sheet Icons can open the app in Qlik Sense, use --skip-login.
+```
 
 **Solutions:**
 
-Run Butler Sheet Icons against a virtual proxy whose **Windows authentication pattern** cannot match a
-browser. The convention is to set it to `Form`, because no browser's User-Agent contains that word, so
-every visitor is given the login page.
+There are two, and which one fits depends on the account you want the thumbnails rendered as.
+
+- **The account running Butler Sheet Icons can open the apps** — for example, it runs on a Sense node as a
+  domain account with access. Let the virtual proxy sign the browser in with Windows authentication: add
+  `--skip-login` and leave out the logon options. Requires BSI 5.3.0 or later; see
+  [Windows Authentication: `--skip-login`](/guide/configuration/qseow#skip-login).
+- **The thumbnails should be rendered as a specific Sense user**, typed in with `--logonuserdir`,
+  `--logonuserid` and `--logonpwd`. Use a virtual proxy that always serves the login page, as below.
+
+For the second, run Butler Sheet Icons against a virtual proxy whose **Windows authentication pattern**
+cannot match a browser. The convention is to set it to `Form`, because no browser's User-Agent contains
+that word, so every visitor is given the login page.
 
 ::: warning Use a separate virtual proxy — do not change your existing one
 Changing the pattern on the virtual proxy your users log in through will **turn off Windows single sign-on
@@ -679,17 +697,78 @@ Read the `Location:` line in the reply:
 | `Location` contains               | Meaning                                                                 |
 | --------------------------------- | ----------------------------------------------------------------------- |
 | `internal_forms_authentication`   | The login page. Butler Sheet Icons will work through this proxy.        |
-| `internal_windows_authentication` | NTLM. Butler Sheet Icons will fail with `ERR_INVALID_AUTH_CREDENTIALS`. |
+| `internal_windows_authentication` | Windows authentication. Without `--skip-login`, Butler Sheet Icons will fail with `ERR_INVALID_AUTH_CREDENTIALS`; with it (5.3.0 or later), the run signs in as the account running BSI. |
 
 On Windows use `curl.exe` rather than `curl` — in PowerShell, `curl` is an alias for something else and
 does not accept these options.
 
 **What this means in general:**
 
-Butler Sheet Icons always expects the Qlik Sense login page. It cannot use Windows authentication at all —
-not from a domain-joined machine, and not with a correct domain account. A virtual proxy that serves the
-login page to every visitor is therefore a requirement on every platform. It only becomes visible on
-Windows, because that is the only platform where the default pattern matches.
+Without `--skip-login`, Butler Sheet Icons expects the Qlik Sense login page, so it needs a virtual proxy
+that serves that page to every visitor — on every platform. It only becomes visible on Windows, because
+that is the only platform where the default pattern matches.
+
+Up to and including 5.2.x there was no alternative: Butler Sheet Icons could not use Windows
+authentication at all, not from a domain-joined machine and not with a correct domain account. From 5.3.0,
+`--skip-login` is the alternative for runs that should sign in as the Windows account running them.
+
+### `--skip-login` stops the run (QSEoW) {#qseow-skip-login-errors}
+
+::: warning Requires BSI 5.3.0 or later
+These messages come from `qseow create-sheet-thumbnails --skip-login`, added in 5.3.0, and from the check
+for a missing login form that came with it. See
+[Windows Authentication: `--skip-login`](/guide/configuration/qseow#skip-login) for what the option needs.
+:::
+
+Each of these stops the run at the first app, before anything is captured or uploaded.
+
+**The virtual proxy served its login page anyway:**
+
+```text
+QSEOW APP: not authenticated after opening the app with --skip-login. The login form's username field (#username-input) is still on the page, so the browser is on the login screen. Continuing would capture that screen as though it were a sheet. The virtual proxy served its login form instead of signing the browser in. Its Windows authentication pattern does not match this browser's User-Agent, or it is not set up for Windows authentication. Use --prefix with a virtual proxy that signs Windows users in, or drop --skip-login and supply credentials.
+```
+
+Expected if Butler Sheet Icons runs on macOS or Linux, or if `--prefix` names a virtual proxy whose
+Windows authentication pattern is `Form`.
+
+**Qlik Sense refused the Windows account.** This arrives in one of two ways, and both name the account:
+
+```text
+QSEOW APP: the browser could not sign in at https://sense.example.com/sense/app/ded8d27d-... (ERR_INVALID_AUTH_CREDENTIALS). With --skip-login the virtual proxy signs the browser in with Windows authentication, as the Windows account running Butler Sheet Icons (ACME\svc-bsi), and it was refused. Check that this account can open the app in Qlik Sense, and that it is the account you expect.
+```
+
+```text
+QSEOW APP: not signed in with --skip-login: opening https://sense.example.com/sense/app/ded8d27d-... ended on HTTP 401 Unauthorized at https://sense.example.com/internal_windows_authentication/?targetId=... - not the app, and not a login page. With --skip-login the virtual proxy signs the browser in with Windows authentication, as the Windows account running Butler Sheet Icons (ACME\svc-bsi), and it was not accepted. Check that this account can open the app in Qlik Sense, and that it is the account you expect.
+```
+
+A scheduled task runs as the account it is configured with, not as the person who created it — check
+which account that is before anything else. Any other HTTP error the app address ends on stops the run
+the same way, with the status and the address the browser ended up at: an error page is never taken for
+a signed-in one just because it has no login form.
+
+**Logon credentials alongside `--skip-login`:**
+
+```text
+error: QSEOW CREATE THUMBNAILS 2: QSEOW: --skip-login is set, so nothing is typed into a login page, but --logonpwd (BSI_QSEOW_CST_LOGON_PWD) is set as well. Remove it - from the environment as well as the command line - or drop --skip-login.
+```
+
+Remove them from the command line **and** the environment — a shared `.env` file is the usual place a
+leftover password hides.
+
+**No login form, and no `--skip-login`.** Up to and including 5.2.x this stopped with
+`No element found for selector: #username-input`. It now says which page the browser was on:
+
+```text
+QSEOW APP: no login form on the page - the username field (#username-input) is not on https://sense.example.com/sense/app/ded8d27d-... (title "Sales dashboard"), so there is nothing to type the credentials into. If that page is the app itself, the browser is already signed in - a virtual proxy using Windows authentication does that - and --skip-login, without --logonuserdir, --logonuserid and --logonpwd, is how to run against it.
+```
+
+If the title is your app's name, this is the situation `--skip-login` exists for. If the page was an HTTP
+error, the message gives the status instead of that advice. A 400 is the common one — Qlik Sense answers
+400 when the host name in `--host` is not in the virtual proxy's host allow list:
+
+```text
+QSEOW APP: no login form on the page - the username field (#username-input) is not on https://sense.example.com/sense/app/ded8d27d-... (no title), so there is nothing to type the credentials into. Opening https://sense.example.com/sense/app/ded8d27d-... ended on HTTP 400 Bad Request - not the app, and not a login page. One known cause: Qlik Sense answers 400 when the host name in the address ("sense.example.com", from --host) is not in the virtual proxy's host allow list. Compare --host with that list in the QMC, or with the name on the server's certificate.
+```
 
 ## Configuration Issues
 

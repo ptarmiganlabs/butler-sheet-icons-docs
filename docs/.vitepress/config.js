@@ -154,6 +154,7 @@ export default withMermaid({
           items: [
             { text: "CI/CD Integration", link: "/guide/advanced/ci-cd" },
             { text: "Docker Usage", link: "/guide/advanced/docker" },
+            { text: "Air-Gapped Servers", link: "/guide/advanced/air-gapped" },
             {
               text: "Browser Cache Directory",
               link: "/guide/advanced/browser-cache-directory",

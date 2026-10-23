@@ -192,7 +192,7 @@ For **Qlik Sense Enterprise on Windows**, all three of these are on your own Sen
 
 Ports 4747 and 4242 are certificate-authenticated, which is why the QSEoW examples mount a certificate directory.
 
-**Outbound internet access is not needed for any of this**, provided you leave `--browser-version` alone — see [Browser versions on an air-gapped host](#browser-versions-on-an-air-gapped-host) below.
+**Outbound internet access is not needed for any of this.** The image's own browser is used as it is, whatever `--browser-version` says — see [Browser versions on an air-gapped host](#browser-versions-on-an-air-gapped-host) below.
 
 ::: tip Qlik Sense Cloud is a different story
 Qlik Sense Cloud lives on the public internet, so a genuinely air-gapped host cannot use the `qscloud` commands at all. Everything in this section is about **QSEoW**.
@@ -339,17 +339,16 @@ The commands in this section are written for a Linux shell, since that is where 
 **4. A real run says which browser it chose.** Once you point the container at Qlik Sense, a healthy air-gapped run logs this sequence. It is worth searching your logs for, because it is the proof that Butler Sheet Icons never went looking for a browser on the internet:
 
 ```
-info: Browser version "recommended" resolved to chrome build 150.0.7871.24 (the build this version of Butler Sheet Icons is tested with)
 info: Checking for available browsers...
 info: Found system browser at: /usr/bin/chromium-browser
 info: Using system browser (from PUPPETEER_EXECUTABLE_PATH)
 info: Browser ready from system: chrome system-installed
 ```
 
-::: tip Two different version numbers, and that is fine
-The first line names the build Butler Sheet Icons was tested against. The browser that actually runs is the one in the image, which is a different build — the last line says `system-installed` rather than a version number for exactly that reason.
+The last line says `system-installed` rather than a version number because the browser is the one packaged into the image, not a build Butler Sheet Icons chose.
 
-The two numbers are not supposed to match, and a mismatch is not something to fix.
+::: warning Requires BSI 5.0.0 or later
+Earlier images logged one more line first — `Browser version "recommended" resolved to chrome build …` — naming the build Butler Sheet Icons is tested with. That number never matched the image's browser, and was not meant to. From 5.0.0 the step that produced it is skipped when a browser is named, so the line no longer appears.
 :::
 
 ### A complete QSEoW example
@@ -387,35 +386,29 @@ Two details that matter more here than elsewhere:
 
 ### Browser versions on an air-gapped host
 
-Leave `--browser-version` alone. The default, `recommended`, is the only value that never needs the internet.
+Inside the image, `--browser-version` makes no difference. Leave it out.
 
-This surprises people, because the image contains a browser and it seems like the version question is settled. It is not quite: Butler Sheet Icons works out which browser build was asked for **before** it looks at which browsers are available, and some values can only be answered by asking the browser vendor's version service — a service that does not exist on your network.
+The image names its browser with `PUPPETEER_EXECUTABLE_PATH`, and when a named browser is present Butler Sheet Icons uses it without first working out which build `--browser-version` asks for. There is no version lookup, so no value can make the run reach for the internet:
 
-| `--browser-version` | On an air-gapped host |
+| `--browser-version` | Inside the image, on an air-gapped host |
 | --- | --- |
-| `recommended` (the default) | **Works.** No lookup — the answer is built into Butler Sheet Icons. |
-| `stable`, `latest`, a channel such as `beta` | **Works, but slowly and noisily.** The lookup fails, two warnings are logged, and the run continues with the embedded browser. Costs several seconds per run, waiting for a name lookup that cannot succeed. |
-| A milestone or build prefix, e.g. `151` or `151.0.7922` | **Fails the whole run.** The lookup fails and Butler Sheet Icons stops rather than quietly running a build you did not ask for. |
-| A full build id, e.g. `151.0.7922.77` | **Works, but is ignored.** No lookup is needed, and the embedded browser is used regardless. Butler Sheet Icons warns that your pin was overridden. |
+| `recommended` (the default) | **Works.** |
+| `stable`, `latest`, a channel such as `beta` | **Works.** No lookup is made, and nothing is logged about it. |
+| A milestone, build prefix or full build id, e.g. `151` or `151.0.7922.77` | **Works, but is ignored.** The embedded browser runs regardless, and Butler Sheet Icons warns that your pin was overridden. |
 
-In the failing case, the reported error names the host that could not be reached:
-
-```
-getaddrinfo EAI_AGAIN googlechromelabs.github.io
-```
-
-That host is Google's index of Chrome builds. It is on the public internet, so an air-gapped host will never reach it — which is the whole reason to leave `--browser-version` at `recommended`.
-
-The two warnings in the second case are:
+The warning in the last case is:
 
 ```
-warn: Could not resolve --browser-version "stable": getaddrinfo EAI_AGAIN googlechromelabs.github.io
-warn: Falling back to the newest browser already in the local cache.
+warn: The browser executable from PUPPETEER_EXECUTABLE_PATH overrides --browser-version "151": the browser at /usr/bin/chromium-browser will be used instead. Unset PUPPETEER_EXECUTABLE_PATH to use the requested build.
 ```
 
-The second warning mentions a local cache. Inside the Docker image that cache is empty, and the run does not need it — the embedded browser is found first, and the next line will be `Found system browser at: /usr/bin/chromium-browser`. There is no cache to go and populate.
+It exists so that a pin is never ignored silently. To make it go away, remove `--browser-version` — inside the image it cannot change which browser runs.
 
-The bottom line: **inside the Docker image, `--browser-version` cannot change which browser runs.** All it can do is decide whether your run needs the internet. See [Browser detection and environment variables](/guide/concepts/browser-detection-and-environment-variables) for the full picture.
+::: warning Requires BSI 5.0.0 or later
+Before 5.0.0, Butler Sheet Icons resolved `--browser-version` **before** looking for a browser, even inside the image. On an air-gapped host that made `stable`, `latest` and the channels cost several seconds per run in a lookup that could not succeed, and made a milestone or build prefix such as `151` fail the whole run with `getaddrinfo EAI_AGAIN googlechromelabs.github.io`. On an older image, leave `--browser-version` at `recommended`.
+:::
+
+This holds only while the image's own browser is in use. If you set `PUPPETEER_EXECUTABLE_PATH` to an empty string to use a browser cache instead (see below), the version question comes back — see [What `--browser-version` costs on an offline machine](/guide/concepts/browser-detection-and-environment-variables#what-browser-version-costs-on-an-offline-machine).
 
 ### If you do not want the embedded browser
 
@@ -439,4 +432,4 @@ That is described on [Browser detection and environment variables](/guide/concep
 
 ### Running Butler Sheet Icons air-gapped without Docker
 
-The pre-built binaries contain no browser, so an air-gapped host running them has to be given one up front. See [Strategy 3: use a pre-cached browser](/guide/concepts/browser-detection-and-environment-variables#strategy-3-use-a-pre-cached-browser-semi-offline).
+The pre-built binaries contain no browser, so an air-gapped host running them has to be given one up front. [Running on an Air-Gapped Server](/guide/advanced/air-gapped) walks through it, from choosing how to provide the browser to a verified result.
