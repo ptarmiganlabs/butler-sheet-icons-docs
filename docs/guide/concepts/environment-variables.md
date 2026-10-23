@@ -42,7 +42,8 @@ Options:
   --schemaversion <version>           Qlik Sense engine schema version (choices: "12.170.2", "12.612.0", "12.936.0", "12.1306.0", "12.1477.0", "12.1657.0", "12.1823.0", "12.2015.0", default: "12.612.0", env: BSI_QSCLOUD_CST_SCHEMAVERSION)
   --tenanturl <url>                   URL or host of Qlik Sense cloud tenant. Example: "https://tenant.eu.qlikcloud.com" or "tenant.eu.qlikcloud.com" (env: BSI_QSCLOUD_CST_TENANTURL)
   --apikey <key>                      API key used to access the Sense APIs (env: BSI_QSCLOUD_CST_APIKEY)
-  --skip-login                        Skip QS login page, go directly to the tenant URL. Use this if you are automatically logged in to Qlik Sense (default: false, env: BSI_QSCLOUD_CST_SKIP_LOGIN)
+  --skip-login [true|false]           Skip QS login page, go directly to the tenant URL. Use this if you are automatically logged in to Qlik Sense.
+  With this set, --logonuserid and --logonpwd are not needed. (default: false, env: BSI_QSCLOUD_CST_SKIP_LOGIN)
   ...
   ...
 ```
