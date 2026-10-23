@@ -71,6 +71,8 @@ Used by BSI when logging in via QSEoW's web interface:
 --logonpwd your-password    # Your web login password
 ```
 
+All three are required unless [`--skip-login`](#skip-login) is set, in which case they must be left out.
+
 When Butler Sheet Icons connects to QSEoW using form-based authentication, you'll see a login page like this (if `--headless false`):
 
 ![QSEoW Login Page](/images/qseow-login.png "QSEoW form-based login page")
@@ -79,7 +81,7 @@ When Butler Sheet Icons connects to QSEoW using form-based authentication, you'l
 
 ### Form-Based Authentication
 
-When running Butler Sheet Icons on Windows form-based authentication must be used, otherwise the browser will default to Windows authentication.  
+When running Butler Sheet Icons on Windows, either form-based authentication must be used, or the virtual proxy must be allowed to sign the browser in with Windows authentication using [`--skip-login`](#skip-login). Otherwise the browser defaults to Windows authentication while Butler Sheet Icons waits for a login page that never appears.
 Adding the following option will tell BSI to use a virtual proxy called "form", which must exist in Sense and be configured as such.
 
 ```bash
@@ -113,6 +115,91 @@ Here's how the virtual proxy configuration should look:
 ![Virtual Proxy Configuration Part 1](/images/virtual-proxy-1.png "Virtual proxy identification settings")
 
 ![Virtual Proxy Configuration Part 2](/images/virtual-proxy-2.png "Virtual proxy authentication settings")
+
+## Windows Authentication: `--skip-login` {#skip-login}
+
+::: warning Requires BSI 5.3.0 or later
+Earlier versions always expect the Qlik Sense login page. On a virtual proxy that signs Windows users in they stop with `No element found for selector: #username-input` or with `ERR_INVALID_AUTH_CREDENTIALS`.
+:::
+
+Some Qlik Sense environments never show a login page. Open the hub, the QMC or an app in a browser on a domain-joined Windows machine — a Sense node you reached over Remote Desktop, for example — and you go straight in, signed in with **Windows authentication** as the account you are logged in with.
+
+`--skip-login` lets Butler Sheet Icons work through such a virtual proxy. It types nothing into a login page; the virtual proxy signs the browser in by itself. Leave out `--logonuserdir`, `--logonuserid` and `--logonpwd`:
+
+::: code-group
+
+```powershell [PowerShell]
+.\butler-sheet-icons.exe qseow create-sheet-thumbnails `
+  --host sense.example.com `
+  --apiuserdir INTERNAL `
+  --apiuserid sa_api `
+  --skip-login `
+  --appid ded8d27d-...
+```
+
+```bash [Bash]
+./butler-sheet-icons qseow create-sheet-thumbnails \
+  --host sense.example.com \
+  --apiuserdir INTERNAL \
+  --apiuserid sa_api \
+  --skip-login \
+  --appid ded8d27d-...
+```
+
+:::
+
+Or set `BSI_QSEOW_CST_SKIP_LOGIN=true`. The value is read: `true`, `1`, `yes` or `on` turn it on, `false`, `0`, `no`, `off` or an empty value turn it off, and anything else stops the run with a message listing the accepted values.
+
+The certificates and the API user are still used to talk to Qlik Sense's services. `--skip-login` only changes how the **browser** signs in.
+
+### Which account the thumbnails are rendered as
+
+Qlik Sense signs the browser in as **the Windows account that runs Butler Sheet Icons**:
+
+| How Butler Sheet Icons is started | Account the browser signs in as                       |
+| --------------------------------- | ----------------------------------------------------- |
+| From a command prompt you opened  | Your own Windows account                              |
+| From a Windows scheduled task     | The account the task is set to run as, not its author |
+| From a Windows service            | The service's account                                 |
+
+A thumbnail is a picture of the sheet as that user sees it, so if an app uses **section access**, or if the account cannot open an app at all, that changes what the thumbnails show. Choose the account as deliberately as you would choose the user for `--logonuserid`.
+
+The log names the account Qlik Sense actually signed in, once per app:
+
+```text
+info: Login skipped (--skip-login): the virtual proxy signed the browser in as ACME\svc-bsi
+```
+
+If Qlik Sense does not say, the line ends after `signed the browser in`, and the run carries on.
+
+### What the virtual proxy needs
+
+Use `--skip-login` when all of these are true:
+
+- Butler Sheet Icons runs **on Windows**.
+- The virtual proxy it connects to (the default one, or the one named with `--prefix`) signs Windows users in with Windows authentication. Its **Windows authentication pattern** must match the browser — the default, `Windows`, does. See [The run fails on Windows but works from macOS](/guide/troubleshooting#windows-invalid-auth-credentials) for how the pattern decides.
+- The Windows account running Butler Sheet Icons is one Qlik Sense accepts, and it can open the apps you are updating.
+
+A quick check: sign in to that machine as that account, open the app's address in a browser, and see whether you get the app or a login page.
+
+No browser setting needs changing. A browser normally offers your Windows account only to servers in the local intranet zone, and a host name containing a dot, such as `sense.example.com`, is not in it by default. With `--skip-login`, Butler Sheet Icons allows its own browser to offer the account to the server named by `--host`, and to no other server. Two things follow:
+
+- **Give `--host` as the name the virtual proxy uses**, normally the one on the server's certificate. If the proxy moves the browser on to a different name, the browser has no permission to offer the account there. `--host` must be a single host name or IP address; a value containing a comma or `*` is refused, because either would widen the permission.
+- **Other servers a sheet loads content from are not offered the account.** An image or extension asset on another intranet server that also uses Windows authentication appears in the thumbnail as an anonymous visitor would see it. That is deliberate: the alternative is offering the account to every server a sheet references.
+
+### Logon credentials are refused alongside it
+
+With `--skip-login` a logon user and password would never be used. A leftover one usually means a different identity was expected than the one the browser will sign in as, so the run stops before connecting to anything:
+
+```text
+error: QSEOW CREATE THUMBNAILS 2: QSEOW: --skip-login is set, so nothing is typed into a login page, but --logonpwd (BSI_QSEOW_CST_LOGON_PWD) is set as well. Remove it - from the environment as well as the command line - or drop --skip-login.
+```
+
+The message names the environment variable as well as the option: a shared `.env` file that still holds `BSI_QSEOW_CST_LOGON_PWD` is the likeliest place for a leftover password.
+
+In [interactive mode](/guide/interactive-mode), the wizard asks *"Does the virtual proxy sign the browser in by itself, with no login page?"* after the API user. Answer yes and it does not ask for logon credentials — and if some are already set, it says so at that question instead of letting the run stop on them later.
+
+If a `--skip-login` run stops with an error, see [`--skip-login` stops the run](/guide/troubleshooting#qseow-skip-login-errors).
 
 ## Server Connection Details
 
