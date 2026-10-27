@@ -161,10 +161,12 @@ Failed to create a thumbnail for 1 of 9 sheet(s) in app a1b2c3d4-...
 ```
 
 ::: warning Requires BSI 5.0.0 or later
-On Qlik Sense Enterprise on Windows, one uncapturable sheet used to discard the whole app — no thumbnails were uploaded and nothing changed, even for the eight sheets that captured fine. From 5.0.0 the sheets that were captured are uploaded and applied; only the one that failed keeps the icon it already had. Qlik Sense Cloud has always behaved this way, and the two platforms now match.
+On Qlik Sense Enterprise on Windows, one uncapturable sheet used to discard the whole app — no thumbnails were uploaded and nothing changed, even for the eight sheets that captured fine. From 5.0.0 the sheets that were captured are uploaded and applied; only the one that failed keeps the icon it already had. Qlik Sense Cloud has always uploaded and applied the sheets that were captured; on that point the two platforms now match.
 :::
 
-This changes what a **failed** QSEoW run leaves behind: it can now have applied new thumbnails to some sheets even though the run reports failure. The run report lists the sheets that were updated, so the account of what changed is accurate rather than reporting zero for work that was done. A sheet that failed is never left pointing at an image that was not created — if it had a thumbnail before, it still has that one.
+This changes what a **failed** QSEoW run leaves behind: it can now have applied new thumbnails to some sheets even though the run reports failure. The run report lists the sheets that were updated, so the account of what changed is accurate rather than reporting zero for work that was done. A sheet that failed is never left pointing at an image that was not created — if it had a thumbnail before, it still points at that one.
+
+On Qlik Sense Cloud that old image may no longer exist. Before capturing, Butler Sheet Icons deletes the images in the app's `thumbnails` media folder, which is where its earlier runs put them. A sheet that fails to capture keeps pointing at its old thumbnail, so if that thumbnail came from an earlier run, the image behind it is gone until a later run captures the sheet. This is tracked as [issue #1217](https://github.com/ptarmiganlabs/butler-sheet-icons/issues/1217).
 
 **What to do:** find the sheet named in the per-sheet log line and work through the usual causes in order:
 
