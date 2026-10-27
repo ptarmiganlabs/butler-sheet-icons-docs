@@ -116,6 +116,25 @@ On Qlik Sense Enterprise on Windows the hint names `--appid` and `--qliksensetag
 
 **What to do:** check the selection options themselves. Common causes are a collection that exists but contains no apps, a tag that no app carries, or an app ID that has been deleted. On QS Cloud, `butler-sheet-icons qscloud list-collections` shows which collections exist.
 
+### `may still be owned by` or `NOT RESTORED` in the summary {#app-owner-not-restored}
+
+Only with [`--change-app-owner`](/guide/concepts/app-owner-change) (QSEoW, BSI 5.4.0 or later). Butler Sheet Icons made the browser login user an app's owner and could not give the app back, even after three attempts. It stops the run there, so no further app has its owner changed:
+
+```
+error: QSEOW APP OWNER: App 2d3f... "Sales" may still be owned by ACME\joe: BSI could not give it back to ACME\anna after 3 attempts. Received error code: 500::Internal Server Error
+error: QSEOW APP OWNER: To give it back by hand: In the QMC, open Apps, edit app 2d3f... and set its owner back to ACME\anna.
+```
+
+The summary lists every such app on a `NOT RESTORED` line. It is also printed after a second Ctrl-C or the shutdown time limit, when the run ended before it could give an app back.
+
+**What to do:** in the QMC, under **Apps**, set each listed app's owner back to the owner the line names. If the login user owned objects in that app before the run, giving the app back moves them to the app's owner too; give them back as well, under **App objects**. The log lists them. See [If Butler Sheet Icons is killed](/guide/concepts/app-owner-change#if-killed).
+
+### `NOT RETURNED` in the summary {#app-objects-not-returned}
+
+Also only with `--change-app-owner`. The app was given back to its owner, but objects the browser login user owned in it before the run could not be given back to the login user, so they may now belong to the app's owner. The run stops here too.
+
+**What to do:** in the QMC, under **App objects**, set the owner of each object the line names back to the login user. The log has each object's id. See [The login user's objects could not be given back](/guide/concepts/app-owner-change#not-returned).
+
 ### `Failed to update N of M sheet(s) in app <id>`
 
 One or more sheets in an app could not be updated, or their icons could not be removed. The app is reported as failed, and therefore so is the run.
@@ -344,6 +363,8 @@ A closely related failure, `reading 'showCondition'`, is fixed by the same chang
 ### The run failed — has anything changed in Qlik Sense?
 
 An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
+
+With [`--change-app-owner`](/guide/concepts/app-owner-change), the app's owner is changed and given back even when the app fails. A summary with no `NOT RESTORED` or `NOT RETURNED` line means every owner was put back. See [`NOT RESTORED` in the summary](#app-owner-not-restored) if there is one.
 
 One exception, from BSI 5.0.0: if the app was captured but **one of its sheets could not be**, the sheets that succeeded are saved even though the run reports failure — see [`Failed to create a thumbnail for N of M sheet(s)`](#failed-to-create-a-thumbnail-for-some-sheets). Re-running is still a clean retry: every sheet is captured again from scratch.
 
@@ -849,6 +870,8 @@ The accepted values are listed in the [`--sense-version` row of the QSEoW refere
    # For published apps, exclude published/public sheets
    --exclude-sheet-status published public
    ```
+
+4. **App owned by someone else** (QSEoW): [`--change-app-owner`](/guide/concepts/app-owner-change) makes the browser login user each app's owner while it is processed, then gives the app back. Read its [side effects](/guide/concepts/app-owner-change#side-effects) first.
 
 ### QS Cloud Access Denied Example
 
