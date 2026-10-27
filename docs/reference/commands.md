@@ -122,3 +122,8 @@ butler-sheet-icons qscloud create-sheet-icons --help
 butler-sheet-icons qseow create-sheet-thumbnails --help
 butler-sheet-icons browser --help
 ```
+
+When you report a problem, include the version. `butler-sheet-icons --version` prints it, and
+every run names it in its header. From BSI 5.4.0, a run refused before it starts, because of a
+missing or misspelled option or a value BSI does not accept, prints it on the line above the
+error; see [When a run stops before the header](/guide/concepts/run-card#when-a-run-stops-before-the-header).
