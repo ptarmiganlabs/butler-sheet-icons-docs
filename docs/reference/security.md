@@ -12,23 +12,29 @@ If you discover a serious bug with BSI that may pose a security problem, please 
 
 ### Windows {#windows-code-signing}
 
-The Windows version of Butler Sheet Icons is signed with a proper, commercial code signing certificate issued by Certum.
+The Windows version of Butler Sheet Icons is signed by **Ptarmigan Labs AB**, the company behind it, through Microsoft's Azure Artifact Signing service. Windows shows Ptarmigan Labs AB as the publisher.
 
-::: warning Requires BSI 5.0.0 or later
-5.0.0 is the first release to carry the restored signature. The previous certificate expired shortly before 4.0.0, so **4.0.0 and 4.1.0 shipped without any signature at all**. If you are running one of those, upgrading is the fix — no configuration change is needed on your side.
+::: warning Requires BSI 5.2.1 or later
+Earlier Windows downloads carry a different signature, or none at all. See the table below.
 :::
 
-The certificate is issued to an individual open source developer rather than to a company, so the publisher name Windows shows you is a person's name, not "Ptarmigan Labs". That is normal for open source projects and does not affect what the signature guarantees. The commands below print the exact publisher string out of the release you already hold.
+| Release | Signed by |
+| --- | --- |
+| 5.2.1 and later | Ptarmigan Labs AB, through Azure Artifact Signing |
+| 5.0.0 to 5.2.0 | A Certum certificate issued to an individual open source developer, so Windows shows a person's name as the publisher |
+| 4.0.0 and 4.1.0 | Not signed. The certificate before Certum's expired shortly before 4.0.0 |
 
-Nothing about how Butler Sheet Icons works changed with the signature. It affects only how Windows treats the file.
+Nothing about how Butler Sheet Icons works changed with the signature. It affects only how Windows identifies the file, and what an application control rule has to match.
+
+A release never carries an unsigned Windows download. The download is attached to a release only after its signature has been checked, so if signing fails, that release has no Windows download. The insiders builds, test builds published from the development branch, are not signed on Windows.
 
 #### What the signature does for you
 
-**It proves where the file came from.** A valid signature confirms the executable was published by the holder of that certificate and has not been altered since — by a mirror, a proxy, or anything else between the release page and your server.
+**It proves where the file came from.** A valid signature confirms the executable was published by Ptarmigan Labs AB and has not been altered since — by a mirror, a proxy, or anything else between the release page and your server.
 
-**Publisher rules work again.** Many organisations enforce application control through AppLocker or Windows Defender Application Control, commonly allowing programs by publisher certificate. Those rules can match the signed release, where they could not match the unsigned 4.0.0 and 4.1.0 downloads at all — an unsigned executable cannot be permitted by a publisher rule under any configuration.
+**Publisher rules can match it.** Many organisations enforce application control through AppLocker or Windows Defender Application Control, commonly allowing programs by publisher. Such a rule can match a signed release, while an unsigned executable such as the 4.0.0 and 4.1.0 downloads cannot be permitted by a publisher rule under any configuration. See [Building an application control rule](#building-an-application-control-rule) below.
 
-If your Windows administrator created a file hash rule to allow an unsigned version, it is worth asking them to replace it with a publisher rule. A hash rule has to be updated for every new release; a publisher rule does not.
+If your Windows administrator created a file hash rule to allow an earlier version, it is worth asking them to replace it with a publisher rule. A hash rule has to be updated for every new release; a publisher rule does not.
 
 **Antivirus false positives become less likely.** Butler Sheet Icons is a single-file executable built from the Node.js runtime, and that construction is a common source of false positives. A valid signature helps, though it does not guarantee anything — if your antivirus still quarantines the file and you obtained it from the official release page, add an exclusion.
 
@@ -36,14 +42,14 @@ If your Windows administrator created a file hash rule to allow an unsigned vers
 
 **It does not immediately silence Microsoft Defender SmartScreen.**
 
-SmartScreen decides whether to warn based on the *reputation* it has accumulated for a file and its signing certificate, not merely on whether a signature exists. Only Extended Validation certificates receive reputation immediately; this is a standard code signing certificate, so reputation builds as more people download the release.
+SmartScreen decides whether to warn from the *reputation* a publisher and a file have built up, not merely from whether a signature exists, and a newly published release has none yet.
 
 In practice you may still see:
 
 > **Windows protected your PC**
 > Microsoft Defender SmartScreen prevented an unrecognised app from starting.
 
-especially in the first weeks after a new certificate is put into use. Choose **More info**, then **Run anyway**. The warning should become less frequent over time, and unlike an unsigned file, you can confirm who published it before you proceed.
+especially in the first days after a release. Choose **More info**, check that the publisher reads Ptarmigan Labs AB, then **Run anyway**.
 
 #### Checking the signature yourself {#checking-the-signature-yourself}
 
@@ -52,42 +58,44 @@ Worth doing if you are deploying into a controlled environment, or confirming a 
 ```powershell
 $sig = Get-AuthenticodeSignature -LiteralPath .\butler-sheet-icons.exe
 $sig | Format-List Status, StatusMessage
-$sig.SignerCertificate | Format-List Subject, Issuer, Thumbprint, NotAfter
+$sig.SignerCertificate | Format-List Subject, Issuer, NotBefore, NotAfter
+$sig.TimeStamperCertificate | Format-List Subject
 ```
 
 You can also right-click the file, choose **Properties**, and look at the **Digital Signatures** tab.
 
-##### Check the thumbprint, not only the status
+##### Check the publisher, not only the status
 
-`Status` reading `Valid` means the file carries an intact signature from a certificate Windows trusts. It does **not** mean the file came from us — any correctly signed program on earth passes that test. Comparing the thumbprint is what actually confirms the publisher.
+`Status` reading `Valid` means the file carries an intact signature from a certificate Windows trusts. It does **not** mean the file came from us — any correctly signed program on earth passes that test. The subject naming **Ptarmigan Labs AB** is what confirms the publisher.
 
 | | |
 | --- | --- |
-| Issuer | `CN=Certum Code Signing 2021 CA, O=Asseco Data Systems S.A., C=PL` |
-| Thumbprint | `1674DF1C6EAD6DB9D816705CD230281B87A1C97E` |
-| Valid | 2026-08-12 to 2027-08-12 |
+| Issued to (publisher) | `Ptarmigan Labs AB` |
+| Issued by | One of Microsoft's ID Verified issuing CAs, such as `Microsoft ID Verified CS AOC CA 03` or `Microsoft ID Verified CS EOC CA 03`. Which one can differ from one release to the next |
+| Above that | `Microsoft ID Verified Code Signing PCA 2021`, under `Microsoft Identity Verification Root Certificate Authority 2020` |
+| Timestamped by | `Microsoft Public RSA Time Stamping Authority` |
+| Certificate lifetime | 72 hours. Every release is signed with a new certificate, so the thumbprint changes from one release to the next |
 
-The subject line — which names the individual the certificate was issued to — is printed by the commands above from the release you already hold, so it is not reproduced here.
+`NotAfter` is a date a few days after the release, and will usually be in the past by the time you check. That is expected. **The signature is timestamped** when the release is signed, and Windows checks the certificate against that moment rather than against today, so `Status` still reads `Valid`.
 
 None of this is confidential: the certificate is embedded in every signed release, so anyone holding a download can read all of it out.
 
-Two things that surprise people:
+##### Building an application control rule {#building-an-application-control-rule}
 
-- **The thumbprint is a SHA-1 hash _of the certificate_**, which has nothing to do with the SHA-256 digest used for the signature itself. Windows has identified certificates this way for years. It is not a weakness in the signature.
-- **A renewal changes the thumbprint.** Releases signed before 2026-08-12 carry an older certificate, and releases after 2027-08-12 will carry its replacement. If the thumbprint does not match, check this page before assuming the worst.
+Build the rule on the publisher, **Ptarmigan Labs AB**. It is the part of the certificate that stays the same from one release to the next.
 
-##### Building an application control rule
+- **Do not pin the rule to one certificate or thumbprint.** Artifact Signing replaces the certificate every day, so a rule pinned to one certificate matches only the releases signed with it. That includes a WDAC signer rule built with `Add-SignerRule` from a certificate exported from one release, as earlier versions of this page suggested.
+- **Do not build the rule on the issuing CA either.** It is not fixed: Microsoft issues these certificates from more than one CA.
+- **AppLocker:** a publisher rule matches on the publisher name, so a rule for Ptarmigan Labs AB keeps matching new releases.
+- **Windows Defender Application Control (App Control for Business):** Microsoft gives each Artifact Signing certificate profile a durable identifier for writing rules that survive the daily renewals. It is an Extended Key Usage (EKU) value starting `1.3.6.1.4.1.311.97.`, the same in every certificate the profile issues. How to use it in a policy is described in [Artifact Signing certificate management](https://learn.microsoft.com/en-us/azure/artifact-signing/concept-certificate-management) on Microsoft Learn. To read it from a release:
 
-If you allow programs by publisher through AppLocker or Windows Defender Application Control, you can build the rule from the publisher certificate rather than from a specific binary. Export it from any signed release:
+  ```powershell
+  $sig = Get-AuthenticodeSignature -LiteralPath .\butler-sheet-icons.exe
+  $sig.SignerCertificate.EnhancedKeyUsageList
+  ```
 
-```powershell
-$sig = Get-AuthenticodeSignature -LiteralPath .\butler-sheet-icons.exe
-[System.IO.File]::WriteAllBytes("$PWD\butler-sheet-icons-publisher.cer", $sig.SignerCertificate.RawData)
-```
-
-That `.cer` file is what `Add-SignerRule` expects when adding a signer to a WDAC policy. Prefer it to a file hash rule: a publisher rule keeps working across releases, while a hash rule has to be updated for every new version.
-
-One point worth understanding: **the signature is timestamped**. It therefore stays valid after the signing certificate itself expires, so a release downloaded years from now still verifies. Without a timestamp, every previously released binary would stop validating the day the certificate lapsed.
+- **A rule written for 5.0.0 to 5.2.0 does not match 5.2.1 or later.** The publisher, the issuer and the certificate are all different. Add a rule for Ptarmigan Labs AB before you roll out the new version, or the new version is blocked where the old one ran.
+- **File hash rules are unaffected.** Every release has a new hash anyway, as before.
 
 A valid signature proves the publisher, not the download source. Always download from the [official release page](https://github.com/ptarmiganlabs/butler-sheet-icons/releases).
 
