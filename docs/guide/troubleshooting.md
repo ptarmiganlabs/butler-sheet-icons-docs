@@ -2046,26 +2046,27 @@ It is now written at `info`, matching every other command that works on an app y
 - **Windows protected your PC** — "Microsoft Defender SmartScreen prevented an unrecognised app from starting"
 - The **Digital Signatures** tab is missing from the file's Properties
 - An AppLocker or Windows Defender Application Control publisher rule does not match the executable
-- The publisher shown is a person's name rather than "Ptarmigan Labs"
+- The publisher shown is a person's name rather than Ptarmigan Labs AB
 
 **Cause and fix, by symptom:**
 
-| What you see                                      | Why                                                                                                                                                      | What to do                                                                                                   |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| No digital signature at all                       | You are on **4.0.0 or 4.1.0**. The previous certificate expired shortly before 4.0.0, so those two releases shipped unsigned                             | Upgrade to 5.0.0 or later. No configuration change is needed                                                 |
-| SmartScreen still warns, even on a signed release | SmartScreen goes on accumulated _reputation_, not merely on whether a signature exists. Only Extended Validation certificates get reputation immediately | Choose **More info**, then **Run anyway**. It becomes less frequent as the release is downloaded more widely |
-| A publisher rule does not match                   | An unsigned executable cannot be permitted by a publisher rule under any configuration                                                                   | Upgrade to a signed release, then build the rule from the publisher certificate rather than a file hash      |
-| The publisher is a person's name                  | The certificate is issued to an individual open source developer rather than to a company                                                                | Expected. Confirm it with the thumbprint rather than the name                                                |
+| What you see | Why | What to do |
+| --- | --- | --- |
+| No digital signature at all | You are on **4.0.0 or 4.1.0**. The previous certificate expired shortly before 4.0.0, so those two releases shipped unsigned | Upgrade to a current release. No configuration change is needed |
+| SmartScreen still warns, even on a signed release | SmartScreen goes on the _reputation_ a publisher and a file have built up, not merely on whether a signature exists, and a new release has none yet | Choose **More info**, check that the publisher reads Ptarmigan Labs AB, then **Run anyway** |
+| A publisher rule stopped matching after an upgrade | The rule was written for the certificate of 5.0.0 to 5.2.0, or pinned to one release's certificate or thumbprint. From 5.2.1 the publisher is Ptarmigan Labs AB, and its certificate is replaced every day | Match on the publisher, Ptarmigan Labs AB — see [Building an application control rule](/reference/security#building-an-application-control-rule) |
+| A publisher rule never matches | An unsigned executable cannot be permitted by a publisher rule under any configuration | Upgrade to a signed release |
+| The publisher is a person's name | You are on **5.0.0 to 5.2.0**, signed with a Certum certificate issued to an individual open source developer | Expected for those releases. From 5.2.1 the publisher is Ptarmigan Labs AB |
 
-**Always confirm the thumbprint, not just the status.** `Status` reading `Valid` only means the file carries an intact signature from a certificate Windows trusts — any correctly signed program passes that test.
+**Always confirm the publisher, not just the status.** `Status` reading `Valid` only means the file carries an intact signature from a certificate Windows trusts — any correctly signed program passes that test. The subject naming Ptarmigan Labs AB is what says it came from us. Do not compare thumbprints: every release is signed with a new certificate.
 
 ```powershell
 $sig = Get-AuthenticodeSignature -LiteralPath .\butler-sheet-icons.exe
 $sig | Format-List Status, StatusMessage
-$sig.SignerCertificate | Format-List Subject, Issuer, Thumbprint, NotAfter
+$sig.SignerCertificate | Format-List Subject, Issuer, NotAfter
 ```
 
-The expected thumbprint, what it protects against, and how to build an AppLocker or WDAC rule are on [Windows code signing](/reference/security#windows-code-signing).
+The expected certificate details, what the signature protects against, and how to build an AppLocker or WDAC rule are on [Windows code signing](/reference/security#windows-code-signing).
 
 If your antivirus quarantines the file even though it is signed, and you obtained it from the [official release page](https://github.com/ptarmiganlabs/butler-sheet-icons/releases), add an exclusion — a single-file executable built from the Node.js runtime is a common source of false positives.
 
