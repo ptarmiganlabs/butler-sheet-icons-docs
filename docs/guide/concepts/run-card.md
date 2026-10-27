@@ -164,6 +164,42 @@ for the full behaviour of the switch.
   id, description, approved, published, hidden) are still available — they moved there
   rather than being removed.
 
+## When a run stops before the header {#when-a-run-stops-before-the-header}
+
+::: warning Requires BSI 5.4.0 or later
+Earlier versions print the error on its own, with no version anywhere in the output.
+:::
+
+The header is where a run names its version, and the version is the first thing to include
+when you report a problem. Some runs never get that far: a required option is missing, an
+option is misspelled, or a value is not one Butler Sheet Icons accepts. Such a run prints a
+single version line just before its error, so the version is there exactly when something went
+wrong. This applies to every command, not only the three that print a run card.
+
+Leaving out a required option, for example:
+
+```text
+butler-sheet-icons x.y.z - built yyyy-mm-dd
+error: required option '--host <host>' not specified
+```
+
+- **The line is what `--version` reports, folded onto one line.** The downloadable executables
+  include the date they were built, as above. The Docker image runs from source and has no
+  build date, so its line is `butler-sheet-icons x.y.z` on its own.
+- **On a terminal, a blank line comes first,** separating the failure from the command you
+  typed. When the output goes to a log file, a scheduler or another program, there is no blank
+  line: just the version line and the error.
+- **It is printed whatever `--log-level` is set to,** even `error`.
+- **Nothing else changes.** The error text is the same as before, and the run still ends with
+  exit code `1`; see [Exit codes](/reference/commands#exit-codes).
+- **The version is never printed twice.** A run that gets as far as its header does not add the
+  line, because a failure later in the run already has the version above it.
+
+::: tip When reporting a problem
+Copy the version line along with the error. It tells whoever helps you which build produced
+the message.
+:::
+
 ## Breaking change: log lines that scripts may grep for
 
 Anyone parsing Butler Sheet Icons log output should note:
