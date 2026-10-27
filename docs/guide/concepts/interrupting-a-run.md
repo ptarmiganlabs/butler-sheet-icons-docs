@@ -67,6 +67,14 @@ icons. The summary's `cleared` count tells you how many were done. Re-run the co
 app to finish the job — clearing an icon that is already gone is harmless.
 :::
 
+::: tip With `--change-app-owner` (QSEoW)
+If the run was [changing app owners](/guide/concepts/app-owner-change), the app it was in the
+middle of is given back to its original owner before Butler Sheet Icons exits, together with any
+of the login user's own objects the owner change moved. A second Ctrl-C, or the shutdown time
+limit running out, cuts that short — see
+[If Butler Sheet Icons is killed](/guide/concepts/app-owner-change#if-killed).
+:::
+
 ## How long it takes
 
 Well under a second in normal use — it does not sit and wait for the sheet it was capturing.

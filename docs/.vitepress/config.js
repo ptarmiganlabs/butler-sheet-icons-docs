@@ -132,6 +132,10 @@ export default withMermaid({
               link: "/guide/concepts/interrupting-a-run",
             },
             {
+              text: "Changing App Owners",
+              link: "/guide/concepts/app-owner-change",
+            },
+            {
               text: "App Overview Screenshots",
               link: "/guide/concepts/app-overview-screenshots",
             },
