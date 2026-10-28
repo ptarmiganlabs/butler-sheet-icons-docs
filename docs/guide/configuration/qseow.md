@@ -227,9 +227,9 @@ How it works, what the run reports, and how to recover from a run that was stopp
 --port 443                        # HTTPS port (default)
 ```
 
-`--host` takes the server's host name or IP address. From BSI 5.0.1 you can also paste an address with the scheme in front — `--host https://qlik-server.company.com` is read the same as `--host qlik-server.company.com`. A leading `https://`, a trailing slash and upper-case letters are handled for you.
+`--host` takes the server's host name or IP address. From BSI 5.1.0 you can also paste an address with the scheme in front — `--host https://qlik-server.company.com` is read the same as `--host qlik-server.company.com`. A leading `https://`, a trailing slash and upper-case letters are handled for you.
 
-::: warning Requires BSI 5.0.1 or later
+::: warning Requires BSI 5.1.0 or later
 In earlier versions a scheme in `--host` was not stripped and broke the connection to the engine, the repository service and the hub. See [Troubleshooting](/guide/troubleshooting#tenant-url-or-host-carries-a-scheme).
 :::
 

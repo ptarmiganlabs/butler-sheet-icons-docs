@@ -212,10 +212,10 @@ error: CLOUD APP: getaddrinfo ENOTFOUND https
 
 This means `--tenanturl` (or, on Qlik Sense Enterprise on Windows, `--host`) was given with `https://` in front, on a version that did not accept it. The startup checks go over the REST API, which tolerated the scheme — hence the green tick — but the engine and browser then built an address of the form `wss://https://.../...`, and `https` is not a host any DNS server knows.
 
-**What to do:** upgrade to BSI 5.0.1 or later, where the scheme is accepted and removed for you on both platforms — see [Tenant URL Format](/guide/configuration/qlik-sense-cloud#tenant-url-format) and [Server Connection Details](/guide/configuration/qseow#server-connection-details). On an earlier version, drop the `https://` and pass the host on its own.
+**What to do:** upgrade to BSI 5.1.0 or later, where the scheme is accepted and removed for you on both platforms — see [Tenant URL Format](/guide/configuration/qlik-sense-cloud#tenant-url-format) and [Server Connection Details](/guide/configuration/qseow#server-connection-details). On an earlier version, drop the `https://` and pass the host on its own.
 
-::: warning Requires BSI 5.0.1 or later to paste a URL
-From 5.0.1 a pasted URL is accepted, but only its host is used. A value carrying a **path**, a **port**, **credentials**, or a value that is **blank** is refused at startup with a message naming what to do instead — for example:
+::: warning Requires BSI 5.1.0 or later to paste a URL
+From 5.1.0 a pasted URL is accepted, but only its host is used. A value carrying a **path**, a **port**, **credentials**, or a value that is **blank** is refused at startup with a message naming what to do instead — for example:
 
 ```text
 error: option '--host <host>' argument 'https://sense.example.com/form/hub' is invalid. Enter the host on its own, for example "sense.example.com" - a path is not part of it. A virtual proxy prefix, if there is one, goes in --prefix.

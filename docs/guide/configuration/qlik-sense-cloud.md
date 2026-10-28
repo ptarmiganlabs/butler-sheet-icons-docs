@@ -97,19 +97,19 @@ The `--skip-login` option is experimental and may not work with all SSO configur
 
 ### Tenant URL Format
 
-`--tenanturl` takes the host name of your tenant. From BSI 5.0.1 you can also paste the address with the scheme in front — both of these mean the same thing:
+`--tenanturl` takes the host name of your tenant. From BSI 5.1.0 you can also paste the address with the scheme in front — both of these mean the same thing:
 
 ```bash
 # Host name
 --tenanturl mytenant.eu.qlikcloud.com
 
-# Address with the scheme in front (5.0.1 and later)
+# Address with the scheme in front (5.1.0 and later)
 --tenanturl https://mytenant.eu.qlikcloud.com
 ```
 
 Butler Sheet Icons reads the value as a URL and keeps only the host name from it, so a leading `https://`, a trailing slash, and upper-case letters are all handled for you. The same applies wherever the value is supplied: on the command line, in `BSI_QSCLOUD_*_TENANTURL`, in a `.env` file, and in the [interactive wizard](/guide/interactive-mode).
 
-::: warning Requires BSI 5.0.1 or later
+::: warning Requires BSI 5.1.0 or later
 In earlier versions `--tenanturl https://mytenant.eu.qlikcloud.com` was accepted by the startup connection test and then failed on the first app with `error: CLOUD APP: getaddrinfo ENOTFOUND https`. Only the bare host worked. See [that symptom in Troubleshooting](/guide/troubleshooting#tenant-url-or-host-carries-a-scheme).
 :::
 

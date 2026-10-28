@@ -337,7 +337,7 @@ call: a value that is malformed on its face — a `--host` with a path or a port
 before anything runs, and — this is the part that used to hurt — they stopped `-i` too, so the wizard
 that exists to fix such a value could not be reached from a `.env` file that contained a bad one.
 
-From BSI 5.0.1 the wizard opens instead. It lists what it could not use, names the variable the value came
+From BSI 5.1.0 the wizard opens instead. It lists what it could not use, names the variable the value came
 from, repeats the reason, and then asks that question with the rejected value pre-filled, so fixing it is
 an edit rather than a retype:
 
@@ -350,7 +350,7 @@ Choosing **Save the answers to .env** at the end writes the corrected value back
 without being asked. This covers every validated option, not only the host — a mistyped
 `BSI_QSEOW_CST_ENGINE_PORT` is repaired the same way.
 
-::: warning Requires BSI 5.0.1 or later
+::: warning Requires BSI 5.1.0 or later
 In earlier versions a value the CLI refused stopped `-i` before the wizard opened, with only the error
 and no prompt.
 :::
