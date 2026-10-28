@@ -5,9 +5,9 @@ Earlier versions have neither the contact sheet nor the
 [run card](/guide/concepts/run-card) — both arrive in the same release.
 :::
 
-When you run one of the three commands that change Qlik Sense apps —
-`qseow create-sheet-thumbnails`, `qscloud create-sheet-thumbnails` or
-`qscloud remove-sheet-icons` — Butler Sheet Icons looks at where its output is going and
+When you run one of the four commands that change Qlik Sense apps —
+`qseow create-sheet-thumbnails`, `qscloud create-sheet-thumbnails`, `qseow remove-sheet-icons`
+or `qscloud remove-sheet-icons` — Butler Sheet Icons looks at where its output is going and
 picks the richest presentation that will actually display correctly there:
 
 - **In an interactive terminal** that supports colour and is at least 72 characters wide,

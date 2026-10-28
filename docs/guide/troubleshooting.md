@@ -116,6 +116,25 @@ On Qlik Sense Enterprise on Windows the hint names `--appid` and `--qliksensetag
 
 **What to do:** check the selection options themselves. Common causes are a collection that exists but contains no apps, a tag that no app carries, or an app ID that has been deleted. On QS Cloud, `butler-sheet-icons qscloud list-collections` shows which collections exist.
 
+### `may still be owned by` or `NOT RESTORED` in the summary {#app-owner-not-restored}
+
+Only with [`--change-app-owner`](/guide/concepts/app-owner-change) (QSEoW, BSI 5.4.0 or later). Butler Sheet Icons made the browser login user an app's owner and could not give the app back, even after three attempts. It stops the run there, so no further app has its owner changed:
+
+```
+error: QSEOW APP OWNER: App 2d3f... "Sales" may still be owned by ACME\joe: BSI could not give it back to ACME\anna after 3 attempts. Received error code: 500::Internal Server Error
+error: QSEOW APP OWNER: To give it back by hand: In the QMC, open Apps, edit app 2d3f... and set its owner back to ACME\anna.
+```
+
+The summary lists every such app on a `NOT RESTORED` line. It is also printed after a second Ctrl-C or the shutdown time limit, when the run ended before it could give an app back.
+
+**What to do:** in the QMC, under **Apps**, set each listed app's owner back to the owner the line names. If the login user owned objects in that app before the run, giving the app back moves them to the app's owner too; give them back as well, under **App objects**. The log lists them. See [If Butler Sheet Icons is killed](/guide/concepts/app-owner-change#if-killed).
+
+### `NOT RETURNED` in the summary {#app-objects-not-returned}
+
+Also only with `--change-app-owner`. The app was given back to its owner, but objects the browser login user owned in it before the run could not be given back to the login user, so they may now belong to the app's owner. The run stops here too.
+
+**What to do:** in the QMC, under **App objects**, set the owner of each object the line names back to the login user. The log has each object's id. See [The login user's objects could not be given back](/guide/concepts/app-owner-change#not-returned).
+
 ### `Failed to update N of M sheet(s) in app <id>`
 
 One or more sheets in an app could not be updated, or their icons could not be removed. The app is reported as failed, and therefore so is the run.
@@ -142,10 +161,12 @@ Failed to create a thumbnail for 1 of 9 sheet(s) in app a1b2c3d4-...
 ```
 
 ::: warning Requires BSI 5.0.0 or later
-On Qlik Sense Enterprise on Windows, one uncapturable sheet used to discard the whole app — no thumbnails were uploaded and nothing changed, even for the eight sheets that captured fine. From 5.0.0 the sheets that were captured are uploaded and applied; only the one that failed keeps the icon it already had. Qlik Sense Cloud has always behaved this way, and the two platforms now match.
+On Qlik Sense Enterprise on Windows, one uncapturable sheet used to discard the whole app — no thumbnails were uploaded and nothing changed, even for the eight sheets that captured fine. From 5.0.0 the sheets that were captured are uploaded and applied; only the one that failed keeps the icon it already had. Qlik Sense Cloud has always uploaded and applied the sheets that were captured; on that point the two platforms now match.
 :::
 
-This changes what a **failed** QSEoW run leaves behind: it can now have applied new thumbnails to some sheets even though the run reports failure. The run report lists the sheets that were updated, so the account of what changed is accurate rather than reporting zero for work that was done. A sheet that failed is never left pointing at an image that was not created — if it had a thumbnail before, it still has that one.
+This changes what a **failed** QSEoW run leaves behind: it can now have applied new thumbnails to some sheets even though the run reports failure. The run report lists the sheets that were updated, so the account of what changed is accurate rather than reporting zero for work that was done. A sheet that failed is never left pointing at an image that was not created — if it had a thumbnail before, it still points at that one.
+
+On Qlik Sense Cloud that old image may no longer exist. Before capturing, Butler Sheet Icons deletes the images in the app's `thumbnails` media folder, which is where its earlier runs put them. A sheet that fails to capture keeps pointing at its old thumbnail, so if that thumbnail came from an earlier run, the image behind it is gone until a later run captures the sheet. This is tracked as [issue #1217](https://github.com/ptarmiganlabs/butler-sheet-icons/issues/1217).
 
 **What to do:** find the sheet named in the per-sheet log line and work through the usual causes in order:
 
@@ -191,10 +212,10 @@ error: CLOUD APP: getaddrinfo ENOTFOUND https
 
 This means `--tenanturl` (or, on Qlik Sense Enterprise on Windows, `--host`) was given with `https://` in front, on a version that did not accept it. The startup checks go over the REST API, which tolerated the scheme — hence the green tick — but the engine and browser then built an address of the form `wss://https://.../...`, and `https` is not a host any DNS server knows.
 
-**What to do:** upgrade to BSI 5.0.1 or later, where the scheme is accepted and removed for you on both platforms — see [Tenant URL Format](/guide/configuration/qlik-sense-cloud#tenant-url-format) and [Server Connection Details](/guide/configuration/qseow#server-connection-details). On an earlier version, drop the `https://` and pass the host on its own.
+**What to do:** upgrade to BSI 5.1.0 or later, where the scheme is accepted and removed for you on both platforms — see [Tenant URL Format](/guide/configuration/qlik-sense-cloud#tenant-url-format) and [Server Connection Details](/guide/configuration/qseow#server-connection-details). On an earlier version, drop the `https://` and pass the host on its own.
 
-::: warning Requires BSI 5.0.1 or later to paste a URL
-From 5.0.1 a pasted URL is accepted, but only its host is used. A value carrying a **path**, a **port**, **credentials**, or a value that is **blank** is refused at startup with a message naming what to do instead — for example:
+::: warning Requires BSI 5.1.0 or later to paste a URL
+From 5.1.0 a pasted URL is accepted, but only its host is used. A value carrying a **path**, a **port**, **credentials**, or a value that is **blank** is refused at startup with a message naming what to do instead — for example:
 
 ```text
 error: option '--host <host>' argument 'https://sense.example.com/form/hub' is invalid. Enter the host on its own, for example "sense.example.com" - a path is not part of it. A virtual proxy prefix, if there is one, goes in --prefix.
@@ -344,6 +365,8 @@ A closely related failure, `reading 'showCondition'`, is fixed by the same chang
 ### The run failed — has anything changed in Qlik Sense?
 
 An app is saved once, after all of its sheets have been dealt with. If the run fails before that save, **nothing about the app changes** and its sheets keep the icons they had. Re-running is a clean retry, not a resume. See [How it works](/guide/concepts/how-it-works#what-happens-at-each-step).
+
+With [`--change-app-owner`](/guide/concepts/app-owner-change), the app's owner is changed and given back even when the app fails. A summary with no `NOT RESTORED` or `NOT RETURNED` line means every owner was put back. See [`NOT RESTORED` in the summary](#app-owner-not-restored) if there is one.
 
 One exception, from BSI 5.0.0: if the app was captured but **one of its sheets could not be**, the sheets that succeeded are saved even though the run reports failure — see [`Failed to create a thumbnail for N of M sheet(s)`](#failed-to-create-a-thumbnail-for-some-sheets). Re-running is still a clean retry: every sheet is captured again from scratch.
 
@@ -849,6 +872,8 @@ The accepted values are listed in the [`--sense-version` row of the QSEoW refere
    # For published apps, exclude published/public sheets
    --exclude-sheet-status published public
    ```
+
+4. **App owned by someone else** (QSEoW): [`--change-app-owner`](/guide/concepts/app-owner-change) makes the browser login user each app's owner while it is processed, then gives the app back. Read its [side effects](/guide/concepts/app-owner-change#side-effects) first.
 
 ### QS Cloud Access Denied Example
 
@@ -2021,26 +2046,27 @@ It is now written at `info`, matching every other command that works on an app y
 - **Windows protected your PC** — "Microsoft Defender SmartScreen prevented an unrecognised app from starting"
 - The **Digital Signatures** tab is missing from the file's Properties
 - An AppLocker or Windows Defender Application Control publisher rule does not match the executable
-- The publisher shown is a person's name rather than "Ptarmigan Labs"
+- The publisher shown is a person's name rather than Ptarmigan Labs AB
 
 **Cause and fix, by symptom:**
 
-| What you see                                      | Why                                                                                                                                                      | What to do                                                                                                   |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| No digital signature at all                       | You are on **4.0.0 or 4.1.0**. The previous certificate expired shortly before 4.0.0, so those two releases shipped unsigned                             | Upgrade to 5.0.0 or later. No configuration change is needed                                                 |
-| SmartScreen still warns, even on a signed release | SmartScreen goes on accumulated _reputation_, not merely on whether a signature exists. Only Extended Validation certificates get reputation immediately | Choose **More info**, then **Run anyway**. It becomes less frequent as the release is downloaded more widely |
-| A publisher rule does not match                   | An unsigned executable cannot be permitted by a publisher rule under any configuration                                                                   | Upgrade to a signed release, then build the rule from the publisher certificate rather than a file hash      |
-| The publisher is a person's name                  | The certificate is issued to an individual open source developer rather than to a company                                                                | Expected. Confirm it with the thumbprint rather than the name                                                |
+| What you see | Why | What to do |
+| --- | --- | --- |
+| No digital signature at all | You are on **4.0.0 or 4.1.0**. The previous certificate expired shortly before 4.0.0, so those two releases shipped unsigned | Upgrade to a current release. No configuration change is needed |
+| SmartScreen still warns, even on a signed release | SmartScreen goes on the _reputation_ a publisher and a file have built up, not merely on whether a signature exists, and a new release has none yet | Choose **More info**, check that the publisher reads Ptarmigan Labs AB, then **Run anyway** |
+| A publisher rule stopped matching after an upgrade | The rule was written for the certificate of 5.0.0 to 5.2.0, or pinned to one release's certificate or thumbprint. From 5.2.1 the publisher is Ptarmigan Labs AB, and its certificate is replaced every day | Match on the publisher, Ptarmigan Labs AB — see [Building an application control rule](/reference/security#building-an-application-control-rule) |
+| A publisher rule never matches | An unsigned executable cannot be permitted by a publisher rule under any configuration | Upgrade to a signed release |
+| The publisher is a person's name | You are on **5.0.0 to 5.2.0**, signed with a Certum certificate issued to an individual open source developer | Expected for those releases. From 5.2.1 the publisher is Ptarmigan Labs AB |
 
-**Always confirm the thumbprint, not just the status.** `Status` reading `Valid` only means the file carries an intact signature from a certificate Windows trusts — any correctly signed program passes that test.
+**Always confirm the publisher, not just the status.** `Status` reading `Valid` only means the file carries an intact signature from a certificate Windows trusts — any correctly signed program passes that test. The subject naming Ptarmigan Labs AB is what says it came from us. Do not compare thumbprints: every release is signed with a new certificate.
 
 ```powershell
 $sig = Get-AuthenticodeSignature -LiteralPath .\butler-sheet-icons.exe
 $sig | Format-List Status, StatusMessage
-$sig.SignerCertificate | Format-List Subject, Issuer, Thumbprint, NotAfter
+$sig.SignerCertificate | Format-List Subject, Issuer, NotAfter
 ```
 
-The expected thumbprint, what it protects against, and how to build an AppLocker or WDAC rule are on [Windows code signing](/reference/security#windows-code-signing).
+The expected certificate details, what the signature protects against, and how to build an AppLocker or WDAC rule are on [Windows code signing](/reference/security#windows-code-signing).
 
 If your antivirus quarantines the file even though it is signed, and you obtained it from the [official release page](https://github.com/ptarmiganlabs/butler-sheet-icons/releases), add an exclusion — a single-file executable built from the Node.js runtime is a common source of false positives.
 

@@ -38,11 +38,11 @@ run proceeds, app by app, and **there is no undo**. Before, an interrupted run l
 guessing which apps had new thumbnails and which still had their old ones. Now the run tells
 you, and the three counts say exactly what you are looking at:
 
-| Count         | Meaning                                                                           |
-| ------------- | --------------------------------------------------------------------------------- |
-| `ok`          | Finished completely. New thumbnails are in Qlik Sense.                            |
-| `interrupted` | Was being worked on when you stopped it. See below — usually nothing was changed. |
-| `not started` | Never touched. Exactly as they were.                                              |
+| Count         | Meaning                                                                         |
+| ------------- | ------------------------------------------------------------------------------- |
+| `ok`          | Finished completely. New thumbnails are in Qlik Sense.                          |
+| `interrupted` | Was being worked on when you stopped it. See below for what that leaves behind. |
+| `not started` | Never touched. Exactly as they were.                                            |
 
 The same three counts appear whichever output style you get. On a normal terminal Butler Sheet
 Icons draws the summary as a card, where the line reads `INTERRUPTED after 3m 12s · 2 app(s) ok
@@ -52,19 +52,38 @@ shown above. The words and the numbers match. See [The Run Card](/guide/concepts
 
 ## What happens to the app it was in the middle of
 
-For `create-sheet-thumbnails` on both Qlik Sense Cloud and Qlik Sense Enterprise on Windows:
-**nothing is changed in that app.**
+For `create-sheet-thumbnails` on Qlik Sense Enterprise on Windows: **nothing is changed in that
+app.**
 
 That is not luck, it is the order of the work. Butler Sheet Icons captures every sheet in an
 app first, and only then uploads the images and points the sheets at them. Stopping during
 the capture means it never reaches the part that writes, so the app keeps the thumbnails it
 already had.
 
+::: warning Qlik Sense Cloud: the old thumbnail images may already be gone
+On Qlik Sense Cloud, `create-sheet-thumbnails` deletes the images in the app's `thumbnails` media
+folder — where its earlier runs put them — _before_ it captures new ones. The sheets keep pointing
+at those images until the run uploads new ones and points the sheets at them. An app you stop
+during the capture, which is where nearly all of the time goes, never gets that far: every sheet
+whose thumbnail came from an earlier run is left pointing at an image that no longer exists.
+
+Re-run the command on that app to give its sheets new thumbnails. This is tracked as
+[issue #1217](https://github.com/ptarmiganlabs/butler-sheet-icons/issues/1217).
+:::
+
 ::: warning `remove-sheet-icons` is different
 The removal commands clear icons **one sheet at a time**, so an app that was being processed
 when you stopped the run can be left part-way: some sheets cleared, the rest still with their
 icons. The summary's `cleared` count tells you how many were done. Re-run the command on that
 app to finish the job — clearing an icon that is already gone is harmless.
+:::
+
+::: tip With `--change-app-owner` (QSEoW)
+If the run was [changing app owners](/guide/concepts/app-owner-change), the app it was in the
+middle of is given back to its original owner before Butler Sheet Icons exits, together with any
+of the login user's own objects the owner change moved. A second Ctrl-C, or the shutdown time
+limit running out, cuts that short — see
+[If Butler Sheet Icons is killed](/guide/concepts/app-owner-change#if-killed).
 :::
 
 ## How long it takes

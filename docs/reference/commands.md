@@ -122,3 +122,11 @@ butler-sheet-icons qscloud create-sheet-icons --help
 butler-sheet-icons qseow create-sheet-thumbnails --help
 butler-sheet-icons browser --help
 ```
+
+When you report a problem, include the version. `butler-sheet-icons --version` prints it, and a
+run names it in its header, except that at `--log-level warn` or `error` the
+`create-sheet-thumbnails` and `remove-sheet-icons` commands print no header and so show no
+version; see [Log levels](/guide/concepts/run-card#log-levels). From BSI 5.4.0, a run refused
+before it starts, because of a missing or misspelled option or a value BSI does not accept,
+prints it on the line above the error; see
+[When a run stops before the header](/guide/concepts/run-card#when-a-run-stops-before-the-header).

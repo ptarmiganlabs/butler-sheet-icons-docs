@@ -201,6 +201,22 @@ In [interactive mode](/guide/interactive-mode), the wizard asks *"Does the virtu
 
 If a `--skip-login` run stops with an error, see [`--skip-login` stops the run](/guide/troubleshooting#qseow-skip-login-errors).
 
+## Apps owned by someone else: `--change-app-owner` {#change-app-owner}
+
+::: warning Requires BSI 5.4.0 or later
+Earlier versions do not have `--change-app-owner`, and stop with `error: unknown option '--change-app-owner'`.
+:::
+
+The browser login user often cannot work with an app someone else owns, and the thumbnails for that app then fail. The manual workaround is to make the login user the app's owner in the QMC, run Butler Sheet Icons, and give the app back.
+
+`--change-app-owner` (`BSI_QSEOW_CST_CHANGE_APP_OWNER`) does that for you, app by app: it makes the browser login user each app's owner while the app is processed, then gives the app back to its original owner, also when the app fails. The API user makes the change, so it must be allowed to change the owner of apps and of app objects, as `INTERNAL\sa_api` is on a default installation.
+
+::: danger Read the side effects first
+On QSEoW, an app's owner change also moves the previous owner's sheets, bookmarks, master items and load script to the new owner. Butler Sheet Icons gives the login user's own objects back afterwards, but the owner change is still visible to the people working in those apps. See [What else changes when an app's owner changes](/guide/concepts/app-owner-change#side-effects) and [Before you use it on real apps](/guide/concepts/app-owner-change#before-you-use-it).
+:::
+
+How it works, what the run reports, and how to recover from a run that was stopped: [Changing app owners while thumbnails are created](/guide/concepts/app-owner-change).
+
 ## Server Connection Details
 
 ### Basic Connection
@@ -211,9 +227,9 @@ If a `--skip-login` run stops with an error, see [`--skip-login` stops the run](
 --port 443                        # HTTPS port (default)
 ```
 
-`--host` takes the server's host name or IP address. From BSI 5.0.1 you can also paste an address with the scheme in front — `--host https://qlik-server.company.com` is read the same as `--host qlik-server.company.com`. A leading `https://`, a trailing slash and upper-case letters are handled for you.
+`--host` takes the server's host name or IP address. From BSI 5.1.0 you can also paste an address with the scheme in front — `--host https://qlik-server.company.com` is read the same as `--host qlik-server.company.com`. A leading `https://`, a trailing slash and upper-case letters are handled for you.
 
-::: warning Requires BSI 5.0.1 or later
+::: warning Requires BSI 5.1.0 or later
 In earlier versions a scheme in `--host` was not stripped and broke the connection to the engine, the repository service and the hub. See [Troubleshooting](/guide/troubleshooting#tenant-url-or-host-carries-a-scheme).
 :::
 

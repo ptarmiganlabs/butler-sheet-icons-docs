@@ -5,8 +5,8 @@ Earlier versions print an unstructured log stream, and several log lines changed
 see [log lines your scripts may grep for](#breaking-change-log-lines-that-scripts-may-grep-for) below.
 :::
 
-Every `qseow create-sheet-thumbnails`, `qscloud create-sheet-thumbnails` and
-`qscloud remove-sheet-icons` run prints a *run card*. Both dry and real runs open with a
+Every `qseow create-sheet-thumbnails`, `qscloud create-sheet-thumbnails`, `qseow remove-sheet-icons`
+and `qscloud remove-sheet-icons` run prints a *run card*. Both dry and real runs open with a
 framed header and a **PLAN** block before anything is changed. A **real** run then adds
 countable **progress** lines while it works (`app 2/3`, `sheet 4/11`) and closes with a
 **RESULT** verdict; a **dry** run instead ends with the per-sheet decision report described
@@ -156,13 +156,53 @@ for the full behaviour of the switch.
 - On a **dry run**, the plan and the dry-run report are the product of the command, so they
   are printed even at `--log-level warn` or `error`.
 - On a **real run**, the whole run card — header, PLAN, progress and RESULT — logs at
-  `info`. A real run of the three thumbnail commands at `--log-level warn` stays quiet —
+  `info`. A real run of the four thumbnail commands at `--log-level warn` stays quiet —
   choosing a quiet level is respected. (The other commands — `browser`, `doctor`,
   `qscloud list-collections` — print their header regardless of level, as the old
   `App version:` line always did.)
 - At `--log-level verbose` and below, the detailed per-sheet lines (sheet id, engine sheet
   id, description, approved, published, hidden) are still available — they moved there
   rather than being removed.
+
+## When a run stops before the header {#when-a-run-stops-before-the-header}
+
+::: warning Requires BSI 5.4.0 or later
+Earlier versions print the error on its own, with no version anywhere in the output.
+:::
+
+The header is where a run names its version, and the version is the first thing to include
+when you report a problem. Some runs never get that far: a required option is missing, an
+option is misspelled, or a value is not one Butler Sheet Icons accepts. Such a run prints a
+single version line just before its error, so the version is there exactly when something went
+wrong. This applies to every command, not only the four that print a run card.
+
+Leaving out a required option, for example:
+
+```text
+butler-sheet-icons x.y.z - built yyyy-mm-dd
+error: required option '--host <host>' not specified
+```
+
+- **The line is what `--version` reports, folded onto one line.** The downloadable executables
+  include the date they were built, as above. The Docker image runs from source and has no
+  build date, so its line is `butler-sheet-icons x.y.z` on its own.
+- **On a terminal, a blank line comes first,** separating the failure from the command you
+  typed. When the output goes to a log file, a scheduler or another program, there is no blank
+  line: just the version line and the error.
+- **It is printed whatever `--log-level` is set to,** even `error`.
+- **Nothing else changes.** The error text is the same as before, and the run still ends with
+  exit code `1`; see [Exit codes](/reference/commands#exit-codes).
+- **A run that gets as far as its header does not add the line,** even if it fails later.
+  Usually the header has shown the version by then. The exception is the
+  `create-sheet-thumbnails` and `remove-sheet-icons` commands at `--log-level warn` or `error`,
+  which print no header (see [Log levels](#log-levels)): when one of those runs fails, its
+  output has no version anywhere, so run `butler-sheet-icons --version` and include what it
+  prints.
+
+::: tip When reporting a problem
+Copy the version line along with the error. It tells whoever helps you which build produced
+the message.
+:::
 
 ## Breaking change: log lines that scripts may grep for
 
