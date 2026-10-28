@@ -7,6 +7,7 @@
     "pre:version": "node ./scripts/fetch-bsi-version.mjs",
     "docs:dev": "npm run pre:version && vitepress dev ./docs",
     "docs:build": "npm run pre:version && vitepress build ./docs",
+    "docs:check-anchors": "node ./scripts/check-anchors.mjs",
     "docs:preview": "npm run pre:version && vitepress preview ./docs"
   },
   "keywords": [

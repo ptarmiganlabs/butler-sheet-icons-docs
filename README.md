@@ -115,11 +115,12 @@ Site theming, navigation, and analytics are defined in `docs/.vitepress/config.j
 
 The site is built and published by **Cloudflare Pages** (project `butler-sheet-icons-docs`), which watches this repository and deploys on its own. There is no manual deploy step and no deploy script — push a commit and it goes out. Cloudflare reports each build as a "Cloudflare Pages" check run and comments preview URLs on pull requests.
 
-| Script                 | Purpose                                           |
-| ---------------------- | ------------------------------------------------- |
-| `npm run docs:dev`     | Start local dev server (runs version fetch first) |
-| `npm run docs:build`   | Build static site (generates version file)        |
-| `npm run docs:preview` | Preview built site locally                        |
+| Script                       | Purpose                                                 |
+| ---------------------------- | ------------------------------------------------------- |
+| `npm run docs:dev`           | Start local dev server (runs version fetch first)       |
+| `npm run docs:build`         | Build static site (generates version file)              |
+| `npm run docs:check-anchors` | Fail on links to missing `#anchors` (run after a build) |
+| `npm run docs:preview`       | Preview built site locally                              |
 
 The build step runs `scripts/fetch-bsi-version.mjs` which writes `docs/.vitepress/version.js` with the latest Butler Sheet Icons release tag (fallback `v0.0.0` if the API is unavailable). Provide `GITHUB_TOKEN` locally to avoid GitHub API rate limiting.
 
@@ -144,7 +145,7 @@ At release time: release Butler Sheet Icons first, then merge `next` → `main`.
 2. Edit or add markdown in `docs/`.
 3. Run `npm run docs:dev` and verify navigation + sidebar.
 4. Ensure external links work; keep screenshots lightweight.
-5. Run `npm run docs:build` before opening a PR — the build fails on dead internal links.
+5. Run `npm run docs:build` and then `npm run docs:check-anchors` before opening a PR. The build fails on dead internal links, and the check fails on dead `#anchors`.
 6. Open a PR against `next`, with a concise summary (link related issues if any).
 
 ## 🔗 Links
