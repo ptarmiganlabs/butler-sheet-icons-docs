@@ -102,10 +102,15 @@ afterwards so the fix is not lost at the next release merge.
 
 The VitePress build **fails on dead internal links**, so a successful build proves that
 every internal link on the site resolves. It does *not* validate `#anchor` fragments.
+`npm run docs:check-anchors` does. Run it after a build: it reads the built HTML in
+`docs/.vitepress/dist` and fails on any link whose `#anchor` has no matching id on the
+target page, naming each one.
 
 `.github/workflows/build.yml` runs the same build on pull requests and on pushes to
-`main` and `next`. It does not deploy anything; it exists so a broken build is caught as
-a GitHub check rather than only as a failed Cloudflare deployment.
+`main` and `next`, then the anchor check. It does not deploy anything; it exists so a
+broken build is caught as a GitHub check rather than only as a failed Cloudflare
+deployment. Cloudflare runs only the build, so a broken anchor fails the check but does
+not stop a deployment.
 
 ## Version label
 
@@ -192,7 +197,7 @@ Export `GITHUB_TOKEN` locally to avoid anonymous API rate limits on the version 
 | Nav shows the wrong version on a `next` preview | Check the build log for the `[bsi-docs]` lines. They name the branch, whether it was treated as a preview, and which release PR was read. A stale `BSI_DOCS_VERSION` overriding everything is the most likely cause. |
 | Change not live on production | Check the "Cloudflare Pages" check run on the commit. Confirm the commit is on `main`, not `next`. |
 | Build fails on a dead link | VitePress names the offending file and link. Internal links are absolute and extensionless: `/guide/concepts/browser-management`. |
-| Anchor link goes nowhere | Anchors are not build-validated. Several pages use a non-breaking hyphen `‑` (U+2011) in headings, which survives into the generated id. Normalise headings to ASCII hyphens. |
+| Anchor link goes nowhere | The build does not check anchors. `npm run docs:check-anchors`, run after a build, names every link whose anchor is missing and the page it is on. Several pages use a non-breaking hyphen `‑` (U+2011) in headings, which survives into the generated id. Normalise headings to ASCII hyphens. |
 | Preview URL 404s for a branch | Preview deployments may be disabled for non-production branches in the Cloudflare project settings. |
 
 ## Maintenance

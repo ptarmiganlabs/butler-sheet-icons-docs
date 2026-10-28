@@ -92,7 +92,7 @@ On a virtual proxy that signs Windows users in with Windows authentication, `--s
 `--qliksensetag`, `--exclude-sheet-tag` and `--contentlibrary` accept names containing `&`, `'`, `#`, `?`, `/` and `%` from BSI 4.0.0 onward — `R&D` or `Q1'25` need no special quoting beyond the usual for spaces. Earlier versions failed on these. Giving several `--exclude-sheet-tag` values excludes sheets carrying **any** of them; before 4.0.0 it matched nothing at all. See [Tag or content library name fails or matches nothing](/guide/troubleshooting#tag-or-content-library-name-fails-or-matches-nothing).
 :::
 
-::: tip One sheet number per environment variable
+::: tip One sheet number per environment variable {#one-sheet-number-per-environment-variable}
 `BSI_QSEOW_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSEOW_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
 
 ```
