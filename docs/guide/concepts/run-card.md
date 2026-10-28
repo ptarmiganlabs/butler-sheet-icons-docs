@@ -192,8 +192,12 @@ error: required option '--host <host>' not specified
 - **It is printed whatever `--log-level` is set to,** even `error`.
 - **Nothing else changes.** The error text is the same as before, and the run still ends with
   exit code `1`; see [Exit codes](/reference/commands#exit-codes).
-- **The version is never printed twice.** A run that gets as far as its header does not add the
-  line, because a failure later in the run already has the version above it.
+- **A run that gets as far as its header does not add the line,** even if it fails later.
+  Usually the header has shown the version by then. The exception is the
+  `create-sheet-thumbnails` and `remove-sheet-icons` commands at `--log-level warn` or `error`,
+  which print no header (see [Log levels](#log-levels)): when one of those runs fails, its
+  output has no version anywhere, so run `butler-sheet-icons --version` and include what it
+  prints.
 
 ::: tip When reporting a problem
 Copy the version line along with the error. It tells whoever helps you which build produced
