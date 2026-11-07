@@ -1955,6 +1955,8 @@ Open the sheet in Qlik Sense. If it scrolls vertically, it is extended. In edit 
 
 2. **Put the content that identifies the sheet near the top**, if the sheet has to stay extended. A thumbnail only needs to help users recognise the sheet.
 
+**What does not help:** a larger sheet part. On Qlik Sense Enterprise on Windows, every `--includesheetpart` value ends at the same point on the sheet. The higher values only add the sheet title, or Qlik Sense's menu and toolbar, around the same content.
+
 See [What fits in a thumbnail](/guide/concepts/sheet-parts#what-fits-in-a-thumbnail) for how much of an extended sheet each thumbnail shows.
 
 ### Screenshot Quality Issues

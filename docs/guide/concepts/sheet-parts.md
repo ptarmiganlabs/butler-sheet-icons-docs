@@ -33,6 +33,8 @@ Butler Sheet Icons opens each sheet in a browser window that is always **1230 ×
 
 `--includesheetpart` chooses which part of that window becomes the thumbnail. Value `4` is the whole page, and the lower values are smaller areas inside it. With the default, `1`, the thumbnail shows the sheet's objects as they appear on screen. Anything a user would have to scroll down to see is not in it.
 
+On Qlik Sense Enterprise on Windows, a higher value never shows more of the sheet itself, because every value is cut from the same window. What a higher value adds is Qlik Sense's own elements around the sheet: `2` adds the sheet title, and `4` also adds the menu and toolbar at the top of the page.
+
 Images are not resized. The capture is uploaded at the size it was taken, and Qlik Sense scales it down when it displays it.
 
 ### Extended sheets {#extended-sheets}
@@ -47,6 +49,8 @@ Butler Sheet Icons captures the sheet as it first opens, scrolled to the top. Wi
 | Extended once (150%)    | The top two-thirds   |
 | Extended twice (200%)   | The top half         |
 | Extended 3 times (250%) | The top two-fifths   |
+
+On Qlik Sense Enterprise on Windows, choosing another `--includesheetpart` value does not change this. Every value ends at the same point on the sheet.
 
 ::: tip A sheet can be extended without anyone meaning to
 Dropping an object on the drop zone at the bottom of a sheet also extends the sheet. If thumbnails look cut off, check the sheet even if nobody remembers switching **Extend sheet** on.
