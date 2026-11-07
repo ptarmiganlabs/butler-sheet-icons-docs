@@ -115,7 +115,7 @@ When you run Butler Sheet Icons, it will:
 1. **Log into Qlik Sense** using the embedded browser
 2. **Navigate to each sheet** in the specified app(s)
 3. **Take screenshots** of the sheet layouts
-4. **Process and resize** the images appropriately
+4. **Make a blurred copy** of each screenshot, used for sheets you choose to blur
 5. **Upload the thumbnails** to Qlik Sense
 6. **Update the sheet icons** automatically
 

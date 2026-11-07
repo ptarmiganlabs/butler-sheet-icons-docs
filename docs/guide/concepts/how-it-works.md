@@ -12,8 +12,7 @@ graph TD
   D --> E[Navigate to First Sheet]
   E --> F[Wait for Sheet to Load]
   F --> G[Take Screenshot]
-  G --> H[Process & Resize Image]
-  H --> I[Create Blurred Version]
+  G --> I[Create Blurred Version]
   I --> J{More Sheets?}
   J -->|Yes| K[Navigate to Next Sheet]
   K --> F
@@ -35,7 +34,7 @@ graph TD
 
 1. Capture screenshots — Navigates each sheet in the browser, waits for rendering, and captures the requested area (content only, with title, with selections, or full page). See [Sheet parts](/guide/concepts/sheet-parts) and [Browser management](/guide/concepts/browser-management).
 
-1. Process images — Resizes to thumbnail and optionally produces a blurred variant for sensitive content. Details in [Sheet blurring](/guide/concepts/sheet-blurring).
+1. Process images — Makes a blurred copy of every capture. The blurring rules decide which of the two a sheet ends up with; see [Sheet blurring](/guide/concepts/sheet-blurring). Images are uploaded at the size they were captured, and Qlik Sense scales them down for display. What a capture contains is described in [What fits in a thumbnail](/guide/concepts/sheet-parts#what-fits-in-a-thumbnail).
 
 1. Upload and assign — Uploads images (QSEoW via QRS content libraries, QS Cloud via cloud APIs) and assigns them to sheets. Options are covered in the platform-specific configuration pages. **If any image fails to upload, the app is left alone** rather than being pointed at images that are not there — see [`Failed to upload N of M thumbnail image(s)`](/guide/troubleshooting#failed-to-upload-n-of-m-thumbnail-image-s).
 

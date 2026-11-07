@@ -60,7 +60,7 @@ Butler Sheet Icons mimics the steps a human would take to create sheet thumbnail
 1. **Browser Login** - Uses an embedded web browser to log into Qlik Sense
 2. **Sheet Discovery** - Uses Qlik Sense APIs to find all sheets in target apps
 3. **Screenshot Capture** - Navigates to each sheet and captures screenshots
-4. **Image Processing** - Resizes and optimizes images for use as thumbnails
+4. **Image Processing** - Makes a blurred copy of each screenshot, used for sheets your blurring rules select
 5. **Upload & Assignment** - Uses APIs to upload images and assign them to sheets
 
 ## Use Cases
