@@ -25,7 +25,38 @@ Default: `1` (content only).
 Notes:
 
 - If there are no active selections, the selection bar (part of option `3`) may not be visible.
-- Very small browser windows can affect cropping; see Browser Management for sizing tips.
+- The browser window is always 1230 × 810 pixels, and an extended sheet shows only its top part. See [What fits in a thumbnail](#what-fits-in-a-thumbnail).
+
+## What fits in a thumbnail {#what-fits-in-a-thumbnail}
+
+Butler Sheet Icons opens each sheet in a browser window that is always **1230 × 810 pixels**. That is large enough for the picture to stay sharp when Qlik Sense shrinks it to thumbnail size. The window size is fixed: no option changes it, and the page is not zoomed.
+
+`--includesheetpart` chooses which part of that window becomes the thumbnail. Value `4` is the whole page, and the lower values are smaller areas inside it. With the default, `1`, the thumbnail shows the sheet's objects as they appear on screen. Anything a user would have to scroll down to see is not in it.
+
+Images are not resized. The capture is uploaded at the size it was taken, and Qlik Sense scales it down when it displays it.
+
+### Extended sheets {#extended-sheets}
+
+Qlik Sense lets a sheet be taller than the screen. You switch on **Extend sheet** under **Sheet properties**, and each extension adds 50% of the sheet's original height. The sheet then scrolls vertically.
+
+Butler Sheet Icons captures the sheet as it first opens, scrolled to the top. With the default sheet part, an extended sheet's thumbnail therefore shows only its upper part:
+
+| The sheet is…           | The thumbnail shows… |
+| ----------------------- | -------------------- |
+| Not extended            | The whole sheet      |
+| Extended once (150%)    | The top two-thirds   |
+| Extended twice (200%)   | The top half         |
+| Extended 3 times (250%) | The top two-fifths   |
+
+::: tip A sheet can be extended without anyone meaning to
+Dropping an object on the drop zone at the bottom of a sheet also extends the sheet. If thumbnails look cut off, check the sheet even if nobody remembers switching **Extend sheet** on.
+:::
+
+For the whole sheet to be in its thumbnail, make it fit on one screen, which means not extended. Otherwise, place whatever makes the sheet recognisable near the top. A thumbnail is there to help users find a sheet, not to show every chart on it.
+
+Qlik's own help describes extending sheets in the section "Extending the sheet area". For Qlik Sense Enterprise on Windows see [Structuring an app using sheets](https://help.qlik.com/en-US/sense/May2026/Subsystems/Hub/Content/Sense_Hub/Sheets/create-sheets-for-structure.htm). For Qlik Sense Cloud see [Changing sheet layouts](https://help.qlik.com/en-US/cloud-services/Subsystems/Hub/Content/Sense_Hub/Sheets/changing-sheet-layout.htm).
+
+If a thumbnail is missing the bottom of its sheet, see [The thumbnail shows only the top of the sheet](/guide/troubleshooting#thumbnail-shows-only-the-top-of-the-sheet).
 
 ## Examples
 
@@ -91,7 +122,8 @@ butler-sheet-icons qseow create-sheet-thumbnails `
 
 - QSEoW commands: [/reference/qseow](/reference/qseow)
 - QS Cloud commands: [/reference/qscloud](/reference/qscloud)
-- Browser management (for debugging and sizing): [/guide/concepts/browser-management](/guide/concepts/browser-management)
+- Browser management (for debugging): [/guide/concepts/browser-management](/guide/concepts/browser-management)
+- A thumbnail that shows only the top of its sheet: [/guide/troubleshooting#thumbnail-shows-only-the-top-of-the-sheet](/guide/troubleshooting#thumbnail-shows-only-the-top-of-the-sheet)
 - How it works (architecture and flow): [/guide/concepts/how-it-works](/guide/concepts/how-it-works)
 
 ## Valid values are checked before the run starts

@@ -1933,6 +1933,30 @@ See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-seve
    # Check sheet permissions
    ```
 
+### The thumbnail shows only the top of the sheet {#thumbnail-shows-only-the-top-of-the-sheet}
+
+**Symptoms:**
+
+- Charts near the bottom of a sheet are missing from its thumbnail
+- The thumbnail looks cut off partway down the sheet, while the other sheets in the app look complete
+- The run reported success — there was no error or warning
+
+**Cause:**
+
+The sheet is extended, so it is taller than one screen. Butler Sheet Icons captures each sheet in a browser window of fixed size, 1230 × 810 pixels, scrolled to the top. Only the part that fits on the first screen is captured, so a sheet extended once loses its bottom third. Nothing is zoomed or scaled, and no option changes the window size.
+
+**How to confirm:**
+
+Open the sheet in Qlik Sense. If it scrolls vertically, it is extended. In edit mode, **Sheet properties** shows **Extend sheet** switched on.
+
+**Solutions:**
+
+1. **Make the sheet fit on one screen**, if it does not need the extra height. The next run then captures all of it.
+
+2. **Put the content that identifies the sheet near the top**, if the sheet has to stay extended. A thumbnail only needs to help users recognise the sheet.
+
+See [What fits in a thumbnail](/guide/concepts/sheet-parts#what-fits-in-a-thumbnail) for how much of an extended sheet each thumbnail shows.
+
 ### Screenshot Quality Issues
 
 **Symptoms:**
@@ -1940,6 +1964,8 @@ See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-seve
 - Blurry or pixelated images
 - Wrong dimensions
 - Missing content
+
+If the missing content is at the bottom of the sheet, see [The thumbnail shows only the top of the sheet](/guide/troubleshooting#thumbnail-shows-only-the-top-of-the-sheet) first.
 
 **Solutions:**
 
