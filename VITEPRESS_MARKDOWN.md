@@ -169,6 +169,16 @@ Create stable, predictable anchor links for headings.
 
 Link to it: `[link text](#short-id)`
 
+A custom container takes an id the same way, at the end of its opening line. The id goes on the
+container's outer `<div>`, so a link lands on the box itself. Use this when the thing worth
+linking to is a tip or warning rather than a whole section:
+
+```markdown
+::: tip One sheet number per environment variable {#one-sheet-number-per-environment-variable}
+...
+:::
+```
+
 ### When to Use
 
 - Sections referenced from multiple pages

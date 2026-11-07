@@ -88,7 +88,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails \
 
 `butler-sheet-icons qscloud list-collections` shows which collections exist. If neither option matches anything, the run reports `No apps to process` and exits 1 — see [Run failures and exit codes](/guide/troubleshooting#run-failures-and-exit-codes).
 
-::: tip One sheet number per environment variable
+::: tip One sheet number per environment variable {#one-sheet-number-per-environment-variable}
 `BSI_QSCLOUD_CST_EXCLUDE_SHEET_NUMBER` and `BSI_QSCLOUD_CST_BLUR_SHEET_NUMBER` each hold a **single** sheet number. A value containing more than one number is rejected at startup:
 
 ```
