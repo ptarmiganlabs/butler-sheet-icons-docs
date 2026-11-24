@@ -79,7 +79,7 @@ A value that is not a non-negative whole number is rejected before Butler Sheet 
 error: option '--exclude-sheet-number <number...>' argument 'abc' is invalid. Exclude sheet number must be a non-negative integer.
 ```
 
-Each of these two options can also be set through an environment variable, but a variable holds **one** sheet number only — see [QSEoW reference](/reference/qseow#sheet-filtering) and [QS Cloud reference](/reference/qscloud#sheet-filtering). To select several sheets, use the command-line option.
+Each of these two options can also be set through an environment variable, but a variable holds **one** sheet number only — see [QSEoW reference](/reference/qseow#one-sheet-number-per-environment-variable) and [QS Cloud reference](/reference/qscloud#one-sheet-number-per-environment-variable). To select several sheets, use the command-line option.
 
 ::: warning Sheet numbers were matched incorrectly before BSI 4.0.0
 In earlier versions `--exclude-sheet-number` and `--blur-sheet-number` selected the wrong sheets. Two faults combined:

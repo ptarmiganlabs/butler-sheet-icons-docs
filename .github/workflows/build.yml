@@ -6,7 +6,9 @@
 #
 # The value here is catching a broken build before Cloudflare tries it: the
 # VitePress build fails on dead internal links, so a green check means every
-# internal link on the site resolves.
+# internal link on the site resolves. The build ignores the #anchor part of a
+# link, so a second step checks that every anchor exists. Cloudflare does not
+# run that step: a broken anchor fails this check but still deploys.
 name: Build docs
 
 on:
@@ -47,3 +49,6 @@ jobs:
           # so the version lookup is not subject to anonymous rate limits.
           GITHUB_TOKEN: ${{ github.token }}
         run: npm run docs:build
+
+      - name: Check anchor links
+        run: npm run docs:check-anchors

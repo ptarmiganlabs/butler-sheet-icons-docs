@@ -172,12 +172,13 @@ Two things to mention alongside the link when they apply:
 ## Verify before reporting done
 
 ```bash
-npm run docs:build
+npm run docs:build && npm run docs:check-anchors
 ```
 
-Fails on dead internal links, so a passing build proves every internal link resolves. It does
-**not** validate `#anchor` fragments — check those against the generated HTML in
-`docs/.vitepress/dist/`, e.g. `grep -o 'id="[^"]*"' docs/.vitepress/dist/reference/commands.html`.
+The build fails on dead internal links, so a passing build proves every internal link resolves.
+It does **not** validate `#anchor` fragments. `docs:check-anchors` does: it checks every
+`#anchor` link against the ids in the generated HTML in `docs/.vitepress/dist/`, and the `build`
+workflow runs it on every pull request.
 
 ## Deployment
 
