@@ -166,6 +166,10 @@ On Qlik Sense Enterprise on Windows, one uncapturable sheet used to discard the 
 
 This changes what a **failed** QSEoW run leaves behind: it can now have applied new thumbnails to some sheets even though the run reports failure. The run report lists the sheets that were updated, so the account of what changed is accurate rather than reporting zero for work that was done. A sheet that failed is never left pointing at an image that was not created — if it had a thumbnail before, it still points at that one.
 
+::: tip An empty sheet no longer causes this — BSI 5.5.2 or later
+A sheet with no objects on it shows Qlik Sense's "get started" placeholder rather than a sheet, and used to fail like this with `--includesheetpart` `1`, `2` or `3`, the log line ending in ``Waiting for selector `#grid-wrap` failed``. From 5.5.2 such a sheet is skipped instead, with the reason `no objects on the sheet`, and the app succeeds. See [Sheets that are always skipped](/guide/concepts/sheet-exclusion#sheets-that-are-always-skipped).
+:::
+
 On Qlik Sense Cloud that old image may no longer exist. Before capturing, Butler Sheet Icons deletes the images in the app's `thumbnails` media folder, which is where its earlier runs put them. A sheet that fails to capture keeps pointing at its old thumbnail, so if that thumbnail came from an earlier run, the image behind it is gone until a later run captures the sheet. This is tracked as [issue #1217](https://github.com/ptarmiganlabs/butler-sheet-icons/issues/1217).
 
 **What to do:** find the sheet named in the per-sheet log line and work through the usual causes in order:

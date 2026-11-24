@@ -111,6 +111,40 @@ Recommendations:
 - In QSEoW you can update all sheet statuses; use `--exclude-sheet-status` only if you intentionally want to skip certain sheets.
 - Hidden sheets are never updated by BSI on either platform.
 
+## Sheets that are always skipped {#sheets-that-are-always-skipped}
+
+Two kinds of sheet are skipped whatever options you pass, on both Qlik Sense Cloud and Qlik Sense Enterprise on Windows:
+
+| The sheet…                         | Reason shown in the run       | Since          |
+| ---------------------------------- | ----------------------------- | -------------- |
+| Is hidden by its show condition    | `hidden by show condition`    | All versions   |
+| Has no objects on it               | `no objects on the sheet`     | BSI 5.5.2    |
+
+A **sheet with no objects** is one someone created and never filled. Qlik Sense does not show such a sheet at all: it shows its "Choose an option below to get started adding to this sheet..." placeholder instead, so there is nothing worth a thumbnail.
+
+::: warning Empty sheets failed the whole app before BSI 5.5.2
+Earlier versions tried to capture an empty sheet. With `--includesheetpart` `1`, `2` or `3` the capture waited for part of the page that the placeholder does not have, and then the **whole app** was reported as failed. See [`Failed to create a thumbnail for N of M sheet(s)`](/guide/troubleshooting#failed-to-create-a-thumbnail-for-some-sheets).
+:::
+
+A dry run lists these sheets as skipped, with the reason:
+
+```
+   #  Sheet                    Would do
+   1  My new sheet             update
+   2  Claude generated charts  update
+   3  My new sheet (1)         skip  (no objects on the sheet)
+```
+
+A real run counts them as excluded, and the run still succeeds:
+
+```
+  sheet  3/3  excluded  'My new sheet (1)'  (no objects on the sheet)
+```
+
+If an option you passed also excludes the sheet, such as `--exclude-sheet-number`, the run names that option instead.
+
+A skipped sheet is not captured and its thumbnail setting is not changed, exactly as for a sheet excluded by an option. On Qlik Sense Enterprise on Windows it keeps the thumbnail it had. On Qlik Sense Cloud, Butler Sheet Icons deletes the images its earlier runs put in the app's `thumbnails` media folder before capturing, so if the skipped sheet's thumbnail came from an earlier run, the image behind it is gone. This is tracked as [issue #1217](https://github.com/ptarmiganlabs/butler-sheet-icons/issues/1217). Once objects are added to an empty sheet, the next run captures it like any other.
+
 ## Examples
 
 ### QSEoW (client-managed)
@@ -195,7 +229,7 @@ butler-sheet-icons qscloud create-sheet-thumbnails `
 
 ## Tips and troubleshooting
 
-- Hidden sheets are never updated by BSI (both QS Cloud and QSEoW).
+- Hidden sheets, and sheets with no objects on them, are never updated by BSI (both QS Cloud and QSEoW). See [Sheets that are always skipped](#sheets-that-are-always-skipped).
 - If you get “Access denied” in QS Cloud on a published app, add `--exclude-sheet-status public published` to skip non-updatable sheets.
 - Combine multiple exclude filters; they’re additive.
 - For privacy without fully excluding, consider blurring instead (see below).
