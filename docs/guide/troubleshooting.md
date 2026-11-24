@@ -1943,7 +1943,7 @@ See [Listing several sheet numbers](/guide/concepts/sheet-exclusion#listing-seve
 
 **Cause:**
 
-The sheet is extended, so it is taller than one screen. Butler Sheet Icons captures each sheet in a browser window of fixed size, 1230 × 810 pixels, scrolled to the top. Only the part that fits on the first screen is captured, so a sheet extended once loses its bottom third. Nothing is zoomed or scaled, and no option changes the window size.
+The sheet is extended, so it is taller than one screen. Butler Sheet Icons captures each sheet in a browser window 1230 pixels wide, scrolled to the top, with its height chosen so the thumbnail is 3:2 (see [Thumbnail shape](/guide/concepts/sheet-parts#thumbnail-shape)). Only the part that fits on the first screen is captured, so a sheet extended once loses its bottom third. Nothing is zoomed or scaled, and no option changes the window size.
 
 **How to confirm:**
 
@@ -1958,6 +1958,36 @@ Open the sheet in Qlik Sense. If it scrolls vertically, it is extended. In edit 
 **What does not help:** a larger sheet part. On Qlik Sense Enterprise on Windows, every `--includesheetpart` value ends at the same point on the sheet. The higher values only add the sheet title, or Qlik Sense's menu and toolbar, around the same content.
 
 See [What fits in a thumbnail](/guide/concepts/sheet-parts#what-fits-in-a-thumbnail) for how much of an extended sheet each thumbnail shows.
+
+### Thumbnails look squashed or stretched in the hub {#thumbnails-look-stretched}
+
+**Symptoms:**
+
+- Text in sheet thumbnails looks narrow, as if squeezed from the sides
+- Circles, such as pie charts and gauges, look like ellipses
+- The image file in the image directory looks right when opened on its own
+
+**Cause:**
+
+Qlik Sense shows every sheet thumbnail in a box with a fixed 3:2 shape, and stretches an image of any other shape to fill it. Thumbnails made before BSI 5.5.1 were not 3:2: with the default sheet part they were 1230 × 681 pixels on Qlik Sense Enterprise on Windows and 1230 × 473 on a Qlik Sense Cloud trial tenant. From 5.5.1 every thumbnail is made 3:2, see [Thumbnail shape](/guide/concepts/sheet-parts#thumbnail-shape).
+
+**How to confirm:**
+
+Check the size of a file in the image directory. On macOS, `sips -g pixelWidth -g pixelHeight thumbnail-*.png` prints it; on Windows, the file's **Properties → Details** shows it. A 3:2 image is 1.5 times as wide as it is tall, such as 1230 × 820.
+
+**Solutions:**
+
+1. **Run Butler Sheet Icons 5.5.1 or later** against the app again. The new thumbnails replace the old ones.
+
+2. **If the run logs this warning**, the part of the sheet being captured did not change height with the browser window, so it could not be made 3:2:
+
+   ```
+   The captured sheet part (--includesheetpart 1) is 1230x500, not 3:2, even after resizing the browser window, so its height does not follow the window. It is captured as it is, and the hub will stretch it to fit its 3:2 thumbnail box.
+   ```
+
+   The run continues and the thumbnail is still uploaded, only its shape is off. Try another `--includesheetpart` value: `4`, the whole page, gets taller and shorter with the window on both platforms.
+
+**Still stretched after a new run?** The browser you view the hub in may be showing the old images. Butler Sheet Icons uploads each thumbnail under the same file name every time, so reload the hub page without the cache (Ctrl+F5, or Cmd+Shift+R on macOS).
 
 ### Screenshot Quality Issues
 

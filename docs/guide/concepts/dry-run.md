@@ -99,7 +99,7 @@ PLAN
   exclude       title "Internal notes", status private
   blur          tag "confidential" (1 sheets)
   browser       chrome (version: recommended), headless, 5s per sheet
-  images        ./img/qseow/<app-id>
+  images        ./img/qseow/<app-id>   3:2, 1230x820 for a full-width sheet part
   uploads to    content library "Butler sheet thumbnails"
   WOULD OVERWRITE existing sheet thumbnails in 1 app(s), 1 of them published
 ```

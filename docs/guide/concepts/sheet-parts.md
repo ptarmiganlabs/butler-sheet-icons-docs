@@ -25,17 +25,37 @@ Default: `1` (content only).
 Notes:
 
 - If there are no active selections, the selection bar (part of option `3`) may not be visible.
-- The browser window is always 1230 × 810 pixels, and an extended sheet shows only its top part. See [What fits in a thumbnail](#what-fits-in-a-thumbnail).
+- Every thumbnail is 3:2, the shape Qlik Sense displays it in, and an extended sheet shows only its top part. See [What fits in a thumbnail](#what-fits-in-a-thumbnail).
 
 ## What fits in a thumbnail {#what-fits-in-a-thumbnail}
 
-Butler Sheet Icons opens each sheet in a browser window that is always **1230 × 810 pixels**. That is large enough for the picture to stay sharp when Qlik Sense shrinks it to thumbnail size. The window size is fixed: no option changes it, and the page is not zoomed.
+Butler Sheet Icons opens each sheet in a browser window **1230 pixels wide**. That is large enough for the picture to stay sharp when Qlik Sense shrinks it to thumbnail size. No option changes the width, and the page is not zoomed. The window's height is set by Butler Sheet Icons, so that the thumbnail comes out 3:2: see [Thumbnail shape](#thumbnail-shape).
 
 `--includesheetpart` chooses which part of that window becomes the thumbnail. Value `4` is the whole page, and the lower values are smaller areas inside it. With the default, `1`, the thumbnail shows the sheet's objects as they appear on screen. Anything a user would have to scroll down to see is not in it.
 
-On Qlik Sense Enterprise on Windows, a higher value never shows more of the sheet itself, because every value is cut from the same window. What a higher value adds is Qlik Sense's own elements around the sheet: `2` adds the sheet title, and `4` also adds the menu and toolbar at the top of the page.
+On Qlik Sense Enterprise on Windows, a higher value never shows more of the sheet itself: Qlik Sense always fits the sheet to the space it has, so every value ends at the same point on the sheet. What a higher value adds is Qlik Sense's own elements around the sheet: `2` adds the sheet title, and `4` also adds the menu and toolbar at the top of the page.
 
 Images are not resized. The capture is uploaded at the size it was taken, and Qlik Sense scales it down when it displays it.
+
+### Thumbnail shape {#thumbnail-shape}
+
+::: warning Requires BSI 5.5.1 or later
+Earlier versions captured every sheet in a window of fixed size, 1230 × 810 pixels, so the thumbnail's shape depended on the sheet part and the platform. With the default sheet part it was 1230 × 681 pixels on Qlik Sense Enterprise on Windows and 1230 × 473 on a Qlik Sense Cloud trial tenant, and Qlik Sense stretched it to fit. Run Butler Sheet Icons again to replace thumbnails made by an earlier version.
+:::
+
+Qlik Sense shows every sheet thumbnail in a box with a fixed 3:2 shape: 150 × 100 pixels in the app overview, and a little larger in the sheet navigator inside a sheet. It does not keep the image's own shape. An image of any other shape is stretched to fill the box, so text looks narrow and circles become ellipses.
+
+Butler Sheet Icons therefore makes every thumbnail 3:2. When it opens an app's first sheet, it measures the part of the sheet it is about to capture and makes the browser window taller or shorter until that part is 3:2. The window keeps that height for the rest of the app's sheets. The image itself is never cropped or padded: the thumbnail is the sheet as Qlik Sense lays it out at that window size.
+
+For a sheet part that spans the width of the window, which is how the sheet parts normally are, that gives images of **1230 × 820 pixels**. The `images` line of the run card's `PLAN` block states this:
+
+```
+  images        ./img/qseow/<app-id>   3:2, 1230x820 for a full-width sheet part
+```
+
+The height Butler Sheet Icons sets depends on how much room Qlik Sense takes for its own menus and panels, which differs between the platforms, the sheet parts and even tenants. That is why it is measured on every run rather than fixed. A side effect is that a thumbnail can show the sheet a little larger than earlier versions did, so a table may show a few more rows.
+
+If the part of the sheet does not get taller or shorter with the window, Butler Sheet Icons cannot make it 3:2. It then captures it as it is and logs a warning: see [Thumbnails look squashed or stretched in the hub](/guide/troubleshooting#thumbnails-look-stretched).
 
 ### Extended sheets {#extended-sheets}
 
@@ -128,6 +148,7 @@ butler-sheet-icons qseow create-sheet-thumbnails `
 - QS Cloud commands: [/reference/qscloud](/reference/qscloud)
 - Browser management (for debugging): [/guide/concepts/browser-management](/guide/concepts/browser-management)
 - A thumbnail that shows only the top of its sheet: [/guide/troubleshooting#thumbnail-shows-only-the-top-of-the-sheet](/guide/troubleshooting#thumbnail-shows-only-the-top-of-the-sheet)
+- A thumbnail that looks squashed or stretched: [/guide/troubleshooting#thumbnails-look-stretched](/guide/troubleshooting#thumbnails-look-stretched)
 - How it works (architecture and flow): [/guide/concepts/how-it-works](/guide/concepts/how-it-works)
 
 ## Valid values are checked before the run starts
