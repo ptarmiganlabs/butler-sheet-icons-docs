@@ -58,7 +58,7 @@ PLAN
   exclude       tag "no-thumbnail" (0 sheets), number 1
   blur          tag "confidential" (2 sheets)
   browser       chrome (version: recommended), headless, 5s per sheet
-  images        ./img/qseow/<app-id>
+  images        ./img/qseow/<app-id>   3:2, 1230x820 for a full-width sheet part
   uploads to    content library "Butler sheet thumbnails"
   WILL OVERWRITE existing sheet thumbnails in 3 app(s), 2 of them published
 
